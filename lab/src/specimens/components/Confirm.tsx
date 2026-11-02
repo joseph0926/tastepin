@@ -6,7 +6,7 @@ import type { SpecimenProps } from "../types";
 import "./Confirm.css";
 
 // params: pattern(dialog | undo | inline), wording(plain | object | consequence), danger(solid | text | neutral), removal(collapse | fade | instant)
-// 확인 대화상자는 대화상자 시편에서 고른 값(커지며 등장, 흐린 배경, 300ms)으로 그리고, 되돌리기 알림은 토스트 시편에서 고른 값(오른쪽 아래, 가장자리에서)으로 그린다.
+// 확인 대화상자는 대화상자 시편의 한 조합(커지며 등장, 흐린 배경, 300ms)으로, 되돌리기 알림은 토스트 시편의 한 조합(오른쪽 아래, 가장자리에서)으로 고정해 그린다.
 
 const initial = [
   { id: "a", name: "10월 예산안", meta: "박서윤, 10월 15일" },

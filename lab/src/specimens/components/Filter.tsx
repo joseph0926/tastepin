@@ -6,7 +6,7 @@ import type { SpecimenProps } from "../types";
 import "./Filter.css";
 
 // params: entry(chips | panel), apply(instant | button | count), applied(chips | inline | summary), facet(count | dim | none)
-// 값 목록은 드롭다운 시편에서 고른 값(버튼에서 펼쳐짐 140ms)으로 열고, 목록 바뀜은 검색 시편에서 고른 값(빠진 행이 접힘 180ms)을 쓴다.
+// 값 목록은 드롭다운 시편의 값(버튼에서 펼쳐짐 140ms)으로 열고, 목록 바뀜은 검색 시편의 값(빠진 행이 접힘 180ms)으로 고정한다.
 // 실제 화면에서는 팝오버와 포커스 관리를 프로젝트의 프리미티브에 맡기고 모양과 동작 값만 옮긴다.
 
 type Key = "status" | "owner";

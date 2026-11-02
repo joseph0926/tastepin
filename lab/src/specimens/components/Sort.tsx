@@ -12,7 +12,7 @@ import type { SpecimenProps } from "../types";
 import "./Sort.css";
 
 // params: control(menu | select | segmented), direction(fixed | toggle), label(value | prefix | icon), resort(instant | move | mark)
-// 메뉴는 드롭다운 시편에서 고른 값(버튼에서 펼쳐짐 140ms, 따라오는 면, 항목 30px), 세그먼트는 세그먼트 시편에서 고른 값(밑줄, 미끄러짐)으로 그린다.
+// 메뉴는 드롭다운 시편의 한 조합(버튼에서 펼쳐짐 140ms, 따라오는 면, 항목 30px), 세그먼트는 세그먼트 시편의 한 조합(밑줄, 미끄러짐)으로 고정해 그린다.
 // 실제 화면에서는 메뉴 프리미티브(Radix DropdownMenu 등)에 열기와 키보드 처리를 맡기고 모양과 모션 값만 옮긴다.
 
 type SortId = "recent" | "name" | "created";

@@ -14,8 +14,8 @@ import type { SpecimenProps } from "../types";
 import "./GlobalSearch.css";
 
 // params: open(palette | expand | screen), before(recent | jump | hint), group(kind | mixed | tabs), keys(footer | row | none)
-// 이미 고른 값 위에서 비교한다. 거르기는 검색 시편(250ms 멈추면, 굵게, 빠진 행이 접힘, 지우기 버튼), 가리킨 행은 드롭다운 시편(따라오는 면 120ms),
-// 팔레트는 대화상자 시편(커지며, 흐린 배경, 300ms), 종류 탭은 탭 시편(바탕 면, 미끄러짐)에서 고른 값이다.
+// 다른 시편의 한 조합으로 고정한 바탕 위에서 비교한다. 거르기는 검색 시편(250ms 멈추면, 굵게, 빠진 행이 접힘, 지우기 버튼), 가리킨 행은 드롭다운 시편(따라오는 면 120ms),
+// 팔레트는 대화상자 시편(커지며, 흐린 배경, 300ms), 종류 탭은 탭 시편(바탕 면, 미끄러짐)의 값이다.
 // 휴대폰 크기의 앱 틀 안에 그리고, 실제 화면에서는 포털과 포커스 가두기를 프로젝트의 프리미티브에 맡긴다.
 
 type Kind = "doc" | "person" | "command";
@@ -88,7 +88,7 @@ export default function GlobalSearch({ params }: SpecimenProps) {
   const seconds = useSeconds();
   const ids = useId();
 
-  // 검색 시편에서 고른 '잠깐 멈추면': 마지막 입력 뒤 250ms 동안 바뀌지 않으면 거른다
+  // 검색 시편의 '잠깐 멈추면': 마지막 입력 뒤 250ms 동안 바뀌지 않으면 거른다
   useEffect(() => {
     const timer = window.setTimeout(
       () => {

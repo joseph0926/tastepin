@@ -14,7 +14,7 @@ import "./Dialog.css";
 // 포커스 가두기를 프로젝트의 프리미티브(Radix Dialog, <dialog> 등)에 맡기고 모양과 모션 값만 옮긴다.
 
 const tempos: Record<string, { enter: number; exit: number }> = {
-  // 퇴장은 전역 '반응과 퇴장'에서 고른 대로 등장과 같은 길이다
+  // 퇴장은 등장과 같은 길이로 고정한다('반응과 퇴장'의 mirror 값)
   quick: { enter: 160, exit: 160 },
   medium: { enter: 220, exit: 220 },
   slow: { enter: 300, exit: 300 },

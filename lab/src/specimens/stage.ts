@@ -14,7 +14,7 @@ export const DemoContext = createContext(0);
 
 export const EASE_OUT = [0.2, 0, 0, 1] as const;
 
-// 전역 시편 '모션 성격'에서 고른 곡선(ease-out-cubic). 2026-10-19 이후 시편은 비교하지 않는 곡선으로 이 값을 쓴다
+// 곡선을 비교하지 않는 시편이 함께 쓰는 고정 곡선(ease-out-cubic). '모션 성격'에서 고른 값을 따라가지 않는다
 export const EASE_OUT_CUBIC = [0.215, 0.61, 0.355, 1] as const;
 
 export function useSeconds() {

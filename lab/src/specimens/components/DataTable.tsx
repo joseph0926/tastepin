@@ -25,7 +25,7 @@ import {
 import "./DataTable.css";
 
 // params: sticky(shadow | line | none), actions(hover | menu | row), resort(move | fade | instant | mark | arrow | wave), paging(pages | more | count)
-// resort의 move, fade, instant는 2026-10-19에 모두 거절되어 비교에서 빠졌고 mark, arrow, wave로 다시 묻는다(lab.py의 offer).
+// resort는 move, fade, instant를 먼저 묻고, 셋 다 별로라고 하면 mark, arrow, wave로 다시 묻는다(lab.py의 offer).
 // 같이 재생은 정렬 바꾸기, 표 안 스크롤, 행 작업 보이기, 넘기기를 차례로 한다. 마우스 올림은 흉내 낸 행(is-hot)으로 보여 준다.
 
 const PAGE = 5;

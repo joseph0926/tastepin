@@ -22,7 +22,7 @@ const CURVES = {
 } as const;
 
 const TEMPOS: Record<string, { move: number; exit: number }> = {
-  // 퇴장은 전역 '반응과 퇴장'에서 고른 대로 등장과 같은 길이다
+  // 퇴장은 등장과 같은 길이로 고정한다('반응과 퇴장'의 mirror 값)
   quick: { move: 160, exit: 160 },
   medium: { move: 220, exit: 220 },
   relaxed: { move: 280, exit: 280 },
