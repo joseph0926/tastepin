@@ -8,13 +8,15 @@ Lab에서 같은 화면의 간격, 모서리, 글꼴, 움직임을 하나씩 비
 
 ## 시작하기
 
-Python 3.11 이상, Node.js 24 이상, Corepack이 필요합니다. 압축된 Codex 대화 기록을 수집할 때만 Python 3.14 이상이 필요합니다. Python CLI는 표준 라이브러리를 사용합니다. 브라우저 검사에는 별도로 uv와 Playwright Chromium이 필요합니다.
+Python 3.11 이상, Node.js 24 이상, pnpm이 필요합니다. 압축된 Codex 대화 기록을 수집할 때만 Python 3.14 이상이 필요합니다. Python CLI는 표준 라이브러리를 사용합니다. 브라우저 검사에는 별도로 uv와 Playwright Chromium이 필요합니다.
+
+pnpm 대신 Corepack을 쓰려면 아래 명령의 `pnpm`을 `corepack pnpm`으로 바꿔 실행합니다. Node.js 25부터는 Corepack이 Node에 포함되지 않으므로 따로 설치해야 합니다. `taste.py lab`도 pnpm이 없을 때만 Corepack을 사용합니다.
 
 저장소 루트에서 실행합니다.
 
 ```sh
 cd lab
-corepack pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile
 cd ..
 python3 -B taste.py lab
 ```
@@ -86,10 +88,10 @@ python3 -B taste.py lint http://localhost:3000
 ```sh
 python3 -B -m unittest discover -s tests -v
 cd lab
-corepack pnpm build
+pnpm build
 ```
 
-Python 검사는 임시 원장과 카탈로그를 사용합니다. 브라우저가 필요한 검사는 uv나 Chromium이 없으면 건너뛴 사실을 출력합니다. Lab의 개발 서버만 실행하려면 기록 서버를 먼저 `python3 -B taste.py open --no-browser`로 시작한 뒤 `lab/`에서 `corepack pnpm dev`를 실행합니다.
+Python 검사는 임시 원장과 카탈로그를 사용합니다. 브라우저가 필요한 검사는 uv나 Chromium이 없으면 건너뛴 사실을 출력합니다. Lab의 개발 서버만 실행하려면 기록 서버를 먼저 `python3 -B taste.py open --no-browser`로 시작한 뒤 `lab/`에서 `pnpm dev`를 실행합니다.
 
 지원 범위는 macOS와 Linux입니다. Windows의 파일 잠금과 프로세스 종료는 아직 지원하지 않습니다. 훅 명령은 코드에 포함되어 있지만, 이 첫 공개용 구성에서는 자동 설치하지 않습니다.
 

@@ -522,10 +522,15 @@ def _labs_running():
 
 
 def _pnpm():
+    """pnpm 실행 명령. 설치된 pnpm을 먼저 쓰고, 없으면 Corepack으로 lab의 packageManager 판을 받는다."""
+    pnpm = shutil.which("pnpm")
+    if pnpm:
+        return [pnpm]
+    # Node.js 25부터 Corepack이 Node에 포함되지 않으므로 대체 경로로만 쓴다
     corepack = shutil.which("corepack")
-    if not corepack:
-        raise FileNotFoundError("Corepack이 필요합니다. README의 설치 조건을 확인하세요.")
-    return corepack
+    if corepack:
+        return [corepack, "pnpm"]
+    raise FileNotFoundError("pnpm이 필요합니다. pnpm을 설치하거나 Corepack을 준비하세요. README의 설치 조건을 확인하세요.")
 
 
 def ensure_labs_server():
@@ -538,9 +543,9 @@ def ensure_labs_server():
     os.makedirs(store.STATE_DIR, exist_ok=True)
     with open(LABS_LOG_PATH, "a") as log:
         if not os.path.isdir(os.path.join(LABS_DIR, "node_modules")):
-            raise FileNotFoundError("lab 의존성이 없습니다. lab/에서 corepack pnpm install --frozen-lockfile을 먼저 실행하세요.")
+            raise FileNotFoundError("lab 의존성이 없습니다. lab/에서 pnpm install --frozen-lockfile을 먼저 실행하세요.")
         process = subprocess.Popen(
-            [pnpm, "pnpm", "exec", "vite", "--host", "127.0.0.1", "--port", str(LABS_PORT), "--strictPort"],
+            [*pnpm, "exec", "vite", "--host", "127.0.0.1", "--port", str(LABS_PORT), "--strictPort"],
             cwd=LABS_DIR,
             stdout=log,
             stderr=log,
