@@ -1,0 +1,11 @@
+state/
+data/rules.json
+TASTE.md
+.env
+.env.*
+__pycache__/
+*.pyc
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
