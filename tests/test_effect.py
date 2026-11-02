@@ -1,16 +1,19 @@
 """효과 측정의 재생을 임시 대화 기록과 임시 원장에서 검사한다. 실제 개인 기록은 사용하지 않는다."""
 
 import datetime as dt
+import io
 import json
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
 TASTE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TASTE_ROOT))
 
+import taste
 from tastelib import effect, harvest, lab, store
 
 
@@ -154,6 +157,63 @@ class RepeatedAfterDeliveryTests(unittest.TestCase):
         found = effect.repeated_after_delivery(verdicts, deliveries, rules, dt.date(2026, 10, 1), dt.date(2026, 10, 31))
         self.assertEqual([item["verdict"]["text"] for item in found], ["순간이동해요"])
         self.assertEqual(found[0]["rules"], ["연속된 전환"])
+
+
+class EffectDatesTests(unittest.TestCase):
+    """효과 비교의 도입일과 소비 방식을 바꾼 날은 사용자가 CLI로 준다. 다른 사용자의 날짜를 기본값으로 쓰지 않는다."""
+
+    def run_effect(self, *args):
+        """보고서 계산 없이 CLI가 정한 날짜만 본다."""
+        seen = {}
+
+        def capture(today):
+            seen["introduced"], seen["interventions"] = effect.INTRODUCED, effect.INTERVENTIONS
+            return ""
+
+        with (
+            patch.object(effect, "INTRODUCED", None),
+            patch.object(effect, "INTERVENTIONS", ()),
+            patch.object(effect, "report", side_effect=capture),
+            patch.object(sys, "argv", ["taste.py", "effect", *args]),
+            redirect_stdout(io.StringIO()),
+            redirect_stderr(io.StringIO()),
+        ):
+            taste.main()
+            segments = effect.intervention_segments(dt.date(2026, 10, 16), dt.date(2026, 11, 12))
+        return seen, segments
+
+    def test_since_alone_is_one_period(self):
+        seen, segments = self.run_effect("--since", "2026-10-03")
+        self.assertEqual(seen["introduced"], dt.date(2026, 10, 3))
+        self.assertEqual(segments, [(dt.date(2026, 10, 16), dt.date(2026, 11, 12), "Tastepin 사용")])
+
+    def test_changes_split_the_current_period_with_their_labels(self):
+        seen, segments = self.run_effect(
+            "--since", "2026-10-03:훅 자동 주입", "--change", "2026-10-22:/taste 명시 호출, 훅은 판정 기록만",
+        )
+        self.assertEqual(seen["introduced"], dt.date(2026, 10, 3))
+        self.assertEqual(segments, [
+            (dt.date(2026, 10, 16), dt.date(2026, 10, 21), "훅 자동 주입"),
+            (dt.date(2026, 10, 22), dt.date(2026, 11, 12), "/taste 명시 호출, 훅은 판정 기록만"),
+        ])
+
+    def test_changes_are_ordered_by_date_whatever_the_argument_order(self):
+        _, segments = self.run_effect(
+            "--since", "2026-10-03", "--change", "2026-11-01:둘째 변경", "--change", "2026-10-22:첫 변경",
+        )
+        self.assertEqual([label for *_, label in segments], ["Tastepin 사용", "첫 변경", "둘째 변경"])
+
+    def test_invalid_dates_are_rejected(self):
+        for args in (
+            ("--since", "2026-13-01"),
+            ("--since", "2026-10-03", "--change", "2026-10-22"),
+            ("--since", "2026-10-03", "--change", "2026-10-22:"),
+            ("--since", "2026-10-03", "--change", "2026-10-03:같은 날"),
+            ("--since", "2026-10-03", "--change", "2026-09-30:도입 전"),
+            ("--since", "2026-10-03", "--change", "2026-10-22:하나", "--change", "2026-10-22:둘"),
+        ):
+            with self.subTest(args=args), self.assertRaises(SystemExit):
+                self.run_effect(*args)
 
 
 if __name__ == "__main__":
