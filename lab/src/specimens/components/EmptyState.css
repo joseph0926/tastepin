@@ -1,0 +1,208 @@
+.emp-page {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  min-height: 340px;
+}
+
+.emp-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.emp-body {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  text-align: center;
+}
+
+[data-align="start"] .emp-body {
+  align-content: start;
+  justify-items: start;
+  padding: 8px 0;
+  text-align: left;
+}
+
+.emp-body h4 {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.emp-body p {
+  max-width: 300px;
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 15px;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.emp-icon {
+  color: var(--sp-muted);
+}
+
+.emp-ghost {
+  display: grid;
+  gap: 6px;
+  width: 180px;
+  margin-bottom: 4px;
+}
+
+.emp-ghost span {
+  height: 12px;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+}
+
+.emp-ghost span:nth-child(2) {
+  width: 80%;
+}
+
+.emp-ghost span:nth-child(3) {
+  width: 60%;
+}
+
+[data-align="center"] .emp-ghost span {
+  justify-self: center;
+}
+
+.emp-primary {
+  height: 40px;
+  margin-top: 8px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-text);
+  color: var(--sp-surface);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emp-steps {
+  display: grid;
+  gap: 4px;
+  width: min(280px, 100%);
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.emp-steps button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.emp-steps button:hover {
+  background: var(--sp-hover);
+}
+
+.emp-steps button.is-done {
+  background: none;
+  color: var(--sp-muted);
+  font-weight: 500;
+  text-decoration: line-through;
+}
+
+.emp-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.is-done .emp-check {
+  background: var(--sp-text);
+  color: var(--sp-surface);
+}
+
+.emp-sample {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.emp-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+  word-break: keep-all;
+}
+
+.emp-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emp-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emp-rows li {
+  display: grid;
+  gap: 2px;
+  padding: 11px 0;
+  opacity: 0.7;
+}
+
+.emp-rows li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.emp-rows b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.emp-rows span {
+  color: var(--sp-secondary);
+  font-size: 13px;
+}
+
+.emp-primary:focus-visible,
+.emp-steps button:focus-visible,
+.emp-link:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

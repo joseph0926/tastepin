@@ -1,0 +1,115 @@
+.msp {
+  display: grid;
+  gap: 16px;
+  min-height: 300px;
+  align-content: start;
+}
+
+.msp h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.msp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.msp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 0 4px 0 12px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.msp-remove {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.msp-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px dashed var(--sp-control-line);
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.msp-more {
+  border-top: 1px solid var(--sp-line);
+}
+
+.msp-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.msp-chevron {
+  display: grid;
+  color: var(--sp-secondary);
+}
+
+.msp-body {
+  overflow: hidden;
+}
+
+.msp-body-inner {
+  display: grid;
+  gap: 10px;
+  padding-bottom: 12px;
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.msp-body-inner p {
+  margin: 0;
+}
+
+.msp-body-inner label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sp-text);
+}
+
+.msp-remove:focus-visible,
+.msp-add:focus-visible,
+.msp-toggle:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

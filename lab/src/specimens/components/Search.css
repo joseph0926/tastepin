@@ -1,0 +1,196 @@
+.srch-page {
+  display: grid;
+  gap: 12px;
+}
+
+.srch-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.srch-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.srch-form {
+  display: flex;
+  gap: 8px;
+}
+
+.srch-box {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+
+.srch-box > svg {
+  position: absolute;
+  left: 12px;
+  color: var(--sp-muted);
+  pointer-events: none;
+}
+
+.srch-box input {
+  width: 100%;
+  height: 40px;
+  padding: 0 36px 0 38px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  outline: none;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+  appearance: none;
+}
+
+.srch-box input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.srch-box input:focus {
+  border-color: var(--sp-accent);
+  box-shadow: inset 0 0 0 1px var(--sp-accent);
+}
+
+.srch-clear {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-muted);
+  cursor: pointer;
+}
+
+.srch-clear:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.srch-button {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.srch-form > .srch-button {
+  height: 40px;
+}
+
+.srch-button:hover {
+  background: var(--sp-hover);
+}
+
+/* 결과 자리 높이를 잡아 두어 결과 수가 바뀌어도 무대가 출렁이지 않는다 */
+.srch-results {
+  display: grid;
+  min-height: calc(6 * 45px);
+  align-content: start;
+}
+
+.srch-layer {
+  grid-area: 1 / 1;
+}
+
+.srch-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.srch-list li {
+  overflow: hidden;
+}
+
+.srch-list li + li .srch-row {
+  border-top: 1px solid var(--sp-line);
+}
+
+.srch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 45px;
+  font-size: 15px;
+}
+
+.srch-row svg {
+  flex: none;
+  color: var(--sp-muted);
+}
+
+.srch-row .srch-title {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.srch-row .srch-title + span {
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* 일치 표시 */
+.srch-match {
+  background: none;
+  color: inherit;
+}
+
+[data-highlight="bold"] .srch-match {
+  color: var(--sp-text);
+  font-weight: 700;
+}
+
+[data-highlight="mark"] .srch-match {
+  border-radius: 2px;
+  background: var(--sp-accent-soft);
+}
+
+.srch-empty {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+.srch-empty p {
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 15px;
+  word-break: keep-all;
+}
+
+.srch-suggest {
+  display: flex;
+  gap: 6px;
+}
+
+.srch-button:focus-visible,
+.srch-clear:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

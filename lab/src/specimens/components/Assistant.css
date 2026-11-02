@@ -1,0 +1,347 @@
+.ast-page {
+  display: grid;
+  gap: 12px;
+}
+
+.ast-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.ast-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* 대화형 값의 목록. 높이를 고정하고 답이 자라면 끝을 따라간다 */
+.ast-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ast-hint {
+  margin: auto 0 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ast-question {
+  align-self: flex-end;
+  max-width: 85%;
+  margin: auto 0 0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--sp-accent-soft);
+  color: var(--sp-text);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.ast-turn {
+  display: grid;
+  gap: 10px;
+}
+
+/* 기다리는 동안 */
+.ast-pending {
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.ast-dots {
+  display: inline-flex;
+  gap: 5px;
+  padding: 12px 0;
+}
+
+.ast-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sp-muted);
+  animation: ast-dot var(--ast-cycle, 1.2s) ease-in-out infinite;
+}
+
+.ast-dots i:nth-child(2) {
+  animation-delay: calc(var(--ast-cycle, 1.2s) / 6);
+}
+
+.ast-dots i:nth-child(3) {
+  animation-delay: calc(var(--ast-cycle, 1.2s) / 3);
+}
+
+@keyframes ast-dot {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+/* 색 그라데이션이 아니라 글자 하나의 밝기를 가리개로 쓸어 지나간다 */
+.ast-shimmer {
+  display: inline-block;
+  padding: 10px 0;
+  mask-image: linear-gradient(90deg, #000 35%, rgb(0 0 0 / 35%) 50%, #000 65%);
+  mask-size: 300% 100%;
+  animation: ast-shimmer var(--ast-cycle, 1.6s) linear infinite;
+}
+
+@keyframes ast-shimmer {
+  from {
+    mask-position: 100% 0;
+  }
+
+  to {
+    mask-position: 0 0;
+  }
+}
+
+.ast-steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.ast-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sp-muted);
+}
+
+.ast-steps li.is-current {
+  color: var(--sp-text);
+}
+
+.ast-steps li.is-done {
+  color: var(--sp-secondary);
+}
+
+.ast-step-mark {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 1.5px solid var(--sp-control-line);
+  border-radius: 50%;
+  color: var(--sp-on-accent);
+}
+
+.is-current .ast-step-mark {
+  border-color: var(--sp-accent);
+}
+
+.is-done .ast-step-mark {
+  border-color: var(--sp-accent);
+  background: var(--sp-accent);
+}
+
+.ast-steps-done {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sp-muted);
+  font-size: 13px;
+}
+
+/* 답 */
+.ast-answer {
+  display: grid;
+  gap: 10px;
+  color: var(--sp-text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.ast-answer p,
+.ast-answer ul,
+.ast-answer h5 {
+  margin: 0;
+}
+
+.ast-answer ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 18px;
+}
+
+.ast-block {
+  display: grid;
+  gap: 6px;
+}
+
+.ast-word {
+  display: inline-block;
+}
+
+.ast-answer.layout-bubble {
+  max-width: 92%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+/* 선과 면 없이 여백과 굵기로만 묶음을 나눈다 */
+.ast-answer.layout-sections {
+  gap: 20px;
+}
+
+.layout-sections .ast-summary {
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.layout-sections h5 {
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* 아래 입력창 */
+.ast-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ast-example {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.ast-example:hover {
+  background: var(--sp-hover);
+}
+
+.ast-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ast-bar input,
+.ast-form textarea {
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  outline: none;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.ast-bar input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+}
+
+.ast-bar input:focus,
+.ast-form textarea:focus {
+  border-color: var(--sp-accent);
+  box-shadow: inset 0 0 0 1px var(--sp-accent);
+}
+
+.ast-send {
+  display: grid;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-accent);
+  color: var(--sp-on-accent);
+  cursor: pointer;
+}
+
+.ast-send:disabled,
+.ast-primary:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ast-send:focus-visible,
+.ast-primary:focus-visible,
+.ast-example:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+/* 질문 칸과 버튼 */
+.ast-form {
+  display: grid;
+  gap: 6px;
+}
+
+.ast-form label {
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ast-form textarea {
+  padding: 10px 12px;
+  line-height: 1.55;
+  resize: none;
+}
+
+.ast-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ast-primary {
+  height: 38px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-accent);
+  color: var(--sp-on-accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ast-result {
+  height: 190px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ast-dots i,
+  .ast-shimmer {
+    animation: none;
+  }
+
+  .ast-dots i {
+    opacity: 0.6;
+  }
+}

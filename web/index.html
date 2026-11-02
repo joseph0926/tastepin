@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tastepin — 취향 기록</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-title">
+      <h1>Tastepin</h1>
+      <p class="meta" id="meta">불러오는 중</p>
+    </div>
+    <div class="top-actions">
+      <button class="text-button" id="harvest-button" type="button">새 기록 수집</button>
+      <button class="text-button" id="theme-button" type="button" aria-label="테마 전환">테마</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="보기">
+    <button role="tab" data-tab="compose" type="button">피드백 쓰기<kbd>1</kbd></button>
+    <button role="tab" data-tab="taste" type="button">내 취향<kbd>2</kbd></button>
+    <button role="tab" data-tab="inbox" type="button">분류 <span class="count" id="inbox-count"></span><kbd>3</kbd></button>
+    <button role="tab" data-tab="flow" type="button">흐름<kbd>4</kbd></button>
+    <button role="tab" data-tab="components" type="button">컴포넌트 <span class="count" id="lab-count"></span><kbd>5</kbd></button>
+    <span class="tab-indicator" aria-hidden="true"></span>
+  </nav>
+
+  <main>
+    <section id="compose" class="view" role="tabpanel"></section>
+    <section id="taste" class="view" role="tabpanel" hidden></section>
+    <section id="inbox" class="view" role="tabpanel" hidden></section>
+    <section id="flow" class="view" role="tabpanel" hidden></section>
+    <section id="components" class="view" role="tabpanel" hidden></section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+/* 화면 전체의 바탕을 비교하는 시편이라 무대 안쪽 여백까지 시편 바탕으로 채운다(.stage-viewport padding과 같은 값) */
+.srf {
+  display: grid;
+  gap: 28px;
+  margin: -16px -20px -24px;
+  padding: 20px 20px 28px;
+  background: var(--srf-page);
+  color: var(--srf-text);
+}
+
+/* 바탕색: 다른 시편과 달리 --sp-* 대신 값마다 라이트와 다크 색을 직접 둔다. 비교 대상이 그 회색 자체이기 때문이다 */
+
+.srf[data-ground="neutral"] {
+  --srf-page: #f4f4f4;
+  --srf-raised: #ffffff;
+  --srf-line: #e2e2e2;
+  --srf-control-line: #c6c6c6;
+  --srf-text: #1a1a1a;
+  --srf-secondary: #5c5c5c;
+  --srf-hover: #ebebeb;
+}
+
+.srf[data-ground="cool"] {
+  --srf-page: #f3f5f8;
+  --srf-raised: #ffffff;
+  --srf-line: #e0e4ea;
+  --srf-control-line: #c3c9d2;
+  --srf-text: #191c21;
+  --srf-secondary: #5a606b;
+  --srf-hover: #e9edf2;
+}
+
+.srf[data-ground="warm"] {
+  --srf-page: #f6f5f1;
+  --srf-raised: #fffefb;
+  --srf-line: #e5e2db;
+  --srf-control-line: #cac6bd;
+  --srf-text: #1d1b17;
+  --srf-secondary: #5f5b53;
+  --srf-hover: #edebe5;
+}
+
+.lab[data-theme="dark"] .srf[data-ground="neutral"] {
+  --srf-page: #121212;
+  --srf-raised: #1c1c1c;
+  --srf-line: #2c2c2c;
+  --srf-control-line: #4a4a4a;
+  --srf-text: #ededed;
+  --srf-secondary: #a3a3a3;
+  --srf-hover: #262626;
+}
+
+.lab[data-theme="dark"] .srf[data-ground="cool"] {
+  --srf-page: #101318;
+  --srf-raised: #191d24;
+  --srf-line: #2a2f38;
+  --srf-control-line: #474e5a;
+  --srf-text: #eceef2;
+  --srf-secondary: #a1a8b4;
+  --srf-hover: #232831;
+}
+
+.lab[data-theme="dark"] .srf[data-ground="warm"] {
+  --srf-page: #14130f;
+  --srf-raised: #1e1c18;
+  --srf-line: #302d27;
+  --srf-control-line: #4e4a42;
+  --srf-text: #efede8;
+  --srf-secondary: #aaa59b;
+  --srf-hover: #29261f;
+}
+
+/* 모서리 */
+
+.srf[data-radius="sharp"] {
+  --srf-r-surface: 2px;
+  --srf-r-control: 2px;
+  --srf-r-check: 2px;
+}
+
+.srf[data-radius="small"] {
+  --srf-r-surface: 6px;
+  --srf-r-control: 6px;
+  --srf-r-check: 4px;
+}
+
+.srf[data-radius="soft"] {
+  --srf-r-surface: 12px;
+  --srf-r-control: 8px;
+  --srf-r-check: 5px;
+}
+
+/* 머리글 */
+
+.srf-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 20px;
+}
+
+.srf-head h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.srf-head p {
+  margin: 2px 0 0;
+  color: var(--srf-secondary);
+  font-size: 13px;
+}
+
+.srf-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(220px, 100%);
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--srf-control-line);
+  border-radius: var(--srf-r-control);
+  background: var(--srf-raised);
+  color: var(--srf-secondary);
+}
+
+.srf-search:focus-within {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.srf-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--srf-text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.srf-search input::placeholder {
+  color: var(--srf-secondary);
+}
+
+/* 묶음 */
+
+.srf-group h4 {
+  margin: 0 0 6px;
+  color: var(--srf-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.srf-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.srf-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.srf-row-main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.srf-row-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.srf-row-text b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.srf-row-text > span {
+  color: var(--srf-secondary);
+  font-size: 13px;
+}
+
+.srf[data-grouping="tone"] .srf-group h4 {
+  margin-bottom: 8px;
+}
+
+.srf[data-grouping="tone"] .srf-rows {
+  padding: 4px 16px;
+  border-radius: var(--srf-r-surface);
+  background: var(--srf-raised);
+}
+
+.srf[data-grouping="hairline"] .srf-row + .srf-row {
+  border-top: 1px solid var(--srf-line);
+}
+
+/* 컨트롤 */
+
+.srf-check-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.srf-check {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--srf-control-line);
+  border-radius: var(--srf-r-check);
+  background: var(--srf-raised);
+  color: transparent;
+}
+
+.srf-check-input:checked + .srf-check {
+  border-color: var(--sp-accent);
+  background: var(--sp-accent);
+  color: var(--sp-on-accent);
+}
+
+.srf-check-input:focus-visible + .srf-check {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.srf-tag {
+  padding: 1px 6px;
+  border-radius: var(--srf-r-check);
+  background: var(--sp-accent-soft);
+  color: var(--sp-accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.srf-link {
+  flex: none;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--srf-r-control);
+  background: none;
+  color: var(--srf-secondary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.srf-link:hover {
+  background: var(--srf-hover);
+  color: var(--srf-text);
+}
+
+.srf-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.srf-button {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--srf-control-line);
+  border-radius: var(--srf-r-control);
+  background: var(--srf-raised);
+  color: var(--srf-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.srf-button:hover {
+  background: var(--srf-hover);
+}
+
+.srf-primary {
+  border-color: var(--sp-accent);
+  background: var(--sp-accent);
+  color: var(--sp-on-accent);
+}
+
+.srf-primary:hover {
+  border-color: var(--sp-accent-hover);
+  background: var(--sp-accent-hover);
+}
+
+.srf-link:focus-visible,
+.srf-button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

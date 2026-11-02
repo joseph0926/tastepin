@@ -1,0 +1,188 @@
+.tip-page {
+  --tip-bg: var(--sp-inverse);
+  --tip-fg: var(--sp-on-inverse);
+  --tip-gap: 6px;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  min-height: 300px;
+}
+
+.tip-page[data-arrow="arrow"] {
+  --tip-gap: 10px;
+}
+
+.tip-page[data-look="raised"] {
+  --tip-bg: var(--sp-raised);
+  --tip-fg: var(--sp-text);
+}
+
+.tip-toolbar {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  justify-self: start;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+.tip-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.tip-tool,
+.tip-help {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.tip-help {
+  width: 28px;
+  height: 28px;
+}
+
+.tip-tool:hover,
+.tip-help:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.tip-tool:focus-visible,
+.tip-help:focus-visible,
+.tip-link:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+/* 툴팁: 대상 아래 가운데. 꼬리 값이면 위쪽 가운데에 삼각 꼬리 */
+.tip-bubble {
+  position: absolute;
+  top: calc(100% + var(--tip-gap));
+  left: 50%;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--tip-bg);
+  color: var(--tip-fg);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  transform-origin: 50% 0;
+}
+
+[data-look="raised"] .tip-bubble,
+.tip-popover {
+  box-shadow: var(--sp-overlay-shadow);
+}
+
+.tip-bubble kbd {
+  font: inherit;
+  opacity: 0.7;
+}
+
+[data-arrow="arrow"] .tip-bubble::before,
+[data-arrow="arrow"] .tip-popover::before {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  background: inherit;
+  content: "";
+  transform: rotate(45deg);
+}
+
+/* 팝오버: 도움말 아이콘 아래, 왼쪽 정렬 */
+.tip-field {
+  display: grid;
+  gap: 6px;
+  max-width: 280px;
+}
+
+.tip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tip-field select {
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.tip-popover {
+  position: absolute;
+  top: calc(100% + var(--tip-gap));
+  left: -8px;
+  z-index: 6;
+  display: grid;
+  gap: 6px;
+  width: 248px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  color: var(--sp-text);
+  font-weight: 400;
+  transform-origin: 22px 0;
+}
+
+[data-arrow="arrow"] .tip-popover::before {
+  left: 22px;
+}
+
+.tip-popover b {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.tip-popover p {
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.tip-link {
+  justify-self: end;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tip-note {
+  margin: 0;
+  color: var(--sp-muted);
+  font-size: 13px;
+}

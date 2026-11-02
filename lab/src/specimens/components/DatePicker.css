@@ -1,0 +1,213 @@
+.dp-page {
+  --dp-cell: 36px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 400px;
+}
+
+.dp-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.dp-chosen {
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.dp-anchor {
+  position: relative;
+  justify-self: start;
+}
+
+.dp-input {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 240px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.dp-input svg {
+  color: var(--sp-muted);
+}
+
+.dp-input[aria-expanded="true"] {
+  border-color: var(--sp-accent);
+  box-shadow: inset 0 0 0 1px var(--sp-accent);
+}
+
+.dp-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 5;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  box-shadow: var(--sp-overlay-shadow);
+}
+
+.dp-calendar {
+  display: grid;
+  gap: 6px;
+  width: calc(7 * var(--dp-cell) + 6 * 4px);
+}
+
+.dp-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dp-month-name {
+  display: grid;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 650;
+  text-align: center;
+}
+
+.dp-month-name > span {
+  grid-area: 1 / 1;
+}
+
+.dp-nav {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.dp-nav:hover {
+  background: var(--sp-hover);
+}
+
+.dp-weekdays,
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, var(--dp-cell));
+  gap: 4px;
+}
+
+.dp-weekdays span {
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: center;
+}
+
+.dp-weekdays .is-sunday {
+  color: var(--sp-danger);
+}
+
+.dp-weekdays .is-weekend {
+  color: var(--sp-secondary);
+  font-weight: 500;
+}
+
+/* 넘기는 동안 두 달이 같은 칸에 겹쳐 교차하고 칸 높이는 6주로 고정한다 */
+.dp-grid-frame {
+  display: grid;
+  overflow: hidden;
+}
+
+.dp-grid {
+  grid-area: 1 / 1;
+}
+
+.dp-day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--dp-cell);
+  height: var(--dp-cell);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.dp-day:hover:not(:disabled, .is-selected) {
+  background: var(--sp-hover);
+}
+
+.dp-day:focus-visible,
+.dp-nav:focus-visible,
+.dp-input:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.dp-day.is-outside {
+  color: var(--sp-muted);
+  opacity: 0.5;
+  cursor: default;
+}
+
+[data-selected="square"] .dp-day {
+  border-radius: 6px;
+}
+
+/* 오늘 */
+[data-today="dot"] .dp-day.is-today::after {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--sp-accent);
+  content: "";
+}
+
+[data-today="bold"] .dp-day.is-today {
+  color: var(--sp-accent);
+  font-weight: 700;
+}
+
+[data-today="ring"] .dp-day.is-today {
+  box-shadow: inset 0 0 0 1px var(--sp-control-line);
+}
+
+/* 고른 날. 오늘 표시보다 앞선다 */
+[data-selected="circle"] .dp-day.is-selected,
+[data-selected="square"] .dp-day.is-selected {
+  background: var(--sp-text);
+  color: var(--sp-surface);
+  font-weight: 600;
+}
+
+[data-selected="ring"] .dp-day.is-selected {
+  box-shadow: inset 0 0 0 2px var(--sp-text);
+  font-weight: 700;
+}
+
+[data-selected="circle"] .dp-day.is-selected::after,
+[data-selected="square"] .dp-day.is-selected::after {
+  background: var(--sp-surface);
+}

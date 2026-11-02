@@ -1,0 +1,145 @@
+.tabs {
+  display: grid;
+  gap: 16px;
+}
+
+.tabs-list {
+  display: flex;
+  gap: 4px;
+}
+
+.indicator-underline .tabs-list {
+  gap: 20px;
+  box-shadow: inset 0 -1px 0 var(--sp-line);
+}
+
+.tabs-tab {
+  position: relative;
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.indicator-underline .tabs-tab {
+  height: 40px;
+  padding: 0 2px;
+  border-radius: 0;
+}
+
+.tabs-tab:hover {
+  color: var(--sp-text);
+}
+
+.tabs-tab[aria-selected="true"] {
+  color: var(--sp-text);
+  font-weight: 600;
+}
+
+.indicator-weight .tabs-tab {
+  padding: 0 8px;
+  color: var(--sp-muted);
+}
+
+.indicator-weight .tabs-tab[aria-selected="true"] {
+  color: var(--sp-text);
+  font-weight: 700;
+}
+
+.tabs-tab:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.tabs-label {
+  position: relative;
+}
+
+.tabs-indicator {
+  position: absolute;
+}
+
+.indicator-underline .tabs-indicator {
+  inset: auto 0 0;
+  height: 2px;
+  background: var(--sp-text);
+}
+
+.indicator-pill .tabs-indicator {
+  inset: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+.tabs-viewport {
+  overflow: hidden;
+}
+
+.tabs-content {
+  position: relative;
+}
+
+.tabs-panel-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.tabs-panel-body p {
+  margin: 0 0 16px;
+  color: var(--sp-secondary);
+}
+
+.tabs-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0;
+}
+
+.tabs-stats dt {
+  color: var(--sp-muted);
+  font-size: 13px;
+}
+
+.tabs-stats dd {
+  margin: 2px 0 0;
+  font-size: 24px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabs-rows {
+  padding: 0;
+  list-style: none;
+}
+
+.tabs-rows li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 0;
+  color: var(--sp-secondary);
+}
+
+.tabs-rows li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.tabs-rows b {
+  color: var(--sp-text);
+  font-weight: 600;
+}
+
+.tabs-rows span {
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}

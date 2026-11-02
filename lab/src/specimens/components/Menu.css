@@ -1,0 +1,148 @@
+.menu-page {
+  display: grid;
+  gap: 8px;
+  min-height: 300px;
+  align-content: start;
+}
+
+.menu-heading {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-secondary);
+}
+
+.menu-files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-files li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: var(--sp-muted);
+}
+
+.menu-files li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.menu-file-name {
+  flex: 1;
+  min-width: 0;
+  color: var(--sp-text);
+  font-size: 15px;
+  font-weight: 550;
+}
+
+.menu-file-meta {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.menu-anchor {
+  position: relative;
+  width: 32px;
+}
+
+.menu-trigger {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.menu-trigger:hover,
+.menu-trigger.is-open {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.menu-trigger:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 1px;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  min-width: 200px;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  box-shadow: var(--sp-overlay-shadow);
+  transform-origin: top right;
+}
+
+.menu.density-roomy {
+  padding: 6px;
+}
+
+.menu-separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--sp-line);
+}
+
+.menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.density-roomy .menu-item {
+  height: 38px;
+  font-size: 15px;
+}
+
+.menu-item:focus-visible {
+  outline: none;
+}
+
+.menu-highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--sp-hover);
+}
+
+.menu-icon,
+.menu-label {
+  position: relative;
+}
+
+.menu-icon {
+  color: var(--sp-muted);
+}
+
+.highlight-accent .menu-item.is-active,
+.highlight-accent .menu-item.is-active .menu-icon {
+  color: var(--sp-accent);
+}
+
+.menu-item.is-danger,
+.menu-item.is-danger .menu-icon {
+  color: var(--sp-danger);
+}

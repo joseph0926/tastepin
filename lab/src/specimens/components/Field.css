@@ -1,0 +1,177 @@
+.fld-page {
+  display: grid;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.fld-page h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+/* 라벨 줄(18px)과 문구 줄(18px)을 늘 잡아 두어 라벨이 오르내리거나 오류가 나도 아래 칸이 밀리지 않는다 */
+.fld-control {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas: "label" "box" "note";
+  row-gap: 4px;
+}
+
+.fld-label {
+  grid-area: label;
+  justify-self: start;
+  height: 18px;
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.fld-box {
+  grid-area: box;
+  position: relative;
+}
+
+.fld-box input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  outline: none;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+}
+
+[data-surface="filled"] .fld-box input {
+  border-color: transparent;
+  background: var(--sp-surface-2);
+}
+
+[data-surface="underline"] .fld-box input {
+  padding: 0;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* 초점: 실제 초점과 같이 재생의 흉내 초점을 같은 모양으로 그린다 */
+.fld-box input:focus,
+.is-focused .fld-box input {
+  border-color: var(--sp-accent);
+  box-shadow: inset 0 0 0 1px var(--sp-accent);
+}
+
+[data-surface="filled"] .fld-box input:focus,
+[data-surface="filled"] .is-focused .fld-box input {
+  background: var(--sp-surface);
+}
+
+[data-surface="underline"] .fld-box input:focus,
+[data-surface="underline"] .is-focused .fld-box input {
+  box-shadow: inset 0 -1px 0 var(--sp-accent);
+}
+
+.is-invalid .fld-box input,
+.is-invalid .fld-box input:focus {
+  border-color: var(--sp-danger);
+  box-shadow: inset 0 0 0 1px var(--sp-danger);
+}
+
+[data-surface="underline"] .is-invalid .fld-box input,
+[data-surface="underline"] .is-invalid .fld-box input:focus {
+  box-shadow: inset 0 -1px 0 var(--sp-danger);
+}
+
+[data-surface="filled"] .is-invalid .fld-box input:not(:focus) {
+  box-shadow: inset 0 -2px 0 var(--sp-danger);
+  border-color: transparent;
+}
+
+[data-message="inside"] .fld-box input {
+  padding-right: 40px;
+}
+
+[data-surface="underline"][data-message="inside"] .fld-box input {
+  padding-right: 28px;
+}
+
+.fld-alert {
+  position: absolute;
+  top: 11px;
+  right: 12px;
+  display: inline-flex;
+  color: var(--sp-danger);
+}
+
+[data-surface="underline"] .fld-alert {
+  right: 0;
+}
+
+.fld-note {
+  grid-area: note;
+  display: grid;
+  height: 18px;
+  margin: 0;
+  color: var(--sp-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.fld-note > span {
+  grid-area: 1 / 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fld-note .is-error {
+  color: var(--sp-danger);
+}
+
+/* 왼쪽 라벨: 라벨 열 96px. 좁은 무대에서는 필드 위로 올린다 */
+[data-label="side"] .fld-control {
+  grid-template-columns: 96px 1fr;
+  grid-template-areas: "label box" ". note";
+  column-gap: 12px;
+}
+
+[data-label="side"] .fld-label {
+  align-self: center;
+  height: auto;
+}
+
+@container stage (max-width: 300px) {
+  [data-label="side"] .fld-control {
+    grid-template-columns: 1fr;
+    grid-template-areas: "label" "box" "note";
+  }
+}
+
+.fld-actions {
+  padding-top: 4px;
+}
+
+.fld-submit {
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-text);
+  color: var(--sp-surface);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fld-submit:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

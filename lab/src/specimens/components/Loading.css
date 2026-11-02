@@ -1,0 +1,224 @@
+.ld-page {
+  display: grid;
+  gap: 14px;
+}
+
+.ld-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ld-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.ld-head p {
+  margin: 4px 0 0;
+  color: var(--sp-secondary);
+  font-size: 15px;
+}
+
+.ld-reloads {
+  display: flex;
+  gap: 6px;
+}
+
+.ld-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ld-button:hover {
+  background: var(--sp-hover);
+}
+
+.ld-button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+/* 로딩 표시와 내용이 같은 칸에 겹쳐 바뀌고, 칸 높이는 내용 4행과 같다 */
+.ld-area {
+  position: relative;
+  display: grid;
+  min-height: calc(4 * 48px);
+}
+
+.ld-layer {
+  grid-area: 1 / 1;
+}
+
+.ld-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ld-rows li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
+  font-size: 15px;
+}
+
+.ld-rows li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.ld-rows b {
+  font-weight: 600;
+}
+
+.ld-rows span {
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.ld-rows .ld-time {
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ld-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sp-surface-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ld-bone {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+}
+
+.ld-bone.is-avatar {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.ld-bone.is-name {
+  width: 64px;
+}
+
+.ld-bone.is-meta {
+  width: 44px;
+  margin-left: auto;
+}
+
+[data-pulse="breathe"] .ld-bone {
+  animation: ld-breathe var(--ld-breathe) ease-in-out infinite;
+}
+
+[data-pulse="shimmer"] .ld-bone::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--sp-hover), transparent);
+  content: "";
+  transform: translateX(-100%);
+  animation: ld-shimmer var(--ld-shimmer) ease-in-out infinite;
+}
+
+.ld-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.ld-spinner svg {
+  animation: ld-spin var(--ld-spin) linear infinite;
+}
+
+.ld-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  overflow: hidden;
+  height: 2px;
+  background: var(--sp-surface-2);
+}
+
+.ld-bar span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  background: var(--sp-accent);
+  animation: ld-flow var(--ld-flow) ease-in-out infinite;
+}
+
+@keyframes ld-breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes ld-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ld-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ld-flow {
+  from {
+    left: -40%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+/* 동작 줄이기 설정에서는 반복 움직임을 멈추고 스피너만 천천히 돌린다 */
+@media (prefers-reduced-motion: reduce) {
+  .ld-bone,
+  .ld-bone::after,
+  .ld-bar span {
+    animation: none !important;
+  }
+
+  .ld-bar span {
+    left: 0;
+    width: 100%;
+    opacity: 0.6;
+  }
+}

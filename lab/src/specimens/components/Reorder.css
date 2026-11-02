@@ -1,0 +1,118 @@
+.rdr-page {
+  display: grid;
+  gap: 14px;
+}
+
+.rdr-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rdr-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.rdr-head p {
+  margin: 4px 0 0;
+  color: var(--sp-secondary);
+  font-size: 15px;
+}
+
+.rdr-button {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rdr-button:hover {
+  background: var(--sp-hover);
+}
+
+.rdr-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rdr-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 6px;
+  background: var(--sp-surface);
+  font-size: 15px;
+  transition: background-color 150ms;
+  user-select: none;
+}
+
+/* Reorder.Item은 끄는 중에만 인라인 z-index를 올린다. 시연에서 들어 올린 항목도 지나가는 항목 위에 그린다 */
+.rdr-item.is-lifted {
+  z-index: 2 !important;
+}
+
+/* 행 전체로 끄는 값만 행에서 스크롤 대신 끌기를 받는다 */
+[data-handle="row"] .rdr-item {
+  cursor: grab;
+  touch-action: none;
+}
+
+[data-handle="row"] .rdr-item:active {
+  cursor: grabbing;
+}
+
+/* 면만 진하게: 크기와 그림자 대신 바탕 톤으로 들어 올림을 알린다 */
+[data-lift="tone"] .rdr-item.is-lifted,
+[data-lift="tone"] .rdr-item:active {
+  background: var(--sp-hover);
+}
+
+.rdr-grip {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 32px;
+  margin-left: -6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-muted);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rdr-grip:hover {
+  background: var(--sp-hover);
+  color: var(--sp-secondary);
+}
+
+.rdr-item:focus-visible,
+.rdr-grip:focus-visible,
+.rdr-button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.rdr-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

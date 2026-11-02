@@ -1,0 +1,196 @@
+.dlg-page {
+  display: grid;
+  gap: 16px;
+  min-height: 300px;
+}
+
+.dlg-page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dlg-page-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.dlg-page-head p {
+  margin: 4px 0 0;
+  color: var(--sp-secondary);
+  font-size: 15px;
+}
+
+.dlg-members {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dlg-members li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 15px;
+}
+
+.dlg-members li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.dlg-members span:last-child {
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 14px;
+}
+
+.dlg-avatar {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sp-surface-2);
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dlg-button {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dlg-button:hover {
+  background: var(--sp-hover);
+}
+
+.dlg-button.is-primary {
+  background: var(--sp-accent);
+  color: var(--sp-on-accent);
+}
+
+.dlg-button.is-primary:hover {
+  background: var(--sp-accent-hover);
+}
+
+.dlg-button:focus-visible,
+.dlg-icon:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.dlg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.dlg-backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+.backdrop-dim {
+  background: rgb(8 10 14 / 40%);
+}
+
+.backdrop-soft {
+  background: rgb(8 10 14 / 16%);
+}
+
+.backdrop-blur {
+  background: rgb(8 10 14 / 20%);
+  backdrop-filter: blur(4px);
+}
+
+.dlg-panel {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  width: min(360px, 100%);
+  padding: 20px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  box-shadow: var(--sp-overlay-shadow);
+}
+
+.dlg-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dlg-panel-head h4 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.dlg-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-muted);
+  cursor: pointer;
+}
+
+.dlg-icon:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.dlg-field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-secondary);
+}
+
+.dlg-field input,
+.dlg-field select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 4px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.dlg-field input:focus,
+.dlg-field select:focus {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.dlg-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

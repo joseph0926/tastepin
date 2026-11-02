@@ -1,0 +1,263 @@
+.upl-page {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 380px;
+}
+
+.upl-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.upl-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 72px;
+  border: 1px dashed var(--sp-control-line);
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}
+
+[data-drop="tone"] .upl-zone {
+  border-color: transparent;
+  background: var(--sp-surface-2);
+}
+
+.upl-zone.is-over {
+  border-color: var(--sp-accent);
+  background: var(--sp-accent-soft);
+  color: var(--sp-text);
+}
+
+.upl-zone u {
+  color: var(--sp-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.upl-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* 한 줄 알림 자리. 늘 비워 두어 알림이 나와도 목록이 밀리지 않는다 */
+.upl-notes {
+  display: grid;
+  min-height: 22px;
+}
+
+.upl-notes > p {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.upl-summary {
+  color: var(--sp-secondary);
+}
+
+.upl-summary svg {
+  color: var(--sp-accent);
+}
+
+.upl-banner {
+  flex-wrap: wrap;
+  color: var(--sp-danger);
+}
+
+.upl-banner button,
+.upl-reason button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.upl-area {
+  position: relative;
+  min-height: 160px;
+}
+
+.upl-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.upl-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.upl-item + .upl-item {
+  margin-top: 2px;
+}
+
+.upl-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--sp-surface-2);
+  transition: width 50ms linear;
+}
+
+.upl-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 8px;
+  font-size: 15px;
+}
+
+.upl-row > svg {
+  flex: none;
+  color: var(--sp-muted);
+}
+
+.upl-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-error="banner"] .is-failed .upl-name {
+  color: var(--sp-danger);
+}
+
+.upl-end {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.upl-done,
+.upl-failed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.upl-check {
+  display: inline-flex;
+  color: var(--sp-accent);
+}
+
+.upl-failed svg {
+  color: var(--sp-danger);
+}
+
+.upl-icon-button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.upl-icon-button:hover {
+  background: var(--sp-hover);
+}
+
+.upl-ring circle {
+  fill: none;
+  stroke-width: 2;
+}
+
+.upl-ring {
+  transform: rotate(-90deg);
+}
+
+.upl-ring-track {
+  stroke: var(--sp-surface-2);
+}
+
+.upl-ring-value {
+  stroke: var(--sp-accent);
+  stroke-linecap: round;
+}
+
+.upl-bar {
+  display: block;
+  height: 2px;
+  margin: -4px 8px 6px 34px;
+  background: var(--sp-surface-2);
+}
+
+.upl-bar span {
+  display: block;
+  height: 100%;
+  background: var(--sp-accent);
+}
+
+.upl-reason {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: -6px 8px 8px 34px;
+  color: var(--sp-danger);
+  font-size: 13px;
+}
+
+.upl-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--sp-accent-soft) 92%, transparent);
+  color: var(--sp-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.upl-zone:focus-visible,
+.upl-button:focus-visible,
+.upl-icon-button:focus-visible,
+.upl-banner button:focus-visible,
+.upl-reason button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

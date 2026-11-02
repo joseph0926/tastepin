@@ -1,0 +1,336 @@
+.dtb-page {
+  display: grid;
+  gap: 10px;
+}
+
+.dtb-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+/* 머리글 36px과 4행 남짓이 보이는 높이로 잘라 표 안에서 스크롤하게 한다 */
+.dtb-scroll {
+  overflow: auto;
+  max-height: 214px;
+  overscroll-behavior: contain;
+}
+
+.dtb {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.dtb th,
+.dtb td {
+  height: 44px;
+  padding: 0 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.dtb td {
+  border-top: 1px solid var(--sp-line);
+}
+
+.dtb th:first-child,
+.dtb td:first-child {
+  padding-left: 8px;
+}
+
+.dtb .is-numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dtb-muted {
+  color: var(--sp-secondary);
+}
+
+.dtb th {
+  height: 36px;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* 머리글 고정 */
+[data-sticky="shadow"] .dtb th,
+[data-sticky="line"] .dtb th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+[data-sticky="line"] .dtb th,
+[data-sticky="none"] .dtb th {
+  box-shadow: inset 0 -1px 0 var(--sp-line);
+}
+
+[data-sticky="shadow"] .dtb th {
+  transition: box-shadow 120ms;
+}
+
+[data-sticky="shadow"] .is-scrolled .dtb th {
+  box-shadow: 0 6px 10px -8px rgb(0 0 0 / 35%);
+}
+
+.dtb th button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dtb th.is-numeric button {
+  flex-direction: row-reverse;
+}
+
+.dtb-actions-head {
+  width: 1%;
+}
+
+.dtb-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+/* 행 작업 */
+.dtb-actions {
+  width: 1%;
+  padding-right: 6px;
+  text-align: right;
+}
+
+/* 올리면 나타남: 아이콘은 표 폭을 차지하지 않고 행 끝 위에 겹쳐 뜬다. 겹친 자리는 행의 올림 면으로 가린다 */
+[data-actions="hover"] .dtb-actions {
+  position: relative;
+  width: 0;
+  padding: 0;
+}
+
+.dtb-icons {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: inline-flex;
+  gap: 2px;
+  padding-left: 12px;
+  background: linear-gradient(90deg, transparent, var(--sp-surface-2) 12px);
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 120ms;
+}
+
+.dtb tbody tr:hover .dtb-icons,
+.dtb tbody tr:focus-within .dtb-icons,
+.dtb tbody tr.is-hot .dtb-icons {
+  opacity: 1;
+}
+
+/* 터치 화면에서는 늘 보이도록 행 안 자리로 돌려놓는다 */
+@media (hover: none) {
+  [data-actions="hover"] .dtb-actions {
+    position: static;
+    width: 1%;
+    padding-right: 6px;
+  }
+
+  .dtb-icons {
+    position: static;
+    padding-left: 0;
+    background: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dtb tbody tr:hover,
+.dtb tbody tr.is-hot,
+.dtb tbody tr.is-open {
+  background: var(--sp-surface-2);
+}
+
+[data-actions="row"] .dtb tbody tr {
+  cursor: pointer;
+}
+
+.dtb-icons button,
+.dtb-more,
+.dtb-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.dtb-icons button:hover,
+.dtb-more:hover,
+.dtb-icon-button:hover:not(:disabled) {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.dtb-icon-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.dtb-menu-anchor {
+  position: relative;
+  display: inline-block;
+}
+
+.dtb-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 3;
+  display: grid;
+  min-width: 112px;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  box-shadow: var(--sp-overlay-shadow);
+  transform-origin: top right;
+}
+
+.dtb-menu button {
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dtb-menu button:hover {
+  background: var(--sp-hover);
+}
+
+.dtb-menu .is-danger {
+  color: var(--sp-danger);
+}
+
+.dtb-detail {
+  min-height: 20px;
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 13px;
+}
+
+/* 넘김 */
+.dtb-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dtb-count {
+  color: var(--sp-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dtb-arrows {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.dtb-page-number {
+  min-width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.dtb-page-number.is-current {
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font-weight: 600;
+}
+
+.dtb-button {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dtb-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--sp-secondary);
+  font-size: 13px;
+}
+
+.dtb-size select {
+  height: 30px;
+  padding: 0 6px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.dtb button:focus-visible,
+.dtb tbody tr:focus-visible,
+.dtb-pager button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: -2px;
+}
+
+/* 정렬 바꿈 mark: 자리가 바뀐 행만 옅은 강조 면을 띄웠다가 걷는다 */
+.dtb tbody tr.is-moved {
+  animation: dtb-mark var(--dtb-mark) ease-out;
+}
+
+@keyframes dtb-mark {
+  from {
+    background: var(--sp-accent-soft);
+  }
+}
+
+.dtb-arrow {
+  display: inline-flex;
+}

@@ -1,0 +1,160 @@
+.sts-page {
+  --sts-line: 20px;
+  --sts-button: 36px;
+  display: grid;
+  gap: 12px;
+  max-width: 440px;
+}
+
+.sts-toolbar {
+  display: grid;
+  gap: 6px;
+}
+
+.sts-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sts-download {
+  flex: none;
+  height: var(--sts-button);
+  padding: 0 14px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sts-download:hover:not(:disabled) {
+  background: var(--sp-hover);
+}
+
+.sts-download:disabled {
+  color: var(--sp-muted);
+  cursor: default;
+}
+
+.sts-download:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+/* 새 문구와 나가는 문구가 같은 칸에 겹쳐 바뀌므로 칸의 크기는 문구 수와 상관없이 일정하다 */
+.sts-slot {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+}
+
+.sts-message {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+  line-height: var(--sts-line);
+}
+
+.sts-icon {
+  display: inline-flex;
+  flex: none;
+  color: var(--sp-accent);
+}
+
+.sts-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-place="reserve"] .sts-slot {
+  height: var(--sts-line);
+}
+
+[data-place="beside"] .sts-slot {
+  flex: 1;
+  height: var(--sts-button);
+}
+
+[data-place="overlay"] .sts-slot {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+[data-place="overlay"] .sts-message {
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: var(--sp-inverse);
+  color: var(--sp-on-inverse);
+  box-shadow: var(--sp-overlay-shadow);
+}
+
+[data-place="overlay"] .sts-icon {
+  color: var(--sp-success-on-inverse);
+}
+
+/* 버튼과 문구가 한 줄에 들어가지 않는 폭에서는 문구가 잘리지 않도록 버튼 아래에 늘 비워 둔 한 줄로 내려간다 */
+@container stage (max-width: 300px) {
+  [data-place="beside"] .sts-actions {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  [data-place="beside"] .sts-slot {
+    flex-basis: 100%;
+    height: var(--sts-line);
+  }
+}
+
+.sts-files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sts-files li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.sts-files label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.sts-files input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--sp-accent);
+}
+
+.sts-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sts-size {
+  color: var(--sp-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}

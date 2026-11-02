@@ -1,0 +1,194 @@
+.bdg-page {
+  /* 상태색. 상태 배지에만 쓰고 분류 태그는 무채색으로 둔다 */
+  --bdg-done: #1f7a4d;
+  --bdg-done-soft: #e6f4ec;
+  --bdg-pending: #9a5b00;
+  --bdg-pending-soft: #fbf0dc;
+  --bdg-rejected: #b43b43;
+  --bdg-rejected-soft: #fbe9ea;
+  --bdg-radius: 4px;
+  display: grid;
+  gap: 16px;
+}
+
+.lab[data-theme="dark"] .bdg-page {
+  --bdg-done: #7fd3a6;
+  --bdg-done-soft: #1b3127;
+  --bdg-pending: #f0bd6a;
+  --bdg-pending-soft: #3a2d17;
+  --bdg-rejected: #ff9ea2;
+  --bdg-rejected-soft: #3d2023;
+}
+
+.bdg-page[data-shape="pill"] {
+  --bdg-radius: 999px;
+}
+.bdg-page[data-shape="square"] {
+  --bdg-radius: 2px;
+}
+
+.bdg-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.bdg-head p {
+  margin: 2px 0 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.bdg-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bdg-list li {
+  display: grid;
+  gap: 6px;
+  padding: 12px 0;
+}
+
+.bdg-list li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.bdg-title-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bdg-title-line b {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bdg-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 배지 한 개의 색은 아래 세 변수로 정한다. 기본은 무채색이다 */
+.bdg-badge {
+  --bdg-fg: var(--sp-secondary);
+  --bdg-bg: var(--sp-surface-2);
+  --bdg-dot: var(--sp-muted);
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--bdg-radius);
+  background: var(--bdg-bg);
+  color: var(--bdg-fg);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+[data-color="state"] .tone-done,
+[data-color="state"] .tone-pending,
+[data-color="state"] .tone-rejected {
+  --bdg-fg: var(--bdg-tone);
+  --bdg-bg: var(--bdg-tone-soft);
+  --bdg-dot: var(--bdg-tone);
+}
+.tone-done {
+  --bdg-tone: var(--bdg-done);
+  --bdg-tone-soft: var(--bdg-done-soft);
+}
+.tone-pending {
+  --bdg-tone: var(--bdg-pending);
+  --bdg-tone-soft: var(--bdg-pending-soft);
+}
+.tone-rejected {
+  --bdg-tone: var(--bdg-rejected);
+  --bdg-tone-soft: var(--bdg-rejected-soft);
+}
+
+/* 하나만 강조: 손이 가야 하는 반려만 강조색, 나머지는 무채색 */
+[data-color="focus"] .tone-rejected {
+  --bdg-fg: var(--sp-accent);
+  --bdg-bg: var(--sp-accent-soft);
+  --bdg-dot: var(--sp-accent);
+}
+
+[data-color="mono"] .bdg-status {
+  --bdg-fg: var(--sp-text);
+}
+
+[data-surface="outline"] .bdg-badge {
+  border-color: color-mix(in srgb, var(--bdg-fg) 45%, transparent);
+  background: transparent;
+}
+
+[data-surface="dot"] .bdg-badge {
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+[data-surface="dot"] .bdg-status {
+  color: var(--sp-text);
+}
+
+.bdg-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bdg-dot);
+}
+
+/* 점과 글자에서는 분류 태그를 점 없이 보조색 글자로 둔다. 태그 사이는 가운뎃점 대신 간격으로 나눈다 */
+[data-surface="dot"] .bdg-meta {
+  gap: 10px;
+}
+
+.bdg-code {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bdg-code-number {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  letter-spacing: 0;
+}
+
+[data-code="mono"] .bdg-code {
+  color: var(--sp-secondary);
+  font-size: 13px;
+}
+
+[data-code="prefix"] .bdg-code {
+  font-size: 13px;
+}
+[data-code="prefix"] .bdg-code-prefix {
+  color: var(--sp-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+[data-code="prefix"] .bdg-code-number {
+  color: var(--sp-text);
+}
+
+[data-code="badge"] .bdg-code-number {
+  font-size: 12px;
+}

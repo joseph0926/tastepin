@@ -1,0 +1,280 @@
+.srt-page {
+  display: grid;
+  gap: 10px;
+}
+
+.srt-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.srt-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.srt-count {
+  color: var(--sp-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.srt-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* 버튼과 메뉴 */
+.srt-anchor {
+  position: relative;
+}
+
+.srt-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 8px 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.srt-trigger svg {
+  color: var(--sp-muted);
+}
+
+.srt-trigger.is-icon {
+  justify-content: center;
+  width: 32px;
+  padding: 0;
+}
+
+.srt-trigger.is-icon svg {
+  color: var(--sp-secondary);
+}
+
+.srt-trigger:hover,
+.srt-trigger.is-open {
+  background: var(--sp-hover);
+}
+
+.srt-prefix {
+  color: var(--sp-secondary);
+}
+
+.srt-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  min-width: 168px;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  box-shadow: var(--sp-overlay-shadow);
+  transform-origin: top right;
+}
+
+.srt-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.srt-menu-item:focus-visible {
+  outline: none;
+}
+
+.srt-menu-highlight {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--sp-hover);
+}
+
+.srt-menu-label {
+  position: relative;
+  flex: 1;
+}
+
+.srt-menu-item svg {
+  position: relative;
+  color: var(--sp-accent);
+}
+
+/* 기본 선택 상자. 닫힌 모양만 버튼과 맞춘다 */
+.srt-select {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.srt-select select {
+  height: 32px;
+  padding: 0 28px 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.srt-select select:hover {
+  background: var(--sp-hover);
+}
+
+.srt-select svg {
+  position: absolute;
+  right: 8px;
+  color: var(--sp-muted);
+  pointer-events: none;
+}
+
+/* 늘 보이는 세그먼트 */
+.srt-segmented {
+  display: flex;
+}
+
+.srt-segment {
+  position: relative;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.srt-segment[aria-checked="true"] {
+  color: var(--sp-text);
+  font-weight: 600;
+}
+
+.srt-underline {
+  position: absolute;
+  inset: auto 6px 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--sp-text);
+}
+
+/* 방향 버튼 */
+.srt-direction {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.srt-direction:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.srt-direction-icon {
+  display: grid;
+  place-items: center;
+}
+
+.srt-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.srt-list li {
+  position: relative;
+  background: var(--sp-surface);
+}
+
+.srt-list li + li .srt-row {
+  border-top: 1px solid var(--sp-line);
+}
+
+/* 바뀐 행만 표시: 옅은 강조 면을 띄웠다가 전역 곡선(ease-out-cubic)으로 걷는다 */
+.srt-mark {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background: var(--sp-accent-soft);
+  opacity: 0;
+  pointer-events: none;
+  animation: srt-mark var(--srt-mark) cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@keyframes srt-mark {
+  from {
+    opacity: 1;
+  }
+}
+
+.srt-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  font-size: 15px;
+}
+
+.srt-row svg {
+  flex: none;
+  color: var(--sp-muted);
+}
+
+.srt-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.srt-meta {
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.srt-trigger:focus-visible,
+.srt-select select:focus-visible,
+.srt-segment:focus-visible,
+.srt-direction:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

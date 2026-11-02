@@ -1,0 +1,148 @@
+.tbl-page {
+  --tbl-row: 44px;
+  --tbl-text: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.tbl-page[data-density="compact"] {
+  --tbl-row: 36px;
+}
+
+.tbl-page[data-density="roomy"] {
+  --tbl-row: 52px;
+  --tbl-text: 15px;
+}
+
+.tbl-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.tbl-scroll {
+  overflow-x: auto;
+}
+
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--tbl-text);
+}
+
+.tbl th,
+.tbl td {
+  height: var(--tbl-row);
+  padding: 0 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tbl th:first-child,
+.tbl td:first-child {
+  padding-left: 8px;
+}
+
+.tbl .is-numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tbl-muted {
+  color: var(--sp-secondary);
+}
+
+/* 머리글 */
+.tbl th {
+  height: 36px;
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+[data-header="plain"] .tbl thead tr,
+[data-header="quiet"] .tbl thead tr {
+  border-bottom: 1px solid var(--sp-line);
+}
+
+[data-header="tone"] .tbl thead tr {
+  background: var(--sp-surface-2);
+}
+
+[data-header="quiet"] .tbl th {
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.tbl th button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.tbl th.is-numeric button {
+  flex-direction: row-reverse;
+}
+
+.tbl th button:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+/* 정렬 표시 */
+.tbl-arrow {
+  flex: none;
+  color: var(--sp-muted);
+}
+
+.tbl-arrow.is-on {
+  color: var(--sp-text);
+}
+
+[data-sort="arrow"] .tbl-arrow:not(.is-on) {
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+[data-sort="arrow"] .tbl th button:hover .tbl-arrow,
+[data-sort="arrow"] .tbl th button:focus-visible .tbl-arrow {
+  opacity: 0.6;
+}
+
+[data-sort="always"] .tbl-arrow:not(.is-on) {
+  opacity: 0.55;
+}
+
+[data-sort="weight"] .tbl th.is-active {
+  color: var(--sp-text);
+  font-weight: 700;
+}
+
+.tbl-dir {
+  color: var(--sp-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 행 구분 */
+[data-rows="line"] .tbl tbody tr + tr {
+  border-top: 1px solid var(--sp-line);
+}
+
+[data-rows="zebra"] .tbl tbody tr:nth-child(even) {
+  background: var(--sp-surface-2);
+}
+
+[data-rows="space"] .tbl tbody tr:hover {
+  background: var(--sp-surface-2);
+}

@@ -1,0 +1,332 @@
+.flt-page {
+  display: grid;
+  gap: 10px;
+}
+
+.flt-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.flt-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.flt-toolbar {
+  position: relative;
+  display: flex;
+  gap: 6px;
+}
+
+.flt-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.flt-trigger svg {
+  color: var(--sp-muted);
+}
+
+.flt-trigger:hover,
+.flt-trigger.is-open {
+  background: var(--sp-hover);
+}
+
+.flt-trigger.is-active {
+  border-color: transparent;
+  background: var(--sp-accent-soft);
+  color: var(--sp-accent);
+  font-weight: 600;
+}
+
+.flt-trigger.is-active svg {
+  color: inherit;
+}
+
+/* 값 목록. 드롭다운 시편과 같은 표면과 그림자다 */
+.flt-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 10;
+  display: grid;
+  gap: 4px;
+  width: 220px;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 6px;
+  background: var(--sp-raised);
+  box-shadow: var(--sp-overlay-shadow);
+  transform-origin: top left;
+}
+
+.flt-group {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.flt-group legend {
+  padding: 8px 10px 4px;
+  color: var(--sp-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flt-group + .flt-group {
+  padding-top: 4px;
+  border-top: 1px solid var(--sp-line);
+}
+
+.flt-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.flt-option:hover {
+  background: var(--sp-hover);
+}
+
+.flt-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flt-box {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 4px;
+  color: var(--sp-on-accent);
+}
+
+.flt-option input:checked + .flt-box {
+  border-color: var(--sp-accent);
+  background: var(--sp-accent);
+}
+
+.flt-option input:focus-visible + .flt-box {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.flt-option-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.flt-option-count {
+  color: var(--sp-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.flt-option.is-disabled {
+  color: var(--sp-muted);
+  cursor: default;
+}
+
+.flt-option.is-disabled:hover {
+  background: none;
+}
+
+.flt-option.is-disabled .flt-box {
+  opacity: 0.5;
+}
+
+.flt-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px;
+  border-top: 1px solid var(--sp-line);
+}
+
+.flt-primary,
+.flt-secondary {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.flt-primary {
+  background: var(--sp-inverse);
+  color: var(--sp-on-inverse);
+}
+
+.flt-primary:hover {
+  background: var(--sp-inverse-hover);
+}
+
+.flt-primary.is-wide {
+  flex: 1;
+}
+
+.flt-secondary {
+  box-shadow: inset 0 0 0 1px var(--sp-control-line);
+  background: none;
+  color: var(--sp-text);
+}
+
+.flt-secondary:hover {
+  background: var(--sp-hover);
+}
+
+.flt-text-button {
+  height: 28px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.flt-text-button:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+/* 결과 줄은 조건 표시 방식과 상관없이 한 줄 높이를 잡아 목록이 밀리지 않는다 */
+.flt-result-line {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  min-width: 0;
+}
+
+.flt-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.flt-count > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flt-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.flt-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 8px 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.flt-chip svg {
+  color: var(--sp-muted);
+}
+
+.flt-chip:hover {
+  background: var(--sp-hover);
+}
+
+/* 결과 수가 바뀌어도 무대가 출렁이지 않게 일곱 행 높이를 잡는다 */
+.flt-list {
+  min-height: calc(7 * 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.flt-list li {
+  overflow: hidden;
+}
+
+.flt-list li + li .flt-row {
+  border-top: 1px solid var(--sp-line);
+}
+
+.flt-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  font-size: 15px;
+}
+
+.flt-row svg {
+  flex: none;
+  color: var(--sp-muted);
+}
+
+.flt-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flt-meta {
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.flt-trigger:focus-visible,
+.flt-chip:focus-visible,
+.flt-text-button:focus-visible,
+.flt-primary:focus-visible,
+.flt-secondary:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,137 @@
+.seg {
+  display: grid;
+  gap: 20px;
+}
+
+.seg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.seg-caption {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.seg-track {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.seg-track.thumb-raised {
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+.seg-option {
+  position: relative;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.thumb-raised .seg-option {
+  height: 30px;
+}
+
+.seg-option:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 1px;
+}
+
+.seg-option.is-active {
+  color: var(--sp-text);
+}
+
+.thumb-filled .seg-option.is-active {
+  color: var(--sp-on-accent);
+}
+
+.seg-label {
+  position: relative;
+}
+
+.seg-thumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+}
+
+.thumb-raised .seg-thumb {
+  background: var(--sp-raised);
+  box-shadow: 0 1px 2px rgb(16 20 28 / 12%);
+}
+
+.thumb-filled .seg-thumb {
+  background: var(--sp-accent);
+}
+
+.thumb-underline .seg-option {
+  padding: 0 10px;
+  border-radius: 0;
+}
+
+.thumb-underline .seg-thumb {
+  inset: auto 6px 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--sp-text);
+}
+
+.seg-preview {
+  display: grid;
+}
+
+.seg-preview-layer {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 14px;
+}
+
+.seg-total {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  font-size: 15px;
+  color: var(--sp-secondary);
+}
+
+.seg-total-value {
+  color: var(--sp-text);
+  font-size: 28px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.seg-unit {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--sp-muted);
+}
+
+.seg-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
+  gap: 8px;
+  height: 120px;
+}
+
+.seg-bar {
+  display: block;
+  border-radius: 2px 2px 0 0;
+  background: var(--sp-chart);
+}

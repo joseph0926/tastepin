@@ -1,0 +1,105 @@
+.mrs {
+  display: grid;
+  gap: 14px;
+  min-height: 300px;
+  align-content: start;
+}
+
+.mrs-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mrs-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.mrs-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.mrs-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mrs-primary {
+  border-color: var(--sp-accent);
+  background: var(--sp-accent);
+  color: var(--sp-on-accent);
+}
+
+.mrs-button:focus-visible,
+.mrs-dismiss:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+/* 알림이 나가는 동안 남은 항목이 자리를 옮기므로 목록 높이를 미리 잡아 둔다 */
+.mrs-list {
+  display: grid;
+  gap: 8px;
+  min-height: 240px;
+  align-content: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mrs-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 6px 0 14px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  font-size: 14px;
+}
+
+.mrs-dismiss {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+/* 자릿수가 바뀌어도 글자 폭이 흔들리지 않게 고정폭 숫자를 쓴다 */
+.mrs-count {
+  color: var(--sp-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.mrs-roll {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.mrs-roll > span {
+  display: inline-block;
+}

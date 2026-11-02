@@ -1,0 +1,150 @@
+.rdg {
+  display: grid;
+  gap: var(--rdg-block-gap);
+  max-width: 560px;
+}
+
+/* 한글 본문 */
+
+.rdg[data-body="tight"] {
+  --rdg-body-size: 15px;
+  --rdg-body-leading: 1.55;
+}
+
+.rdg[data-body="regular"] {
+  --rdg-body-size: 16px;
+  --rdg-body-leading: 1.65;
+}
+
+.rdg[data-body="airy"] {
+  --rdg-body-size: 17px;
+  --rdg-body-leading: 1.75;
+}
+
+/* 밀도 */
+
+.rdg[data-density="compact"] {
+  --rdg-block-gap: 12px;
+  --rdg-row-pad: 6px;
+  --rdg-row-gap: 0px;
+}
+
+.rdg[data-density="regular"] {
+  --rdg-block-gap: 20px;
+  --rdg-row-pad: 11px;
+  --rdg-row-gap: 2px;
+}
+
+.rdg[data-density="spacious"] {
+  --rdg-block-gap: 30px;
+  --rdg-row-pad: 16px;
+  --rdg-row-gap: 4px;
+}
+
+/* 제목 위계 */
+
+.rdg[data-heading="scale"] {
+  --rdg-title-size: 30px;
+  --rdg-title-weight: 600;
+  --rdg-title-tracking: -0.02em;
+  --rdg-sub-size: 18px;
+  --rdg-sub-weight: 600;
+  --rdg-title-font: inherit;
+}
+
+.rdg[data-heading="weight"] {
+  --rdg-title-size: 21px;
+  --rdg-title-weight: 750;
+  --rdg-title-tracking: -0.01em;
+  --rdg-sub-size: 16px;
+  --rdg-sub-weight: 750;
+  --rdg-title-font: inherit;
+}
+
+.rdg[data-heading="serif"] {
+  --rdg-title-size: 27px;
+  --rdg-title-weight: 600;
+  --rdg-title-tracking: -0.01em;
+  --rdg-sub-size: 18px;
+  --rdg-sub-weight: 600;
+  --rdg-title-font: "Noto Serif KR", serif;
+}
+
+/* 한글 서체. 명조 제목(heading=serif)은 제목만 --rdg-title-font로 따로 둔다 */
+
+.rdg[data-face="noto"] {
+  font-family: "DM Sans", "Noto Sans KR", sans-serif;
+}
+
+.rdg[data-face="pretendard"] {
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+}
+
+.rdg[data-face="suit"] {
+  font-family: "SUIT Variable", sans-serif;
+}
+
+/* 제목 굵기. 굵기 대비 제목의 크기는 그대로 두고 굵기만 바꾼다 */
+
+.rdg[data-titleweight="bold"] {
+  --rdg-title-weight: 650;
+  --rdg-sub-weight: 650;
+}
+
+.rdg[data-titleweight="semibold"] {
+  --rdg-title-weight: 600;
+  --rdg-sub-weight: 600;
+}
+
+.rdg h3,
+.rdg h4 {
+  margin: 0;
+  font-family: var(--rdg-title-font);
+  letter-spacing: var(--rdg-title-tracking);
+  line-height: 1.3;
+}
+
+.rdg h3 {
+  font-size: var(--rdg-title-size);
+  font-weight: var(--rdg-title-weight);
+}
+
+.rdg h4 {
+  margin-bottom: calc(var(--rdg-block-gap) / 2);
+  font-size: var(--rdg-sub-size);
+  font-weight: var(--rdg-sub-weight);
+}
+
+.rdg-head .rdg-meta {
+  margin: 6px 0 0;
+}
+
+.rdg-meta {
+  color: var(--sp-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.rdg-body {
+  margin: 0;
+  font-size: var(--rdg-body-size);
+  line-height: var(--rdg-body-leading);
+}
+
+.rdg-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rdg-list li {
+  display: grid;
+  gap: var(--rdg-row-gap);
+  padding: var(--rdg-row-pad) 0;
+}
+
+.rdg-item-title {
+  font-size: var(--rdg-body-size);
+  font-weight: 550;
+  line-height: 1.45;
+}
