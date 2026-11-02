@@ -62,7 +62,7 @@ python3 -B taste.py apply /path/to/project --check
 printf '%s\n' '버튼 사이 간격이 너무 좁아요' | python3 -B taste.py record --surface codex
 ```
 
-기존 대화 기록을 읽으려는 경우에만 `python3 -B taste.py harvest` 또는 `open --harvest`를 사용합니다. 수집 대상은 로컬 Claude Code와 Codex 대화 기록이며, 해당 CLI를 실행하지는 않습니다. `effect --since YYYY-MM-DD`는 사용 시작일 전후의 대화 기록을 다시 읽는 선택 기능입니다. 비교 결과만으로 디자인 품질 개선을 증명하지는 않습니다.
+기존 대화 기록을 읽으려는 경우에만 `python3 -B taste.py harvest` 또는 `open --harvest`를 사용합니다. 수집 대상은 로컬 Claude Code와 Codex 대화 기록이며, 해당 CLI를 실행하지는 않습니다. `effect --since YYYY-MM-DD`는 사용 시작일 전후의 대화 기록을 다시 읽는 선택 기능입니다. 사용 방식을 중간에 바꿨다면 `--change YYYY-MM-DD:이름`을 더해 최근 구간을 그 날 전후로 나눠 봅니다. 여러 번 줄 수 있고, `--since`에도 `:이름`을 붙여 첫 구간의 이름을 정할 수 있습니다. 비교 결과만으로 디자인 품질 개선을 증명하지는 않습니다.
 
 - `state/`: 선택, 피드백 원문 일부, 세션 식별자, 작업 경로와 실행 기록.
 - `data/rules.json`: 사용자가 저장한 개인 규칙. 파일이 없으면 빈 규칙으로 시작합니다.

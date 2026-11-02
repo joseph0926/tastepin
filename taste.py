@@ -549,12 +549,36 @@ def cmd_lint(args):
     sys.exit(subprocess.call(command))
 
 
+def _dated(required_label):
+    """`YYYY-MM-DD[:이름]` 인자를 (날짜, 이름)으로 읽는 argparse 형식. 이름은 효과 보고에서 구간을 가리킨다."""
+
+    def parse(text):
+        day_text, has_label, label = text.partition(":")
+        try:
+            day = datetime.date.fromisoformat(day_text)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"날짜는 YYYY-MM-DD 형식이어야 합니다: {day_text}") from None
+        label = label.strip()
+        if required_label and not label:
+            raise argparse.ArgumentTypeError(f"날짜 뒤에 ':이름'이 필요합니다: {text}")
+        if has_label and not label:
+            raise argparse.ArgumentTypeError(f"':' 뒤 이름이 비었습니다: {text}")
+        return day, label or "Tastepin 사용"
+
+    return parse
+
+
 def cmd_effect(args):
     """효과 판정 재료. 지난 대화 기록을 다시 읽으므로 수십 초 걸릴 수 있다."""
     from tastelib import effect
 
-    effect.INTRODUCED = args.since
-    effect.INTERVENTIONS = ((args.since, "Tastepin 사용"),)
+    since, label = args.since
+    changes = sorted(args.change or [])
+    days = [day for day, _ in changes]
+    if any(day <= since for day in days) or len(set(days)) != len(days):
+        sys.exit("--change 날짜는 --since 뒤여야 하고 서로 달라야 합니다.")
+    effect.INTRODUCED = since
+    effect.INTERVENTIONS = ((since, label), *changes)
     if args.freeze:
         baseline, created = effect.freeze_baseline()
         summary = baseline["summary"]
@@ -648,7 +672,14 @@ def main():
     lint.add_argument("--no-log", action="store_true", help="state/lint.jsonl에 남기지 않는다")
     add("export", cmd_export, "TASTE.md 생성")
     effect_cmd = add("effect", cmd_effect, "훅 도입 전후의 지적 빈도를 같은 기준으로 비교")
-    effect_cmd.add_argument("--since", type=datetime.date.fromisoformat, required=True, help="취향을 적용하기 시작한 날짜 YYYY-MM-DD")
+    effect_cmd.add_argument(
+        "--since", type=_dated(required_label=False), required=True,
+        help="취향을 적용하기 시작한 날짜 YYYY-MM-DD[:이름]. 이름이 없으면 'Tastepin 사용'",
+    )
+    effect_cmd.add_argument(
+        "--change", type=_dated(required_label=True), action="append",
+        help="소비 방식을 바꾼 날짜 YYYY-MM-DD:이름. 이번 구간을 이 날로 나눠 따로 센다. 여러 번 줄 수 있다",
+    )
     effect_cmd.add_argument("--freeze", action="store_true", help="도입 전 기준선을 계산해 고정 (이미 있으면 그대로)")
     effect_cmd.add_argument("--save-version", metavar="이유", help="최초 기준선을 보존하고 현재 정의의 재계산본을 별도 저장")
     lab_cmd = add("lab", cmd_lab, "labs 시편 비교 화면 열기 (원장 서버와 labs 개발 서버를 필요하면 띄운다)")
