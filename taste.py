@@ -99,13 +99,15 @@ def _start_background(port):
 
 
 def _running_server(port):
-    """떠 있는 서버가 ping으로 알린 코드 지문과 pid. 서버가 없으면 None. 지문이 없는 옛 서버면 code가 빈 문자열이다."""
+    """떠 있는 서버가 ping으로 알린 코드 지문, pid, 설치 폴더와 기록 폴더. 서버가 없으면 None.
+    지문이 없는 옛 서버면 code가 빈 문자열이다. 기록 폴더를 알리지 않는 판은 설치 폴더의 기록만 썼다."""
     try:
         with urllib.request.urlopen(_url(port) + "api/ping", timeout=0.5) as response:
             payload = json.loads(response.read() or b"{}")
     except (OSError, ValueError):
         return None
-    return {"code": payload.get("code", ""), "pid": payload.get("pid"), "root": payload.get("root")}
+    root = payload.get("root")
+    return {"code": payload.get("code", ""), "pid": payload.get("pid"), "root": root, "data": payload.get("data", root)}
 
 
 def _stop_stale_server(port, running):
@@ -131,6 +133,12 @@ def _ensure_server(port):
     running = _running_server(port)
     if running and running.get("root") != store.ROOT:
         sys.exit(f"{port} 포트를 다른 서버가 사용 중입니다. 해당 서버를 종료하거나 다른 포트를 지정하세요.")
+    # 같은 설치라도 다른 기록 폴더의 서버는 다른 사람이나 다른 실행 경로의 원장이다. 다시 쓰거나 끄지 않는다
+    if running and running["data"] != store.DATA_ROOT:
+        sys.exit(
+            f"{port} 포트를 다른 기록 폴더({running['data']})의 서버가 사용 중입니다. "
+            "해당 서버를 종료하거나 다른 포트를 지정하세요."
+        )
     if running and running["code"] == server.code_version():
         return
     if running:
@@ -648,6 +656,9 @@ def main():
     lab_cmd.add_argument("--no-browser", action="store_true")
 
     args = parser.parse_args()
+    problems = store.location_problems()
+    if problems:
+        sys.exit("\n".join(problems))
     args.handler(args)
 
 

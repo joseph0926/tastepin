@@ -9,6 +9,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import tempfile
 from contextlib import contextmanager
 
@@ -18,17 +19,36 @@ except ImportError:  # Windows에는 없다. 이 원장은 mac에서만 쓰므�
     fcntl = None
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 개인 기록(판정, 선택, 규칙, 생성 문서)을 둘 폴더. TASTEPIN_DATA로 설치 밖 폴더를 고를 수 있고, 그 안의 구조는
+# 설치 폴더와 같다(state/, data/rules.json, TASTE.md). 증상 카탈로그는 코드와 함께 배포하므로 설치 폴더에 남는다.
+DATA_ROOT = os.path.abspath(os.path.expanduser(os.environ.get("TASTEPIN_DATA") or ROOT))
 DATA_DIR = os.path.join(ROOT, "data")
-STATE_DIR = os.path.join(ROOT, "state")
+STATE_DIR = os.path.join(DATA_ROOT, "state")
 SYMPTOMS_PATH = os.path.join(DATA_DIR, "symptoms.json")
-RULES_PATH = os.path.join(DATA_DIR, "rules.json")
+RULES_PATH = os.path.join(DATA_ROOT, "data", "rules.json")
 VERDICTS_PATH = os.path.join(STATE_DIR, "verdicts.jsonl")
 CURSOR_PATH = os.path.join(STATE_DIR, "cursor.json")
-EXPORT_PATH = os.path.join(ROOT, "TASTE.md")
+EXPORT_PATH = os.path.join(DATA_ROOT, "TASTE.md")
 DELIVERIES_PATH = os.path.join(STATE_DIR, "deliveries.jsonl")
 LINT_LOG_PATH = os.path.join(STATE_DIR, "lint.jsonl")
 
-CLI = "python3 -B " + os.path.join(ROOT, "taste.py").replace(os.path.expanduser("~"), "~")
+
+def shell_path(path):
+    """안내 명령에 넣을 경로. 홈 아래는 ~로 줄이고, 공백 같은 셸 문자가 있으면 인용한다(~ 뒤는 인용해도 펼쳐진다)."""
+    home = os.path.expanduser("~")
+    if path.startswith(home + os.sep):
+        return "~/" + shlex.quote(os.path.relpath(path, home))
+    return shlex.quote(path)
+
+
+# 안내 문구에 넣는 실행 명령. 에이전트가 안내대로 새로 실행한 명령도 같은 기록 폴더를 써야 한다.
+# 기록 폴더를 정해 주는 실행 파일은 TASTEPIN_ENTRY로 자기 경로를 알리고, 그런 파일 없이 TASTEPIN_DATA만
+# 받았으면 명령 앞에 그 값을 붙인다.
+ENTRY = os.path.abspath(os.path.expanduser(os.environ.get("TASTEPIN_ENTRY") or os.path.join(ROOT, "taste.py")))
+DATA_PREFIX = (
+    f"TASTEPIN_DATA={shell_path(DATA_ROOT)} " if DATA_ROOT != ROOT and not os.environ.get("TASTEPIN_ENTRY") else ""
+)
+CLI = DATA_PREFIX + "python3 -B " + shell_path(ENTRY)
 LINT_COMMAND = CLI + " lint <url>"
 # probe.js와 lint.py가 값으로 재는 증상. tests/test_lint.py가 두 파일과 어긋나지 않는지 확인한다
 LINT_SYMPTOMS = frozenset({
@@ -109,6 +129,17 @@ def write_jsonl(path, rows):
     _write_atomic(path, "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows))
 
 
+def location_problems():
+    """환경변수로 받은 기록 폴더와 실행 경로가 실제로 있는지 본다. 오타 난 경로에 빈 원장을 새로 만들거나
+    없는 실행 파일을 안내하지 않게 명령 실행 전에 멈춘다."""
+    problems = []
+    if os.environ.get("TASTEPIN_DATA") and not os.path.isdir(DATA_ROOT):
+        problems.append(f"TASTEPIN_DATA 폴더가 없습니다: {DATA_ROOT}")
+    if os.environ.get("TASTEPIN_ENTRY") and not os.path.isfile(ENTRY):
+        problems.append(f"TASTEPIN_ENTRY 실행 파일이 없습니다: {ENTRY}")
+    return problems
+
+
 def _read_json(path, default):
     if not os.path.exists(path):
         return default
@@ -122,6 +153,17 @@ def load_symptoms():
 
 def load_rules():
     return _read_json(RULES_PATH, {"rules": []})
+
+
+def unknown_symptoms(rules_doc, symptoms_doc):
+    """규칙이 참조하지만 증상 카탈로그에 없는 증상. 없는 증상은 판정에 붙지 않아 규칙의 근거가 늘지 않는다."""
+    known = {symptom["id"] for symptom in symptoms_doc["symptoms"]}
+    unknown = {}
+    for rule in rules_doc["rules"]:
+        missing = [symptom for symptom in rule.get("symptoms", []) if symptom not in known]
+        if missing:
+            unknown[rule["id"]] = missing
+    return unknown
 
 
 def save_rules(rules_doc):

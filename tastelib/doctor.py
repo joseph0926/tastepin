@@ -51,6 +51,16 @@ def _tool_lines():
     return results
 
 
+def _ledger_lines():
+    results = [(True, f"기록 폴더 {store.DATA_ROOT.replace(HOME, '~')}")]
+    unknown = store.unknown_symptoms(store.load_rules(), store.load_symptoms())
+    for rule_id, symptoms in unknown.items():
+        results.append((False, f"규칙 {rule_id}의 증상 중 카탈로그에 없는 것: {', '.join(symptoms)}"))
+    if not unknown:
+        results.append((True, "규칙이 참조하는 증상이 모두 카탈로그에 있다"))
+    return results
+
+
 def _repo_lines():
     results = []
     for path in repo.applied_repos():
@@ -86,6 +96,7 @@ def report():
     sections = (
         ("훅", _hook_lines()),
         ("스킬", _skill_lines()),
+        ("원장", _ledger_lines()),
         ("도구", _tool_lines()),
         ("저장소 사본", _repo_lines()),
     )

@@ -265,7 +265,7 @@ class Handler(SimpleHTTPRequestHandler):
             return None
         url = urlparse(self.path)
         if url.path == "/api/ping":
-            return self._send_json(200, {"ok": True, "code": LOADED_VERSION, "pid": os.getpid(), "root": store.ROOT})
+            return self._send_json(200, {"ok": True, "code": LOADED_VERSION, "pid": os.getpid(), "root": store.ROOT, "data": store.DATA_ROOT})
         if url.path == "/api/state":
             return self._send_json(200, _state_payload())
         if url.path == "/api/lab/state":

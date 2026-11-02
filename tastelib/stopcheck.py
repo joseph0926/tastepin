@@ -18,7 +18,8 @@ from . import inject, store
 
 UI_FILE = re.compile(r"\.(tsx|jsx|css|scss|sass|less|vue|svelte|html|astro|mdx)$", re.I)
 EDIT_TOOLS = {"Edit", "Write", "MultiEdit", "NotebookEdit"}
-LINT_CALL = re.compile(r"taste\.py\s+lint\b|(^|\s)/taste\s+(점검|lint)\b")
+# 안내 명령은 공백이 든 경로를 인용하므로 taste.py 뒤에 닫는 따옴표가 올 수 있다
+LINT_CALL = re.compile(r"taste\.py['\"]?\s+lint\b|(^|\s)/taste\s+(점검|lint)\b")
 PATCH_PATH = re.compile(r"^\*\*\* (?:(?:Add|Update|Delete) File|Move to): (.+)$", re.M)
 
 

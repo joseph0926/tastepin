@@ -175,7 +175,7 @@ def build(catalog, judgments, rules_doc, verdicts, symptoms_doc, request="", com
             "위 값이 들어 있다. 프로젝트가 쓰는 쪽을 import해 숫자를 다시 적지 않는다.",
             "",
             "### 끝나면",
-            f"로컬에 취향 원장(`{store.CLI.split(' ')[-1]}`)이 있으면: {store.LINT_GUIDE} "
+            f"로컬에 취향 원장(`{store.shell_path(store.ENTRY)}`)이 있으면: {store.LINT_GUIDE} "
             "없으면(클라우드 세션 등) 위 값과 규칙을 화면에서 직접 확인하고 확인한 범위를 보고한다.",
         ]
     else:

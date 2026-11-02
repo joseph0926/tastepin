@@ -39,7 +39,7 @@ JUDGMENTS_PATH = os.path.join(store.STATE_DIR, "judgments.jsonl")
 LABS_PORT = 5181
 LABS_PID_PATH = os.path.join(store.STATE_DIR, "labs.pid")
 LABS_LOG_PATH = os.path.join(store.STATE_DIR, "labs.log")
-LAB_COMMAND = "python3 -B " + os.path.join(store.ROOT, "taste.py").replace(HOME, "~") + " lab"
+LAB_COMMAND = store.CLI + " lab"
 
 OUTCOMES = ("chose", "same", "none")
 GLOBAL_AXES = ("visual", "motion")
