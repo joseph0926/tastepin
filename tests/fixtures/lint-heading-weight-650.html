@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>굵기 650 제목</title>
+  <style>
+    :root { --bg: #ffffff; --ink: #111111; --ink-2: #4d4d4d; --accent: #1d4ed8; color-scheme: light; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0f0f0f; --ink: #f2f2f2; --ink-2: #b8b8b8; --accent: #93b4ff; color-scheme: dark; }
+    }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+    main { max-width: 680px; margin: 0 auto; padding: 48px 16px; }
+    /* 크기 위계 점검의 굵기 예외 경계: 제목 21px, 본문 15px(비율 1.4) */
+    h1 { font-family: Georgia, "Apple SD Gothic Neo", serif; font-size: 21px; font-weight: 650; line-height: 1.35; margin: 0 0 32px; }
+    h2 { font-size: 16px; font-weight: 650; margin: 40px 0 8px; }
+    p { font-size: 15px; line-height: 1.6; color: var(--ink-2); margin: 0 0 12px; }
+    a { color: var(--accent); transition: color 0.15s ease-out; }
+    @media (prefers-reduced-motion: reduce) { a { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Quiet ledger</h1>
+    <h2>첫 번째 묶음</h2>
+    <p>그룹은 여백과 글자 굵기로 나누고, 테두리와 카드는 쓰지 않는다. 본문은 한글 서체로 열여섯 픽셀과 넉넉한 줄 간격을 둔다.</p>
+    <p>강조색은 <a href="#">링크 하나</a>에만 쓰고 나머지는 무채색 단계로 둔다.</p>
+    <h2>두 번째 묶음</h2>
+    <p>두 번째 묶음도 같은 리듬으로 이어진다. 화면에는 지배적인 생각 하나만 남긴다.</p>
+  </main>
+</body>
+</html>
