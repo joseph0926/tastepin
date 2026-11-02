@@ -583,12 +583,12 @@ class ServerVersionTests(unittest.TestCase):
         return ping, stop_pid, start
 
     def test_restarts_server_that_runs_other_code(self):
-        _, stop_pid, start = self.ensure([{"code": "", "pid": None, "root": store.ROOT}, None])
+        _, stop_pid, start = self.ensure([{"code": "", "pid": None, "root": store.ROOT, "data": store.DATA_ROOT}, None])
         stop_pid.assert_called_once()
         start.assert_called_once_with(4870)
 
     def test_keeps_server_that_runs_current_code(self):
-        _, stop_pid, start = self.ensure([{"code": "new", "pid": 1, "root": store.ROOT}])
+        _, stop_pid, start = self.ensure([{"code": "new", "pid": 1, "root": store.ROOT, "data": store.DATA_ROOT}])
         stop_pid.assert_not_called()
         start.assert_not_called()
 

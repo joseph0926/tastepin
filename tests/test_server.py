@@ -43,6 +43,12 @@ class RequestGuardTest(unittest.TestCase):
         connection.close()
         return response.status, payload
 
+    def test_ping_reports_install_and_data_folders(self):
+        status, payload = self.request("GET", "/api/ping")
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["root"], server.store.ROOT)
+        self.assertEqual(payload["data"], server.store.DATA_ROOT)
+
     def test_ping_without_browser_headers_passes(self):
         status, payload = self.request("GET", "/api/ping")
         self.assertEqual(status, 200)

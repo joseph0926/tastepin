@@ -104,6 +104,14 @@ class StopCheckTests(LedgerCase):
         entries.append(tool("Edit", file_path="/p/src/button.css"))
         self.assertIsNotNone(self.run_stop(entries), "lint 뒤에 다시 고쳤으면 다시 확인한다")
 
+    def test_lint_through_a_quoted_entry_path_counts(self):
+        store.log_delivery("skill", session="s1")
+        entries = [
+            user("버튼 고쳐줘"), tool("Write", file_path="/p/src/button.css"),
+            tool("Bash", command="python3 -B '/my tools/taste/taste.py' lint localhost:3000 --session s1"),
+        ]
+        self.assertIsNone(self.run_stop(entries))
+
     def test_only_this_turn_and_only_screen_files_count(self):
         store.log_delivery("skill", session="s1")
         earlier = [user("화면 만들어줘"), tool("Edit", file_path="/p/a.tsx"), tool_result()]
@@ -210,6 +218,22 @@ class DoctorTests(LedgerCase):
         self.assertIn("훅은 선택 기능입니다", text)
         self.assertIn("확인 필요  동봉된 tastepin 스킬", text)
         self.assertIn("홈 스킬 설치 생략됨", text)
+        self.assertGreater(problems, 0)
+
+    def test_reports_rules_that_reference_symptoms_missing_from_the_catalog(self):
+        symptoms = self.root / "symptoms.json"
+        symptoms.write_text(json.dumps({"axes": [], "symptoms": [{"id": "known"}]}), encoding="utf-8")
+        rules = self.root / "rules.json"
+        rules.write_text(json.dumps({"rules": [
+            {"id": "kept", "symptoms": ["known"]},
+            {"id": "broken", "symptoms": ["known", "gone"]},
+        ]}), encoding="utf-8")
+        with patch.multiple(store, SYMPTOMS_PATH=str(symptoms), RULES_PATH=str(rules)), \
+                patch.object(repo, "APPLIED_PATH", str(self.state / "applied.json")):
+            text, problems = doctor.report()
+            self.assertEqual(store.unknown_symptoms(store.load_rules(), store.load_symptoms()), {"broken": ["gone"]})
+        self.assertIn("확인 필요  규칙 broken의 증상 중 카탈로그에 없는 것: gone", text)
+        self.assertNotIn("규칙 kept", text)
         self.assertGreater(problems, 0)
 
 
