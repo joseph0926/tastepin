@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tastepin — 취향 적용 전후</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #23272f;
+        background: #fff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 32px;
+      }
+      main {
+        max-width: 1800px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+      p {
+        margin: 0;
+        color: #626b78;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      .comparison {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 24px;
+        margin-top: 32px;
+      }
+      .heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 0;
+      }
+      a {
+        color: #315ac9;
+        font-size: 13px;
+      }
+      .frame {
+        overflow: hidden;
+        border: 1px solid #d5dbe4;
+        background: #f3f5f8;
+      }
+      iframe {
+        display: block;
+        width: 1200px;
+        height: 1000px;
+        border: 0;
+        transform-origin: top left;
+      }
+      .note {
+        margin-top: 24px;
+      }
+      @media (max-width: 900px) {
+        body {
+          padding: 24px 16px;
+        }
+        .comparison {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>같은 화면, 내가 고른 취향</h1>
+      <p>
+        기본 화면을 먼저 만든 뒤, 오른쪽에만 저장된 취향을 적용했습니다. 탭을
+        바꾸거나 변경 내용 확인을 눌러보세요.
+      </p>
+      <div class="comparison">
+        <section>
+          <div class="heading">
+            <h2>스킬 없이</h2>
+            <a href="./before/">전체 화면 열기</a>
+          </div>
+          <div class="frame">
+            <iframe
+              src="./before/"
+              title="취향을 적용하지 않은 설정 화면"
+            ></iframe>
+          </div>
+        </section>
+        <section>
+          <div class="heading">
+            <h2>$taste 적용</h2>
+            <a href="./after/">전체 화면 열기</a>
+          </div>
+          <div class="frame">
+            <iframe
+              src="./after/"
+              title="저장된 취향을 적용한 설정 화면"
+            ></iframe>
+          </div>
+        </section>
+      </div>
+      <p class="note">
+        기능과 문구는 같습니다. 적용 후에는 Pretendard, 여백 중심 배치, 무채색
+        버튼과 선택한 전환을 사용합니다. 개인 취향 한 가지의 예시이며 Tastepin의
+        기본 디자인은 아닙니다.
+      </p>
+    </main>
+    <script>
+      const frames = document.querySelectorAll(".frame");
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const scale = entry.contentRect.width / 1200;
+          entry.target.querySelector("iframe").style.transform =
+            `scale(${scale})`;
+          entry.target.style.height = `${1000 * scale + 2}px`;
+        }
+      });
+      frames.forEach((frame) => observer.observe(frame));
+    </script>
+  </body>
+</html>

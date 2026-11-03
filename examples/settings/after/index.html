@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모음 — 워크스페이스 설정</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="../app.js" defer></script>
+    <script src="./motion.js" defer></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="./" aria-label="모음 홈"
+        ><span class="brand-mark" aria-hidden="true">m</span>모음</a
+      >
+      <span class="workspace-label">디자인 팀 / 설정</span>
+      <span class="avatar" aria-label="사용자 이서연">SY</span>
+    </header>
+
+    <main>
+      <header class="page-header">
+        <p class="eyebrow">WORKSPACE SETTINGS</p>
+        <h1>함께 일하는 공간</h1>
+        <p class="description">팀의 기본 정보와 알림을 관리합니다.</p>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="설정 종류">
+        <button
+          id="general-tab"
+          role="tab"
+          aria-selected="true"
+          aria-controls="general-panel"
+          type="button"
+        >
+          기본 정보
+        </button>
+        <button
+          id="notifications-tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="notifications-panel"
+          tabindex="-1"
+          type="button"
+        >
+          알림
+        </button>
+      </div>
+
+      <form id="settings-form">
+        <section
+          id="general-panel"
+          class="settings-panel"
+          role="tabpanel"
+          aria-labelledby="general-tab"
+        >
+          <div class="section-heading">
+            <h2>워크스페이스</h2>
+            <p>팀원에게 표시되는 이름과 주소입니다.</p>
+          </div>
+          <div class="section-fields">
+            <div class="field">
+              <label for="workspace-name">이름</label>
+              <input
+                id="workspace-name"
+                name="workspaceName"
+                value="스튜디오 모음"
+                maxlength="40"
+                required
+                autocomplete="organization"
+              />
+              <p class="field-hint">프로젝트와 초대 화면에 표시됩니다.</p>
+            </div>
+            <div class="field">
+              <label for="workspace-slug">주소</label>
+              <div class="input-group">
+                <span>moeum.example/</span
+                ><input
+                  id="workspace-slug"
+                  name="slug"
+                  value="studio-moeum"
+                  pattern="[a-z0-9\-]+"
+                  maxlength="40"
+                  required
+                  aria-describedby="slug-hint"
+                />
+              </div>
+              <p class="field-hint" id="slug-hint">
+                영문 소문자, 숫자, 하이픈을 사용할 수 있습니다.
+              </p>
+            </div>
+            <div class="field">
+              <label for="timezone">시간대</label>
+              <select id="timezone" name="timezone">
+                <option value="Asia/Seoul">서울 (GMT+09:00)</option>
+                <option value="Asia/Tokyo">도쿄 (GMT+09:00)</option>
+                <option value="UTC">협정 세계시 (UTC)</option>
+              </select>
+              <p class="field-hint">마감 시간과 알림에 적용됩니다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="notifications-panel"
+          class="settings-panel"
+          role="tabpanel"
+          aria-labelledby="notifications-tab"
+          hidden
+        >
+          <div class="section-heading">
+            <h2>알림</h2>
+            <p>필요한 소식만 받아보세요.</p>
+          </div>
+          <div class="section-fields">
+            <label class="check-row"
+              ><span
+                ><strong>댓글과 멘션</strong
+                ><small>나를 언급한 댓글을 알려줍니다.</small></span
+              ><input type="checkbox" name="mentions" checked
+            /></label>
+            <label class="check-row"
+              ><span
+                ><strong>프로젝트 변경</strong
+                ><small
+                  >참여 중인 프로젝트의 변경 사항을 알려줍니다.</small
+                ></span
+              ><input type="checkbox" name="projects" checked
+            /></label>
+            <label class="check-row"
+              ><span
+                ><strong>주간 요약</strong
+                ><small
+                  >월요일 아침, 지난주 소식을 이메일로 받습니다.</small
+                ></span
+              ><input type="checkbox" name="digest"
+            /></label>
+          </div>
+        </section>
+
+        <footer class="form-footer">
+          <p>설정은 이 브라우저에 저장됩니다.</p>
+          <div class="actions">
+            <button class="button secondary" type="button" id="reset-settings">
+              되돌리기
+            </button>
+            <button class="button primary" type="submit">
+              변경 내용 확인<span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </footer>
+      </form>
+      <p class="example-note">모음은 Tastepin 비교를 위한 가상 서비스입니다.</p>
+    </main>
+
+    <dialog id="review-dialog" aria-labelledby="review-title">
+      <div class="dialog-body">
+        <p class="eyebrow">REVIEW CHANGES</p>
+        <h2 id="review-title">이 설정으로 저장할까요?</h2>
+        <p class="description">저장할 내용을 한 번 더 확인해 주세요.</p>
+        <dl class="review-list">
+          <div>
+            <dt>워크스페이스</dt>
+            <dd id="review-name"></dd>
+          </div>
+          <div>
+            <dt>주소</dt>
+            <dd id="review-slug"></dd>
+          </div>
+          <div>
+            <dt>시간대</dt>
+            <dd id="review-timezone"></dd>
+          </div>
+          <div>
+            <dt>알림</dt>
+            <dd id="review-notifications"></dd>
+          </div>
+        </dl>
+      </div>
+      <div class="dialog-footer actions">
+        <button class="button secondary" type="button" id="cancel-save">
+          계속 수정
+        </button>
+        <button class="button primary" type="button" id="confirm-save">
+          저장하기
+        </button>
+      </div>
+    </dialog>
+    <div class="toast" role="status" aria-live="polite">
+      <span class="toast-icon" aria-hidden="true">✓</span
+      ><span id="toast-message"></span>
+    </div>
+  </body>
+</html>
