@@ -9,6 +9,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -121,14 +122,16 @@ def _run_scenario(browser, url, options, shot_path, policy):
 
 
 def _launch(playwright):
-    """playwright에 딸린 Chromium을 먼저 쓰고, 없으면 설치된 Chrome을 쓴다."""
+    """보안 수정된 시스템 Chrome만 사용하며 페이지를 열기 전에 버전을 확인한다."""
+    browser = playwright.chromium.launch(channel="chrome", chromium_sandbox=True)
     try:
-        return playwright.chromium.launch()
-    except Exception as bundled_error:  # noqa: BLE001
-        try:
-            return playwright.chromium.launch(channel="chrome")
-        except Exception:  # noqa: BLE001
-            raise bundled_error from None
+        version = browser.version
+        if not re.fullmatch(r"\d+\.\d+\.\d+\.\d+", version) or tuple(map(int, version.split("."))) < (156, 0, 8078, 79):
+            raise RuntimeError(f"Chrome 156.0.8078.79 이상이 필요합니다. 설치된 버전: {version}")
+        return browser
+    except Exception:
+        browser.close()
+        raise
 
 
 def measure(url, scenario_ids, shots_dir=None, *, catalog=None, judgments=None, rules_doc=None):
@@ -281,7 +284,7 @@ def main(argv=None):
         results, notes = measure(url, scenario_ids, args.shots)
     except Exception as error:  # noqa: BLE001
         print(f"점검하지 못했습니다: {error}", file=sys.stderr)
-        print("브라우저가 없으면: ~/.local/bin/uv run --with playwright playwright install --no-remove chromium", file=sys.stderr)
+        print("Google Chrome을 설치하거나 최신 안정판으로 업데이트하세요. Playwright의 Chromium 캐시로 대체하지 않습니다.", file=sys.stderr)
         return 2
 
     checks, unmeasured = annotate(merge(results), store.load_symptoms(), store.load_rules())

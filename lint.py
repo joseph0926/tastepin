@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["playwright>=1.48"]
+# dependencies = ["playwright==1.64.1"]
 # ///
 """`taste.py lint`의 실행 진입점. playwright가 필요해 uv가 격리 환경에서 이 파일을 실행한다."""
 
