@@ -7,6 +7,14 @@
 
 Lab에서 고른 값과 직접 남긴 피드백은 로컬에 저장됩니다. 이미 구현된 화면도 자신의 취향을 기준으로 검사할 수 있습니다.
 
+## 적용 예시
+
+같은 설정 화면을 만들고, 오른쪽에만 `$taste`로 개인 취향을 적용했습니다.
+
+![스킬 없이 만든 화면과 취향을 적용한 화면](examples/settings/media/comparison.png)
+
+[움직임 비교 GIF](examples/settings/media/comparison.gif) / [직접 실행하기](examples/settings/README.md)
+
 ## 시작하기
 
 ```text
