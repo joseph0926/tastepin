@@ -2,10 +2,10 @@
 
 내 디자인 취향을 고르고, 기억하고, 코드에 적용하는 도구입니다.
 
-- Lab은 여러 컴포넌트의 디자인 시안을 비교하고, 마음에 드는 것을 고르는 화면입니다.
-- Lab에서 고른 값과 직접 남긴 피드백은 로컬에 저장됩니다.
-- tastepin 스킬로 저장된 취향을 UI 작업에 적용할 수 있습니다.
-- 이미 구현된 화면도 자신의 취향을 기준으로 검사할 수 있습니다.
+1. **Lab에서 취향을 고릅니다.** 여러 컴포넌트의 디자인 시안을 비교하고, 마음에 드는 것을 선택합니다.
+2. **스킬로 취향을 적용합니다.** UI 작업을 할 때 `tastepin` 스킬을 부르면 저장된 취향을 사용합니다.
+
+Lab에서 고른 값과 직접 남긴 피드백은 로컬에 저장됩니다. 이미 구현된 화면도 자신의 취향을 기준으로 검사할 수 있습니다.
 
 ## 시작하기
 
@@ -18,7 +18,9 @@ playwright (브라우저 검사)
 Google Chrome >= 156.0.8078.79 (브라우저 검사)
 ```
 
-저장소 루트에서 실행합니다.
+### 1. Lab에서 취향 고르기
+
+저장소 루트에서 실행한 뒤, Lab에서 마음에 드는 시안을 고르고 저장합니다.
 
 ```sh
 cd lab
@@ -28,17 +30,8 @@ python3 -B taste.py lab
 ```
 
 Lab: `http://127.0.0.1:5181/specimens`
-대시보드: `http://127.0.0.1:4871`
 
-```sh
-python3 -B taste.py open                  # 대시보드
-python3 -B taste.py status                # 선택과 기록 현황
-python3 -B taste.py apply-context --surface codex --request "설정 화면 만들기"
-python3 -B taste.py tokens --out ./tokens # CSS, Tailwind, Motion 파일
-python3 -B taste.py stop                  # 이 사본이 시작한 서버 종료
-```
-
-## 스킬로 사용하기
+### 2. 스킬로 취향 적용하기
 
 저장소 루트에서 [tastepin 스킬](skills/tastepin/SKILL.md)을 연결합니다.
 
@@ -55,7 +48,19 @@ ln -s "$TASTEPIN_ROOT/skills/tastepin" "$HOME/.agents/skills/tastepin"
 $tastepin 설정 화면 만들어줘
 ```
 
-### 다른 머신에서 사용하기
+## 기타 명령
+
+대시보드: `http://127.0.0.1:4871`
+
+```sh
+python3 -B taste.py open                  # 대시보드
+python3 -B taste.py status                # 선택과 기록 현황
+python3 -B taste.py apply-context --surface codex --request "설정 화면 만들기"
+python3 -B taste.py tokens --out ./tokens # CSS, Tailwind, Motion 파일
+python3 -B taste.py stop                  # 이 사본이 시작한 서버 종료
+```
+
+## 다른 머신에서 사용하기
 
 작업 저장소에 취향 사본과 스킬을 저장합니다.
 
