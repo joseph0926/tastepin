@@ -1,16 +1,22 @@
 # Tastepin
 
-내 디자인 취향을 고르고, 기억하고, 코드에 적용하는 로컬 도구입니다.
+내 디자인 취향을 고르고, 기억하고, 코드에 적용하는 도구입니다.
 
-Lab에서 같은 화면의 간격, 모서리, 글꼴, 움직임을 하나씩 비교합니다. 고른 값과 화면을 보며 남긴 피드백은 로컬에 저장됩니다. 스킬은 다음 UI 작업에서 그 취향을 읽고, 검사기는 선택한 값으로 측정 가능한 부분을 확인합니다.
-
-처음에는 취향이 비어 있습니다. Lab의 비교 예제는 선택 후보이며, 작성자의 취향이 사용자 기본값으로 들어가지는 않습니다. 현재 UI와 피드백 분류는 한국어 중심입니다.
+- Lab은 여러 컴포넌트의 디자인 시안을 비교하고, 마음에 드는 것을 고르는 화면입니다.
+- Lab에서 고른 값과 직접 남긴 피드백은 로컬에 저장됩니다.
+- tastepin 스킬로 저장된 취향을 UI 작업에 적용할 수 있습니다.
+- 이미 구현된 화면도 자신의 취향을 기준으로 검사할 수 있습니다.
 
 ## 시작하기
 
-Python 3.11 이상, Node.js 24 이상, pnpm이 필요합니다. 압축된 Codex 대화 기록을 수집할 때만 Python 3.14 이상이 필요합니다. Python CLI는 표준 라이브러리를 사용합니다. 브라우저 검사에는 별도로 uv와 Playwright Chromium이 필요합니다.
-
-pnpm 대신 Corepack을 쓰려면 아래 명령의 `pnpm`을 `corepack pnpm`으로 바꿔 실행합니다. Node.js 25부터는 Corepack이 Node에 포함되지 않으므로 따로 설치해야 합니다. `taste.py lab`도 pnpm이 없을 때만 Corepack을 사용합니다.
+```text
+python >= 3.11 (압축된 Codex 대화 기록 수집 시 >= 3.14)
+nodejs >= 24
+pnpm
+uv (브라우저 검사)
+playwright (브라우저 검사)
+Google Chrome >= 156.0.8078.79 (브라우저 검사)
+```
 
 저장소 루트에서 실행합니다.
 
@@ -21,7 +27,8 @@ cd ..
 python3 -B taste.py lab
 ```
 
-Lab은 `http://127.0.0.1:5181/specimens`, 기록을 저장하는 대시보드는 `http://127.0.0.1:4871`에서 실행됩니다. `A`, `B`, `C`로 선택하고 `Enter`로 저장합니다. `D`는 다크 모드, `M`은 휴대폰 폭, `Space`는 움직임 재생입니다. 차이가 없거나 모두 마음에 들지 않는다는 답도 남길 수 있습니다.
+Lab: `http://127.0.0.1:5181/specimens`
+대시보드: `http://127.0.0.1:4871`
 
 ```sh
 python3 -B taste.py open                  # 대시보드
@@ -31,11 +38,9 @@ python3 -B taste.py tokens --out ./tokens # CSS, Tailwind, Motion 파일
 python3 -B taste.py stop                  # 이 사본이 시작한 서버 종료
 ```
 
-`lab`은 의존성을 자동 설치하지 않습니다. 서버 포트가 이미 다른 프로그램에서 쓰이고 있으면 먼저 해당 프로그램의 상태를 확인하세요. CLI 파일명 `taste.py`와 `.taste/` 출력 형식은 기존 구현과 호환되도록 유지했습니다.
-
 ## 스킬로 사용하기
 
-스킬 원본은 [`skills/tastepin/SKILL.md`](skills/tastepin/SKILL.md)입니다. 설치 경로는 고정되어 있지 않습니다. 에이전트 실행 환경에 `TASTEPIN_ROOT`를 이 저장소의 절대 경로로 설정하세요.
+저장소 루트에서 [tastepin 스킬](skills/tastepin/SKILL.md)을 연결합니다.
 
 ```sh
 export TASTEPIN_ROOT="$PWD"
@@ -43,47 +48,102 @@ mkdir -p "$HOME/.agents/skills"
 ln -s "$TASTEPIN_ROOT/skills/tastepin" "$HOME/.agents/skills/tastepin"
 ```
 
-이미 설치된 경로가 있으면 위 명령은 덮어쓰지 않습니다. 설정을 유지하려면 사용하는 셸이나 에이전트 실행 환경에 환경변수를 등록합니다. Codex에서는 `$tastepin 설정 화면 만들어줘`처럼 명시적으로 호출합니다. 스킬은 취향을 읽고 원래 요청한 작업을 이어갑니다.
+- `TASTEPIN_ROOT`는 Tastepin 저장소의 절대 경로입니다. 계속 사용하려면 셸이나 에이전트 실행 환경에 등록합니다.
+- Codex에서 아래처럼 호출하면 저장된 취향을 읽고 작업에 적용합니다.
 
-다른 머신에서 적용할 취향을 작업 저장소에 남기려면 다음을 실행합니다. 개인 취향과 규칙이 출력 파일에 포함되므로 공개할 저장소에서는 내용을 먼저 검토하세요.
-
-```sh
-python3 -B taste.py apply /path/to/project
-python3 -B taste.py apply /path/to/project --check
+```text
+$tastepin 설정 화면 만들어줘
 ```
 
-이 명령은 `.taste/`와 `.agents/skills/tastepin/`을 쓰고, 기존 지침 파일에 취향 사본 위치를 안내합니다. Git 명령은 실행하지 않습니다. 원장이 없는 환경에서는 스킬이 `.taste/AGENT.md`를 읽습니다.
+### 다른 머신에서 사용하기
 
-## 피드백과 개인정보
+작업 저장소에 취향 사본과 스킬을 저장합니다.
 
-대화 기록 수집과 에이전트 훅 설치는 기본 실행에 포함되지 않습니다. 직접 남길 때는 다음처럼 실행합니다.
+```sh
+python3 -B taste.py apply /path/to/project         # 사본 저장
+python3 -B taste.py apply /path/to/project --check # 현재 취향과 일치하는지 확인
+```
+
+- `.taste/`: 취향 사본. Tastepin을 실행할 수 없는 환경에서는 스킬이 `.taste/AGENT.md`를 읽습니다.
+- `.agents/skills/tastepin/`: 작업 저장소에서 사용할 스킬.
+- 저장소 지침 파일에는 취향 사본의 위치를 추가합니다. 지침 파일이 없으면 생성합니다.
+- 사본에는 개인 취향과 규칙이 포함됩니다. 공개할 때는 내용을 먼저 확인하세요.
+
+## 피드백 기록하기
+
+화면에 대한 피드백을 직접 남깁니다.
 
 ```sh
 printf '%s\n' '버튼 사이 간격이 너무 좁아요' | python3 -B taste.py record --surface codex
 ```
 
-기존 대화 기록을 읽으려는 경우에만 `python3 -B taste.py harvest` 또는 `open --harvest`를 사용합니다. 수집 대상은 로컬 Claude Code와 Codex 대화 기록이며, 해당 CLI를 실행하지는 않습니다. `effect --since YYYY-MM-DD`는 사용 시작일 전후의 대화 기록을 다시 읽는 선택 기능입니다. 사용 방식을 중간에 바꿨다면 `--change YYYY-MM-DD:이름`을 더해 최근 구간을 그 날 전후로 나눠 봅니다. 여러 번 줄 수 있고, `--since`에도 `:이름`을 붙여 첫 구간의 이름을 정할 수 있습니다. 비교 결과만으로 디자인 품질 개선을 증명하지는 않습니다.
+기존 대화에서 피드백을 모으려면 다음을 실행합니다.
 
-- `state/`: 선택, 피드백 원문 일부, 세션 식별자, 작업 경로와 실행 기록.
-- `data/rules.json`: 사용자가 저장한 개인 규칙. 파일이 없으면 빈 규칙으로 시작합니다.
-- `TASTE.md`: 규칙과 근거 인용을 포함하는 생성 문서.
+```sh
+python3 -B taste.py harvest        # 대화에서 피드백 수집
+python3 -B taste.py open --harvest # 수집 후 대시보드 열기
+```
 
-위 파일은 `.gitignore`로 제외합니다. 기본 실행은 이 저장소 밖의 기존 taste 원장을 읽거나 변경하지 않습니다.
+- 수집 대상은 로컬에 저장된 Claude Code와 Codex 대화 기록입니다. 해당 프로그램을 실행하지는 않습니다.
+- 대화 수집은 직접 요청할 때만 실행하며, 에이전트 훅은 자동 설치하지 않습니다.
+- 피드백의 분류가 맞지 않으면 대시보드에서 수정할 수 있습니다.
 
-기록을 저장소 밖에 두려면 `TASTEPIN_DATA`에 기존 폴더의 절대 경로를 지정합니다. 그 폴더 안에 같은 구조(`state/`, `data/rules.json`, `TASTE.md`)로 저장하며, `data/symptoms.json`은 저장소의 것을 계속 씁니다. 지정한 폴더가 없으면 새로 만들지 않고 멈춥니다. 출력되는 안내 명령에는 `TASTEPIN_DATA`가 함께 붙으므로, 안내대로 새로 실행해도 같은 기록을 씁니다. 기록 폴더를 정해 주는 실행 파일을 따로 두었다면 `TASTEPIN_ENTRY`에 그 파일 경로를 넣습니다. 이때 안내 명령은 그 파일을 가리킵니다. 같은 포트에 다른 기록 폴더의 서버가 떠 있으면 그 서버를 다시 쓰거나 끄지 않고 멈춥니다. `doctor`는 기록 폴더 위치와, 규칙이 참조하는 증상이 카탈로그에 모두 있는지도 확인합니다. Lab은 서체 비교를 위해 Google Fonts와 jsDelivr에서 글꼴을 불러오므로 완전한 오프라인 화면은 아닙니다. 대화나 선택 기록을 그곳으로 보내지는 않습니다.
+### 사용 전후 비교하기
 
-`data/symptoms.json`은 한국어 표현을 진단과 수정 제안에 연결하는 기본 사전입니다. 확정 취향이 아니며, 해석이 틀리면 대시보드에서 분류하거나 수정합니다.
+사용 시작일 전후의 대화 기록을 다시 읽고, 화면에 대한 지적이 얼마나 나왔는지 비교합니다.
+
+```sh
+python3 -B taste.py effect --since YYYY-MM-DD
+python3 -B taste.py effect --since YYYY-MM-DD:시작 --change YYYY-MM-DD:변경
+```
+
+- `--since`: Tastepin 사용 시작일. 날짜 뒤에 `:이름`을 붙일 수 있습니다.
+- `--change`: 사용 방식을 바꾼 날짜와 이름. 여러 번 지정할 수 있습니다.
+- 지적 빈도를 비교하는 기능이며, 결과만으로 디자인 품질이 좋아졌다고 판단할 수는 없습니다.
+
+## 기록 저장 위치
+
+기본 저장 위치는 Tastepin 저장소 안입니다. 아래 파일은 `.gitignore`로 제외합니다.
+
+```text
+state/          # 선택, 피드백 원문 일부, 세션 식별자, 작업 경로와 실행 기록
+data/rules.json # 개인 취향 규칙
+TASTE.md        # 규칙과 근거 인용으로 생성한 문서
+```
+
+### 다른 폴더에 저장하기
+
+`TASTEPIN_DATA`에 사용할 폴더의 절대 경로를 지정합니다. 폴더는 미리 만들어 두어야 합니다.
+
+```sh
+export TASTEPIN_DATA="/absolute/path/to/tastepin-data"
+python3 -B taste.py status
+```
+
+- 지정한 폴더 안에 위와 같은 구조로 저장합니다. 안내되는 명령도 같은 기록 폴더를 사용합니다.
+- 같은 포트를 다른 기록 폴더의 서버가 사용 중이면 실행을 멈춥니다.
+- 기록 폴더를 지정하는 실행 파일을 따로 만들었다면 `TASTEPIN_ENTRY`에 그 파일의 경로를 지정합니다. 이후 안내 명령은 해당 파일을 사용합니다.
+
+기록 폴더와 규칙에 문제가 있는지 확인하려면 다음을 실행합니다.
+
+```sh
+python3 -B taste.py doctor
+```
+
+### 기본 사전과 외부 글꼴
+
+- `data/symptoms.json`은 피드백을 진단과 수정 제안에 연결하는 사전입니다. 개인 취향과 별개이며, 기록 폴더를 바꿔도 Tastepin 저장소의 파일을 사용합니다.
+- Lab은 Google Fonts와 jsDelivr에서 비교용 글꼴을 불러옵니다. 대화와 선택 기록은 전송하지 않습니다.
 
 ## 브라우저 검사
 
-uv가 설치된 환경에서 Playwright의 Chromium을 준비합니다. 기존 브라우저 캐시를 정리하지 않도록 `--no-remove`를 사용합니다.
-
 ```sh
-uv run --with playwright python -m playwright install --no-remove chromium
 python3 -B taste.py lint http://localhost:3000
 ```
 
-검사는 라이트, 다크, 휴대폰 조건에서 현재 선택과 기본 오류를 확인합니다. 아직 고르지 않은 취향은 임의의 값으로 판정하지 않습니다. JS로 실행되는 모션의 실제 길이와 연속성, 캔버스와 이미지 속 글자 등은 측정하지 못합니다. 결과 끝의 수동 확인 항목도 검토해야 합니다.
+- 라이트, 다크, 휴대폰 화면에서 선택한 취향과 기본 오류를 검사합니다.
+- 아직 고르지 않은 취향은 임의의 값으로 판정하지 않습니다.
+- JavaScript로 실행되는 움직임의 실제 길이와 연속성, 캔버스와 이미지 속 글자는 측정하지 못합니다. 결과 끝의 수동 확인 항목도 함께 확인하세요.
 
 ## 개발과 검증
 
@@ -93,9 +153,20 @@ cd lab
 pnpm build
 ```
 
-Python 검사는 임시 원장과 카탈로그를 사용합니다. 브라우저가 필요한 검사는 uv나 Chromium이 없으면 건너뛴 사실을 출력합니다. Lab의 개발 서버만 실행하려면 기록 서버를 먼저 `python3 -B taste.py open --no-browser`로 시작한 뒤 `lab/`에서 `pnpm dev`를 실행합니다.
+- Python 테스트는 임시 기록과 비교 시안 목록을 사용합니다.
 
-지원 범위는 macOS와 Linux입니다. Windows의 파일 잠금과 프로세스 종료는 아직 지원하지 않습니다. 훅 명령은 코드에 포함되어 있지만, 이 첫 공개용 구성에서는 자동 설치하지 않습니다.
+Lab 개발 서버를 직접 실행하려면 기록 서버를 먼저 시작합니다.
+
+```sh
+python3 -B taste.py open --no-browser
+cd lab
+pnpm dev
+```
+
+## 지원 환경
+
+- macOS, Linux
+- Windows는 파일 잠금과 프로세스 종료를 아직 지원하지 않습니다.
 
 ## 라이선스
 
