@@ -1,4 +1,4 @@
-"""lint의 측정 계약과 결과 합치기를 검사한다. 브라우저 점검은 uv와 Chromium이 있을 때만 실행한다."""
+"""lint의 측정 계약과 결과 합치기를 검사한다. 브라우저 점검은 uv와 Google Chrome이 있을 때만 실행한다."""
 
 import json
 import os
@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import Mock
 
 TASTE_ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = Path(__file__).with_name("fixtures")
@@ -24,6 +25,32 @@ def _check(check_id, level, symptom="color-dated", summary="", samples=()):
 
 
 class LintContractTests(unittest.TestCase):
+    def test_old_or_unknown_browser_is_closed_before_measuring(self):
+        for version in ("147.0.7727.15", "156.0.8078.4", "156.0.8078.74", "unknown"):
+            with self.subTest(version=version):
+                playwright = Mock()
+                browser = playwright.chromium.launch.return_value
+                browser.version = version
+                with self.assertRaisesRegex(RuntimeError, "Chrome 156"):
+                    lint._launch(playwright)
+                browser.close.assert_called_once()
+                browser.new_context.assert_not_called()
+
+    def test_patched_system_chrome_uses_sandbox(self):
+        playwright = Mock()
+        browser = playwright.chromium.launch.return_value
+        browser.version = "156.0.8078.80"
+        self.assertIs(lint._launch(playwright), browser)
+        playwright.chromium.launch.assert_called_once_with(channel="chrome", chromium_sandbox=True)
+        browser.close.assert_not_called()
+
+    def test_launch_failure_does_not_fall_back_to_cached_chromium(self):
+        playwright = Mock()
+        playwright.chromium.launch.side_effect = RuntimeError("missing Chrome")
+        with self.assertRaisesRegex(RuntimeError, "missing Chrome"):
+            lint._launch(playwright)
+        self.assertEqual(playwright.chromium.launch.call_count, 1)
+
     def test_measured_symptoms_match_probe_and_catalog(self):
         probe = (TASTE_ROOT / "tastelib" / "probe.js").read_text(encoding="utf-8")
         runner = (TASTE_ROOT / "tastelib" / "lint.py").read_text(encoding="utf-8")
