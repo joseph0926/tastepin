@@ -54,6 +54,8 @@ def render_css(tokens):
 # Tailwind v4 테마 이름 -> taste 토큰. 토큰이 없으면 그 줄을 내보내지 않는다
 TAILWIND = (
     ("--color-ground", "bg"),
+    ("--color-accent", "accent"),
+    ("--color-on-accent", "on-accent"),
     ("--font-sans", "font-family-base"),
     ("--font-title", "font-family-title"),
     ("--text-body", "font-size-body"),
@@ -68,6 +70,7 @@ TAILWIND = (
     ("--radius-check", "radius-check"),
     ("--spacing-block", "space-block"),
     ("--spacing-row", "space-row-y"),
+    ("--container-content", "content-width"),
     ("--ease-taste", "ease"),
     ("--default-transition-duration", "duration"),
     ("--default-transition-timing-function", "ease"),
