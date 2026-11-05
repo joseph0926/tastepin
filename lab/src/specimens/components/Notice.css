@@ -1,0 +1,177 @@
+.ntc-page {
+  display: grid;
+  gap: 24px;
+  max-width: 440px;
+
+  /* 주의 색은 평가 화면 토큰에 없어 이 시편에서만 정한다 */
+  --ntc-warning: #9a6700;
+  --ntc-warning-soft: #fff4d6;
+}
+
+.lab[data-theme="dark"] .ntc-page {
+  --ntc-warning: #e3b341;
+  --ntc-warning-soft: #2e2613;
+}
+
+.ntc-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+/* 접히는 안내문이 사라질 때 간격이 끝에 한 번 더 튀지 않도록 grid gap 대신 안내문 자신의 여백을 쓴다 */
+.ntc-section h4 {
+  margin: 0 0 8px;
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ntc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.ntc-row-text {
+  display: grid;
+  min-width: 0;
+}
+
+.ntc-row-text b {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ntc-row-text span {
+  color: var(--sp-muted);
+  font-size: 13px;
+}
+
+.ntc-link {
+  flex: none;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ntc-link:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.ntc-fold {
+  overflow: hidden;
+}
+
+.ntc {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0 8px;
+  color: var(--sp-text);
+}
+
+.ntc[data-look="tint"] {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+.ntc[data-look="outline"] {
+  padding: 10px 12px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+}
+
+.ntc[data-look="plain"] {
+  color: var(--sp-secondary);
+}
+
+.ntc-icon {
+  flex: none;
+  margin-top: 2px;
+  color: var(--sp-secondary);
+}
+
+/* 종류별 색: 주의는 면과 아이콘에, 아이콘만 색이면 아이콘에만 노란 계열을 쓴다 */
+.ntc[data-tone="color"][data-kind="warning"][data-look="tint"] {
+  background: var(--ntc-warning-soft);
+}
+
+.ntc[data-tone="color"][data-kind="warning"][data-look="outline"] {
+  border-color: color-mix(in srgb, var(--ntc-warning) 45%, transparent);
+}
+
+.ntc[data-tone="color"][data-kind="warning"] .ntc-icon,
+.ntc[data-tone="icon"][data-kind="warning"] .ntc-icon {
+  color: var(--ntc-warning);
+}
+
+.ntc-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.ntc[data-look="tint"] .ntc-text,
+.ntc[data-look="outline"] .ntc-text {
+  padding-right: 20px;
+}
+
+.ntc-action {
+  margin-left: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.ntc-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-muted);
+  cursor: pointer;
+}
+
+.ntc[data-look="plain"] .ntc-close {
+  position: static;
+  flex: none;
+  margin-top: -2px;
+}
+
+.ntc-close:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.ntc-page button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

@@ -1,7 +1,9 @@
+/* 대화상자가 무대 안에 그려지므로 가장 긴 구성(자세한 안내, 팀 목록, 버튼)이 잘리지 않을 높이를 둔다 */
 .dlg-page {
   display: grid;
+  align-content: start;
   gap: 16px;
-  min-height: 300px;
+  min-height: 560px;
 }
 
 .dlg-page-head {
@@ -193,4 +195,87 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 4px;
+}
+
+.dlg-actions[data-actions="full"] {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+}
+
+/* 세로로 쌓기: 주 버튼이 폭을 채우고 보조 버튼은 그 아래 글자 버튼이 된다 */
+.dlg-actions[data-actions="stack"] {
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.dlg-actions[data-actions="stack"] .dlg-button:not(.is-primary) {
+  background: none;
+  color: var(--sp-secondary);
+}
+
+.dlg-actions[data-actions="stack"] .dlg-button:not(.is-primary):hover {
+  color: var(--sp-text);
+}
+
+/* '불러오는 중'과 '멤버 초대'가 바뀌어도 버튼 폭이 흔들리지 않게 한다 */
+.dlg-trigger {
+  min-width: 96px;
+}
+
+.dlg-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.dlg-desc {
+  margin: -6px 0 0;
+  color: var(--sp-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* 팀 목록과 스켈레톤은 같은 높이(라벨 18px + 행 28px 셋)를 쓴다 */
+.dlg-teams {
+  display: grid;
+  gap: 4px;
+}
+
+.dlg-teams-label {
+  height: 18px;
+  color: var(--sp-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.dlg-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  font-size: 15px;
+}
+
+.dlg-team input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--sp-accent);
+}
+
+.dlg-skeleton {
+  height: 28px;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+}
+
+.dlg-skeleton.is-label {
+  width: 32px;
+  height: 18px;
+}
+
+.dlg-grow {
+  overflow: hidden;
 }

@@ -40,6 +40,49 @@
   --srf-hover: #edebe5;
 }
 
+/* 강조색: 평가 화면 기본(--sp-accent)을 이 시편 안에서만 바꾼다. 파랑은 평가 화면 기본값과 같다 */
+.srf[data-accent="blue"] {
+  --sp-accent: #3157dc;
+  --sp-accent-hover: #2549c7;
+  --sp-accent-soft: #eef2ff;
+  --sp-on-accent: #ffffff;
+}
+
+.srf[data-accent="teal"] {
+  --sp-accent: #0f766e;
+  --sp-accent-hover: #0b5f58;
+  --sp-accent-soft: #e6f4f2;
+  --sp-on-accent: #ffffff;
+}
+
+.srf[data-accent="ink"] {
+  --sp-accent: #1b1d22;
+  --sp-accent-hover: #33363d;
+  --sp-accent-soft: #ececee;
+  --sp-on-accent: #ffffff;
+}
+
+.lab[data-theme="dark"] .srf[data-accent="blue"] {
+  --sp-accent: #8fa6ff;
+  --sp-accent-hover: #a9bbff;
+  --sp-accent-soft: #232b45;
+  --sp-on-accent: #0d1120;
+}
+
+.lab[data-theme="dark"] .srf[data-accent="teal"] {
+  --sp-accent: #5cc8b8;
+  --sp-accent-hover: #7ad8ca;
+  --sp-accent-soft: #12302c;
+  --sp-on-accent: #06201c;
+}
+
+.lab[data-theme="dark"] .srf[data-accent="ink"] {
+  --sp-accent: #eceef2;
+  --sp-accent-hover: #ffffff;
+  --sp-accent-soft: #2a2d33;
+  --sp-on-accent: #16181c;
+}
+
 .lab[data-theme="dark"] .srf[data-ground="neutral"] {
   --srf-page: #121212;
   --srf-raised: #1c1c1c;

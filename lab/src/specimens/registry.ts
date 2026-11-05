@@ -9,9 +9,11 @@ import Dialog from "./components/Dialog";
 import Disclosure from "./components/Disclosure";
 import Drawer from "./components/Drawer";
 import EmptyState from "./components/EmptyState";
+import Failure from "./components/Failure";
 import Field from "./components/Field";
 import Filter from "./components/Filter";
 import GlobalSearch from "./components/GlobalSearch";
+import ListRow from "./components/ListRow";
 import Loading from "./components/Loading";
 import Menu from "./components/Menu";
 import MotionFeel from "./components/MotionFeel";
@@ -19,12 +21,16 @@ import MotionResponse from "./components/MotionResponse";
 import MotionSpring from "./components/MotionSpring";
 import MotionSwap from "./components/MotionSwap";
 import Nav from "./components/Nav";
+import Notice from "./components/Notice";
+import PageWidth from "./components/PageWidth";
 import Reading from "./components/Reading";
+import Refresh from "./components/Refresh";
 import Reorder from "./components/Reorder";
 import Search from "./components/Search";
 import Segmented from "./components/Segmented";
 import Selection from "./components/Selection";
 import Sort from "./components/Sort";
+import Steps from "./components/Steps";
 import StatusLine from "./components/StatusLine";
 import Surface from "./components/Surface";
 import Table from "./components/Table";
@@ -47,6 +53,8 @@ export interface SpecimenEntry {
 export const specimens: Record<string, SpecimenEntry> = {
   surface: { Component: Surface, demoInterval: 0, demoSteps: 0 },
   reading: { Component: Reading, demoInterval: 0, demoSteps: 0 },
+  // 화면 폭은 움직임이 없어 같이 재생을 숨긴다
+  page: { Component: PageWidth, demoInterval: 0, demoSteps: 0 },
   "motion-feel": { Component: MotionFeel, demoInterval: 900, demoSteps: 4 },
   "motion-response": {
     Component: MotionResponse,
@@ -60,19 +68,28 @@ export const specimens: Record<string, SpecimenEntry> = {
   selection: { Component: Selection, demoInterval: 650, demoSteps: 6 },
   segmented: { Component: Segmented, demoInterval: 900, demoSteps: 3 },
   tabs: { Component: Tabs, demoInterval: 900, demoSteps: 4 },
-  dialog: { Component: Dialog, demoInterval: 1100, demoSteps: 4 },
+  // 열고 닫기 반복. 늦게 오는 팀 목록(600ms)을 다 받은 뒤에도 열린 채로 보이도록 간격을 둔다
+  dialog: { Component: Dialog, demoInterval: 1500, demoSteps: 4 },
   menu: { Component: Menu, demoInterval: 600, demoSteps: 5 },
   toast: { Component: Toast, demoInterval: 700, demoSteps: 4 },
   status: { Component: StatusLine, demoInterval: 1000, demoSteps: 7 },
+  // 카드 바꾸기(주의 안내가 풀림), 일반 안내 닫기, 처음으로
+  notice: { Component: Notice, demoInterval: 1200, demoSteps: 3 },
   // 배지는 움직임이 없어 같이 재생을 숨긴다
   badge: { Component: Badge, demoInterval: 0, demoSteps: 0 },
   drawer: { Component: Drawer, demoInterval: 1000, demoSteps: 4 },
   reorder: { Component: Reorder, demoInterval: 650, demoSteps: 8 },
   field: { Component: Field, demoInterval: 900, demoSteps: 7 },
+  // 없는 번호 입력, 찾기, 번호 고침, 찾기(연결 실패), 다시 시도, 찾은 결과 보기, 처음으로
+  failure: { Component: Failure, demoInterval: 1100, demoSteps: 7 },
   loading: { Component: Loading, demoInterval: 1100, demoSteps: 4 },
+  // 탭 바꿈, 새 행 강조 보기, 탭 바꿈(실패), 실패 알림 보기, 다시 시도, 새 목록 보기, 처음으로
+  refresh: { Component: Refresh, demoInterval: 1100, demoSteps: 7 },
   datepicker: { Component: DatePicker, demoInterval: 900, demoSteps: 6 },
   table: { Component: Table, demoInterval: 1200, demoSteps: 3 },
   datatable: { Component: DataTable, demoInterval: 1100, demoSteps: 6 },
+  // 목록을 두 번 내려 묶음 머리글을 보이고 맨 위로
+  listrow: { Component: ListRow, demoInterval: 1000, demoSteps: 3 },
   // 빈 상태는 움직임이 없어 같이 재생을 숨긴다
   empty: { Component: EmptyState, demoInterval: 0, demoSteps: 0 },
   nav: { Component: Nav, demoInterval: 1000, demoSteps: 6 },
@@ -80,6 +97,8 @@ export const specimens: Record<string, SpecimenEntry> = {
   upload: { Component: Upload, demoInterval: 1000, demoSteps: 8 },
   confirm: { Component: Confirm, demoInterval: 1100, demoSteps: 4 },
   transition: { Component: Transition, demoInterval: 1100, demoSteps: 6 },
+  // 단계마다 답하고 넘어가기, 한 단계 뒤로, 처음으로
+  steps: { Component: Steps, demoInterval: 1100, demoSteps: 7 },
   tooltip: { Component: Tooltip, demoInterval: 1000, demoSteps: 5 },
   filter: { Component: Filter, demoInterval: 1000, demoSteps: 6 },
   sort: { Component: Sort, demoInterval: 1000, demoSteps: 4 },

@@ -1,0 +1,79 @@
+.pgw {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+}
+
+/* 1440 x 900 화면을 실제 크기로 그리고 왼쪽 위를 기준으로 줄인다 */
+.pgw-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--sp-page);
+  color: var(--sp-text);
+  font-size: 15px;
+  line-height: 1.6;
+  transform-origin: 0 0;
+}
+
+.pgw-bar {
+  height: 64px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--sp-line);
+  background: var(--sp-surface);
+}
+
+.pgw-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  margin: 0 auto;
+  font-size: 17px;
+}
+
+.pgw-bar nav {
+  display: flex;
+  gap: 28px;
+  color: var(--sp-secondary);
+}
+
+.pgw-main {
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+.pgw-main h1 {
+  margin: 0 0 12px;
+  font-size: 30px;
+  font-weight: 650;
+}
+
+.pgw-main p {
+  margin: 0 0 32px;
+  color: var(--sp-secondary);
+  font-size: 16px;
+}
+
+.pgw-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pgw-list li {
+  display: grid;
+  gap: 2px;
+  padding: 16px;
+  border-radius: 6px;
+  background: var(--sp-surface);
+}
+
+.pgw-list span {
+  color: var(--sp-muted);
+  font-size: 14px;
+}

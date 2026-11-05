@@ -3,7 +3,7 @@ import { Check, Search } from "lucide-react";
 import type { SpecimenProps } from "../types";
 import "./Surface.css";
 
-// params: grouping(space | tone | hairline), radius(sharp | small | soft), ground(neutral | cool | warm)
+// params: grouping(space | tone | hairline), radius(sharp | small | soft), ground(neutral | cool | warm), accent(blue | teal | ink)
 // 컴포넌트 하나가 아니라 화면 전체의 표면 값을 비교하는 전역 시편이다. 움직임은 없다.
 
 const notifications = [
@@ -34,7 +34,7 @@ const members = [
 ];
 
 export default function Surface({ params }: SpecimenProps) {
-  const { grouping, radius, ground } = params;
+  const { grouping, radius, ground, accent } = params;
   // 같은 시편이 무대마다 하나씩 그려지므로 제목 id가 겹치지 않게 한다
   const id = useId();
   const [enabled, setEnabled] = useState(
@@ -55,6 +55,7 @@ export default function Surface({ params }: SpecimenProps) {
       data-grouping={grouping}
       data-radius={radius}
       data-ground={ground}
+      data-accent={accent}
     >
       <header className="srf-head">
         <div>

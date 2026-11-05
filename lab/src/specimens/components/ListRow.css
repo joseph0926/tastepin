@@ -1,0 +1,163 @@
+.lst-page {
+  display: grid;
+  gap: 10px;
+}
+
+.lst-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+/* 목록은 고정 높이 안에서 스크롤한다. 고정 머리글이 붙었다 밀려나는 모습이 이 영역 위쪽에서 보인다 */
+.lst-scroll {
+  height: 300px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.lst-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 행 사이는 선이나 면 없이 여백으로만 나눈다 */
+.lst-row {
+  display: grid;
+  gap: 2px;
+  padding: 9px 0;
+}
+
+[data-lines="two"] .lst-row {
+  padding: 11px 0;
+}
+
+[data-lines="three"] .lst-row {
+  gap: 4px;
+  padding: 13px 0;
+}
+
+/* 묶음 */
+.lst-group + .lst-group {
+  margin-top: 14px;
+}
+
+.lst-head {
+  margin: 0;
+  padding: 6px 0 4px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+/* 머리글은 자기 묶음 안에서만 붙어 있으므로 묶음이 끝나면 다음 머리글에 밀려 올라간다 */
+[data-group="sticky"] .lst-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.lst-line,
+.lst-title-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.lst-line > .lst-title-line {
+  flex: 1 1 auto;
+}
+
+.lst-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-lines="one"] .lst-title {
+  font-weight: 500;
+}
+
+.lst-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--sp-secondary);
+  font-size: 14px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-lines="three"] .lst-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.lst-aside,
+.lst-byline {
+  display: flex;
+  flex: none;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--sp-muted);
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.lst-byline {
+  margin-left: 0;
+}
+
+.lst-meta-text {
+  color: var(--sp-secondary);
+}
+
+.lst-date {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 배지. 상태만 진행 중을 강조색으로 두고 분류는 무채색이다 */
+.lst-badges {
+  display: inline-flex;
+  flex: none;
+  gap: 4px;
+  align-self: center;
+}
+
+.lst-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+  color: var(--sp-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.lst-badge[data-status="received"] {
+  color: var(--sp-text);
+}
+
+.lst-badge[data-status="progress"] {
+  background: var(--sp-accent-soft);
+  color: var(--sp-accent);
+}

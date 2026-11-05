@@ -1,0 +1,307 @@
+.rfr-page {
+  display: grid;
+  gap: 12px;
+  max-width: 440px;
+}
+
+.rfr-page h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.rfr-tabs {
+  display: flex;
+  gap: 2px;
+  justify-self: start;
+  max-width: 100%;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+.rfr-tab {
+  flex: 1 1 auto;
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 550;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rfr-tab[aria-pressed="true"] {
+  background: var(--sp-raised);
+  color: var(--sp-text);
+  box-shadow: 0 1px 2px rgb(16 20 28 / 12%);
+}
+
+/* 진행 막대와 실패 한 줄이 목록 바로 위 18px 줄을 함께 쓴다. 줄을 늘 잡아 두어 무엇이 나타나도 목록이 밀리지 않는다 */
+.rfr-slot {
+  position: relative;
+  height: 18px;
+  margin-bottom: -12px;
+}
+
+.rfr-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  height: 2px;
+  background: var(--sp-surface-2);
+}
+
+.rfr-bar span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40%;
+  background: var(--sp-accent);
+  animation: rfr-flow var(--rfr-flow) ease-in-out infinite;
+}
+
+.rfr-inline {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--sp-danger);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.rfr-inline > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rfr-link {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* 목록, 스켈레톤, 실패 화면이 같은 칸에 겹친다. 칸 높이는 가장 긴 목록(5행)과 같다 */
+.rfr-area {
+  display: grid;
+  min-height: calc(5 * 40px);
+}
+
+.rfr-area > * {
+  grid-area: 1 / 1;
+}
+
+.rfr-layer.is-hidden {
+  visibility: hidden;
+}
+
+.rfr-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rfr-list.is-dim {
+  opacity: 0.5;
+}
+
+.rfr-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 8px;
+  border-top: 1px solid var(--sp-line);
+}
+
+.rfr-row:first-child {
+  border-top-color: transparent;
+}
+
+.rfr-row.is-fresh {
+  animation: rfr-fresh var(--rfr-mark) ease-out forwards;
+}
+
+.rfr-task {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.rfr-task input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--sp-accent);
+  cursor: pointer;
+}
+
+.rfr-title {
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rfr-task input:checked + .rfr-title {
+  color: var(--sp-muted);
+  text-decoration: line-through;
+}
+
+.rfr-due {
+  flex: none;
+  color: var(--sp-muted);
+  font-size: 13px;
+}
+
+.rfr-bone {
+  display: block;
+  height: 12px;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+}
+
+.rfr-bone.is-check {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.rfr-bone.is-title {
+  width: min(160px, 50%);
+}
+
+.rfr-bone.is-due {
+  flex: none;
+  width: 28px;
+  margin-left: auto;
+}
+
+.rfr-replace {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  color: var(--sp-secondary);
+  font-size: 14px;
+}
+
+.rfr-replace p {
+  margin: 0;
+}
+
+.rfr-retry {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* 무대 안에 갇혀 보이도록 무대 기준 absolute로 그린다. 실제 화면에서는 viewport 기준 fixed로 둔다 */
+.rfr-toast {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(340px, calc(100% - 48px));
+  min-height: 48px;
+  margin: 0 auto;
+  padding: 0 6px 0 14px;
+  border-radius: 6px;
+  background: var(--sp-inverse);
+  color: var(--sp-on-inverse);
+  box-shadow: var(--sp-overlay-shadow);
+  font-size: 14px;
+}
+
+.rfr-toast-icon {
+  flex: none;
+  color: var(--sp-danger-on-inverse);
+}
+
+.rfr-toast-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.rfr-toast-retry {
+  flex: none;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-on-inverse);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rfr-toast-retry:hover {
+  background: var(--sp-inverse-hover);
+}
+
+.rfr-page button:focus-visible,
+.rfr-task input:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+@keyframes rfr-flow {
+  from {
+    left: -40%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes rfr-fresh {
+  from {
+    background: var(--sp-accent-soft);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+/* 동작 줄이기 설정에서는 막대를 흐르게 하지 않고 채워 둔다 */
+@media (prefers-reduced-motion: reduce) {
+  .rfr-bar span {
+    left: 0;
+    width: 100%;
+    opacity: 0.6;
+    animation: none;
+  }
+}
