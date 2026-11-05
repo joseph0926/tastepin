@@ -27,6 +27,8 @@ CATALOG = {"version": 1, "components": [
          dimension("ground", {"cool": {"bg-light": "#f3f5f8", "bg-dark": "#101318"},
                               "warm": {"bg-light": "#f6f5f1", "bg-dark": "#14130f"}}),
          dimension("radius", {"small": {"radius-surface": "6px"}, "soft": {"radius-surface": "12px"}}),
+         dimension("accent", {"teal": {"accent-light": "#0f766e", "accent-dark": "#5cc8b8"},
+                              "ink": {"accent-light": "#1b1d22", "accent-dark": "#eceef2"}}),
      ]},
     {"id": "reading", "label": "글과 밀도", "scope": "global", "axis": "visual", "file": "Reading.tsx", "aliases": [],
      "dimensions": [
@@ -105,6 +107,13 @@ class TokenTests(RepoTestCase):
         self.assertIn("--color-ground: var(--taste-bg);", tailwind)
         self.assertIn("--radius-surface: var(--taste-radius-surface);", tailwind)
         self.assertNotIn("--text-title", tailwind, "고르지 않은 값의 Tailwind 이름은 만들지 않는다")
+
+    def test_chosen_accent_reaches_tailwind_color_with_dark_value(self):
+        self.choose("surface", "accent", "teal")
+        files = tokens.render_all(lab.load_catalog(), lab.load_judgments())
+        self.assertIn("  --taste-accent: #0f766e;", files["taste.css"].split("@media")[0])
+        self.assertIn("  --taste-accent: #5cc8b8;", files["taste.css"].split("@media")[1])
+        self.assertIn("--color-accent: var(--taste-accent);", files["taste.tailwind.css"])
 
     def test_motion_presets_use_seconds_and_bezier_arrays(self):
         self.choose("motion-feel", "curve", "cubic")
