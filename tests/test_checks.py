@@ -1,4 +1,4 @@
-"""Stop 훅의 lint 확인, lint 기록, doctor를 임시 원장과 임시 홈에서 검사한다."""
+"""이전 Stop 훅의 비활성화, 수동 lint 기록, doctor를 임시 원장과 임시 홈에서 검사한다."""
 
 import io
 import json
@@ -14,7 +14,7 @@ TASTE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TASTE_ROOT))
 
 import taste
-from tastelib import doctor, lab, lint, repo, stopcheck, store
+from tastelib import doctor, lab, lint, repo, store
 
 
 def user(text):
@@ -85,54 +85,32 @@ class StopCheckTests(LedgerCase):
             taste.main()
         self.assertEqual(output.getvalue(), "")
 
-    def test_blocks_once_when_a_taste_session_edits_screen_files_without_lint(self):
+    def test_claude_ui_edits_do_not_require_browser_lint(self):
         store.log_delivery("skill", session="s1")
         entries = [user("/taste 설정 화면 만들어줘"), tool("Edit", file_path="/p/src/Settings.tsx"), tool_result()]
-        output = self.run_stop(entries)
-        self.assertEqual(output["decision"], "block")
-        self.assertIn("Settings.tsx", output["reason"])
-        self.assertIn("lint <url> --session s1", output["reason"])
-        self.assertIsNone(self.run_stop(entries, active=True), "이미 이 훅 때문에 이어 가는 중이면 막지 않는다")
-
-    def test_lint_after_the_last_edit_lets_the_turn_end(self):
-        store.log_delivery("skill", session="s1")
-        entries = [
-            user("버튼 고쳐줘"), tool("Write", file_path="/p/src/button.css"),
-            tool("Bash", command="python3 -B /example/tastepin/taste.py lint localhost:3000 --session s1"),
-        ]
+        before = {p.name: p.read_bytes() for p in self.state.iterdir() if p.is_file()}
         self.assertIsNone(self.run_stop(entries))
-        entries.append(tool("Edit", file_path="/p/src/button.css"))
-        self.assertIsNotNone(self.run_stop(entries), "lint 뒤에 다시 고쳤으면 다시 확인한다")
+        self.assertIsNone(self.run_stop(entries, active=True))
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.state.iterdir() if p.is_file()})
 
-    def test_lint_through_a_quoted_entry_path_counts(self):
-        store.log_delivery("skill", session="s1")
-        entries = [
-            user("버튼 고쳐줘"), tool("Write", file_path="/p/src/button.css"),
-            tool("Bash", command="python3 -B '/my tools/taste/taste.py' lint localhost:3000 --session s1"),
-        ]
-        self.assertIsNone(self.run_stop(entries))
+    def test_codex_ui_edits_do_not_track_or_require_browser_lint(self):
+        store.log_delivery("skill", session="s1", surface="codex")
+        before = {p.name: p.read_bytes() for p in self.state.iterdir() if p.is_file()}
+        self.run_codex_track("apply_patch", "*** Begin Patch\n*** Update File: src/Settings.tsx\n*** End Patch")
+        self.assertIsNone(self.run_stop([], surface="codex"))
+        self.assertFalse((self.state / "stop-actions").exists())
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.state.iterdir() if p.is_file()})
 
-    def test_only_this_turn_and_only_screen_files_count(self):
-        store.log_delivery("skill", session="s1")
-        earlier = [user("화면 만들어줘"), tool("Edit", file_path="/p/a.tsx"), tool_result()]
-        self.assertIsNone(self.run_stop(earlier + [user("README 고쳐줘"), tool("Edit", file_path="/p/README.md")]))
-
-    def test_harness_messages_do_not_start_a_new_turn(self):
-        store.log_delivery("skill", session="s1")
-        notification = {
-            "type": "user", "origin": {"kind": "task-notification"},
-            "message": {"role": "user", "content": "<task-notification>조사 끝</task-notification>"},
-        }
-        summary = {"type": "user", "isCompactSummary": True, "message": {"role": "user", "content": "이전 대화 요약"}}
-        for inserted in (notification, summary):
-            entries = [user("설정 화면 고쳐줘"), tool("Edit", file_path="/p/src/Settings.tsx"), tool_result(), inserted]
-            self.assertIsNotNone(self.run_stop(entries), "하네스가 넣은 메시지 앞의 화면 수정도 이번 턴이다")
-
-    def test_sessions_without_taste_are_never_blocked(self):
-        entries = [user("화면 만들어줘"), tool("Edit", file_path="/p/a.tsx")]
-        self.assertIsNone(self.run_stop(entries, session="other"))
-        store.log_delivery("hook", session="other")
-        self.assertIsNone(self.run_stop(entries, session="other"), "10-21까지의 자동 주입은 /taste 적용이 아니다")
+    def test_legacy_codex_turn_records_do_not_block_or_get_deleted(self):
+        store.log_delivery("skill", session="s1", surface="codex")
+        import hashlib
+        key = hashlib.sha256(b"s1\0turn-1").hexdigest()
+        old = self.state / "stop-actions" / (key + ".jsonl")
+        old.parent.mkdir()
+        content = json.dumps({"kind": "edit", "paths": ["src/Settings.tsx"]}) + "\n"
+        old.write_text(content)
+        self.assertIsNone(self.run_stop([], surface="codex"))
+        self.assertEqual(old.read_text(), content)
 
     def test_broken_input_does_not_block(self):
         output = io.StringIO()
@@ -144,42 +122,6 @@ class StopCheckTests(LedgerCase):
             taste.main()
         self.assertEqual(output.getvalue(), "")
         self.assertIn("stop-check error", (self.state / "hook.log").read_text(encoding="utf-8"))
-
-    def test_codex_blocks_after_a_ui_patch_without_reading_the_transcript(self):
-        store.log_delivery("skill", session="s1", surface="codex")
-        self.run_codex_track("apply_patch", "*** Begin Patch\n*** Update File: src/Settings.tsx\n*** End Patch")
-        output = self.run_stop([], surface="codex")
-        self.assertEqual(output["decision"], "block")
-        self.assertIn("Settings.tsx", output["reason"])
-        self.assertIsNone(self.run_stop([], surface="codex"), "읽은 턴 기록은 다시 쓰지 않는다")
-
-    def test_codex_lint_after_the_last_ui_patch_lets_the_turn_end(self):
-        store.log_delivery("skill", session="s1", surface="codex")
-        self.run_codex_track("apply_patch", "*** Begin Patch\n*** Add File: src/button.css\n*** End Patch")
-        self.run_codex_track("Bash", "python3 -B /example/tastepin/taste.py lint localhost:3000 --session s1")
-        self.assertIsNone(self.run_stop([], surface="codex"))
-
-        self.run_codex_track("Bash", "python3 -B /example/tastepin/taste.py lint localhost:3000 --session s1")
-        self.run_codex_track("apply_patch", "*** Begin Patch\n*** Update File: src/button.css\n*** End Patch")
-        self.assertIsNotNone(self.run_stop([], surface="codex"), "lint 뒤에 다시 고쳤으면 막는다")
-
-    def test_codex_turn_record_is_removed_when_the_continued_turn_stops(self):
-        store.log_delivery("skill", session="s1", surface="codex")
-        self.run_codex_track("apply_patch", "*** Begin Patch\n*** Update File: src/Settings.tsx\n*** End Patch")
-        self.assertIsNotNone(self.run_stop([], surface="codex"))
-        self.run_codex_track("Bash", "python3 -B /example/tastepin/taste.py lint localhost:3000 --session s1")
-        self.assertIsNone(self.run_stop([], surface="codex", active=True))
-        self.assertEqual(list((self.state / "stop-actions").iterdir()), [], "막은 뒤 이어 간 턴의 기록도 남지 않는다")
-
-    def test_codex_ignores_non_ui_patches_and_other_turns(self):
-        store.log_delivery("skill", session="s1", surface="codex")
-        self.run_codex_track("apply_patch", "*** Begin Patch\n*** Update File: README.md\n*** End Patch")
-        self.run_codex_track(
-            "apply_patch",
-            "*** Begin Patch\n*** Update File: src/App.tsx\n*** End Patch",
-            turn="other-turn",
-        )
-        self.assertIsNone(self.run_stop([], surface="codex"))
 
 
 class LintRecordTests(LedgerCase):

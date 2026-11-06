@@ -377,7 +377,8 @@ class ApplyContextTests(LabTestCase):
         output = io.StringIO()
         with patch.object(sys, "argv", argv), redirect_stdout(output):
             taste.main()
-        self.assertIn("lint <url> --session codex-s1", output.getvalue())
+        self.assertNotIn("lint <url>", output.getvalue())
+        self.assertIn("코드", output.getvalue().split("### 끝나면")[1])
         delivery, = store.load_deliveries()
         self.assertEqual(
             (delivery["via"], delivery["session"], delivery["surface"]), ("handoff-implement", "codex-s1", "codex"),
