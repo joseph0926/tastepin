@@ -127,7 +127,7 @@ def build(catalog, judgments, rules_doc, verdicts, symptoms_doc, request="", com
     """적용 문구와 기록할 내용(규칙 id, 컴포넌트 id, 전역 시편 id)을 돌려준다.
 
     portable은 `taste.py apply`가 저장소에 남기는 사본(`.taste/AGENT.md`)이다. 원장이 없는 클라우드 세션에서도 읽히도록
-    다른 컴포넌트는 `.taste/components/`에서, lint는 로컬에 원장이 있을 때만 쓰게 안내한다."""
+    다른 컴포넌트는 `.taste/components/`에서 읽고, 원장 유무와 관계없이 코드로 검토하게 안내한다."""
     rules = rules_doc["rules"]
     known = {c["id"]: c for c in catalog["components"] if not lab.is_global(c)}
     requested = list(dict.fromkeys(
@@ -173,13 +173,8 @@ def build(catalog, judgments, rules_doc, verdicts, symptoms_doc, request="", com
             "### 토큰",
             "`.taste/taste.css`(CSS 변수), `.taste/taste.tailwind.css`(Tailwind v4 `@theme`), `.taste/taste.motion.ts`(Motion 프리셋)에 "
             "위 값이 들어 있다. 프로젝트가 쓰는 쪽을 import해 숫자를 다시 적지 않는다.",
-            "",
-            "### 끝나면",
-            f"로컬에 취향 원장(`{store.shell_path(store.ENTRY)}`)이 있으면: {store.LINT_GUIDE} "
-            "없으면(클라우드 세션 등) 위 값과 규칙을 화면에서 직접 확인하고 확인한 범위를 보고한다.",
         ]
-    else:
-        lines += ["", "### 끝나면", store.LINT_GUIDE]
+    lines += ["", "### 끝나면", store.CODE_REVIEW_GUIDE]
     used_rules = [r["id"] for r in confirmed] + [r["id"] for r in exceptions] + [
         r["id"] for r in rules if r.get("component") in requested and r["status"] == "확정"
     ]

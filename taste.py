@@ -17,8 +17,8 @@
   python3 -B taste.py serve     서버를 포그라운드로 실행
   python3 -B taste.py stop      백그라운드 서버 종료
   python3 -B taste.py hook      프롬프트 제출 훅 (stdin JSON을 읽어 화면 판정을 기록만 한다)
-  python3 -B taste.py stop-track  Codex PostToolUse 훅 (이번 턴의 화면 수정과 lint 실행을 기록한다)
-  python3 -B taste.py stop-check  Claude Code/Codex Stop 훅 (화면을 고치고 lint 없이 끝내면 한 번 막는다)
+  python3 -B taste.py stop-track  이전 훅 설정용 호환 명령 (기록하지 않는다)
+  python3 -B taste.py stop-check  이전 훅 설정용 호환 명령 (종료를 막지 않는다)
   python3 -B taste.py doctor    훅, 스킬, labs, uv, 저장소 사본이 제대로 있는지 한 번에 보기
 """
 
@@ -321,9 +321,6 @@ def cmd_apply_context(args):
     )
     # 치환되지 않은 ${CLAUDE_SESSION_ID} 같은 자리표시자는 세션 id가 아니다
     session = "" if "$" in args.session else args.session.strip()
-    if session:
-        # lint 결과가 이 세션의 적용과 이어지도록 안내하는 명령에 세션 id를 붙인다
-        text = text.replace(store.LINT_COMMAND, f"{store.LINT_COMMAND} --session {session}")
     if not args.no_log:
         store.log_delivery(
             args.via, session=session, project=os.getcwd().replace(os.path.expanduser("~"), "~"),
@@ -644,9 +641,9 @@ def main():
     apply_cmd.add_argument("repo", help="작업 저장소 경로")
     apply_cmd.add_argument("--check", action="store_true", help="쓰지 않고 사본이 낡았는지만 확인 (낡으면 종료 코드 1)")
 
-    stop_track = add("stop-track", cmd_stop_track, "Codex PostToolUse 훅")
+    stop_track = add("stop-track", cmd_stop_track, "이전 PostToolUse 훅 호환 명령 (동작 없음)")
     stop_track.add_argument("--surface", choices=("codex",), default="codex")
-    stop_check = add("stop-check", cmd_stop_check, "Claude Code/Codex Stop 훅")
+    stop_check = add("stop-check", cmd_stop_check, "이전 Stop 훅 호환 명령 (동작 없음)")
     stop_check.add_argument("--surface", choices=("claude", "codex"), default="claude")
     add("doctor", cmd_doctor, "소비 경로 점검")
 

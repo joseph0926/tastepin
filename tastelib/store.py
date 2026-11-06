@@ -292,11 +292,13 @@ def rule_evidence(rule, verdicts):
     ]
 
 
-LINT_GUIDE = (
-    f"화면을 고친 뒤 열어 볼 URL이나 HTML 파일이 있으면 `{LINT_COMMAND}`로 바탕 채도, 강조색 수, 대비, "
-    "카드와 테두리, 반경, 서체, 한글 조판, 모션 길이를 라이트, 다크, 휴대폰에서 잰다. "
-    "실패를 고친 뒤 사용자에게 보여 주고, 값으로 재지 못한 규칙은 출력 끝의 목록대로 화면을 보고 확인한다. "
-    "좁은 화면 붕괴는 값으로 다 잡히지 않으므로 `--shots <폴더>`로 남긴 휴대폰 스크린숏은 통과해도 직접 본다."
+CODE_REVIEW_GUIDE = (
+    "변경한 코드와 관련 스타일, 공통 컴포넌트를 위 선택 값과 규칙에 대조한다. "
+    "서체, 색상, 모서리, 모션 설정과 문구, 컨트롤 구성을 확인하고 위반이 있으면 위치와 근거를 짚어 고친다. "
+    "관련된 기존 정적 검사나 테스트가 있으면 화면을 띄우지 않는 범위에서 실행한다. "
+    "취향 검증을 위해 개발 서버, 브라우저, 스크린숏이나 화면 lint를 실행하지 않는다. "
+    "실제 넘침, 서체 로딩, 깜빡임과 움직임의 체감처럼 코드만으로 확인할 수 없는 항목은 미검증으로 보고한다. "
+    "화면 검사는 사용자가 별도로 명시한 경우에만 수행한다."
 )
 
 
@@ -400,7 +402,7 @@ def build_block(rules_doc, verdicts, audience, symptoms_doc, component_lines=())
         fixes = _symptom_fix_lines(verdicts, symptoms_doc)
         if fixes:
             lines += ["", "### 자주 지적한 증상과 고치는 법", ""] + fixes
-        lines += ["", "### 보여 주기 전 점검", "", LINT_GUIDE]
+        lines += ["", "### 코드 검토", "", CODE_REVIEW_GUIDE]
     lines += ["", f"_취향 원장 기준일 {_today()}_"]
     return "\n".join(lines) + "\n"
 
