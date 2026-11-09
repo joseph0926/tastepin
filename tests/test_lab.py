@@ -598,12 +598,36 @@ class ServerVersionTests(unittest.TestCase):
         start.assert_called_once_with(4870)
 
 
-class BlogCatalogTests(LabTestCase):
-    def test_blog_choices_persist_and_reach_only_requested_components(self):
+class ExtendedCatalogTests(LabTestCase):
+    def test_rejected_many_options_reopens_with_combined_choices(self):
+        catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
+        self.write_catalog(catalog)
+        note = "검색과 분류를 함께 보고 싶음"
+        rejection = lab.record_judgment({
+            "component": "manyoptions", "dimension": "kind",
+            "options": ["search", "groups"], "outcome": "none", "note": note,
+        })
+        state = next(component for component in lab.lab_state("manyoptions")["components"] if component["id"] == "manyoptions")
+        self.assertEqual(state["preferences"]["kind"]["status"], "미평가")
+        self.assertEqual(state["next"]["options"], ["searchgroups", "searchfold"])
+        self.assertEqual(state["preferences"]["kind"]["notes"], [note])
+        for _ in range(2):
+            lab.record_judgment({
+                "component": "manyoptions", "dimension": "kind",
+                "options": ["searchgroups", "searchfold"],
+                "outcome": "chose", "choice": "searchfold",
+            })
+        judgments = lab.load_judgments()
+        self.assertEqual(judgments[0], rejection)
+        component = next(component for component in catalog["components"] if component["id"] == "manyoptions")
+        pref = lab.component_preferences(component, judgments)["kind"]
+        self.assertEqual((pref["status"], pref["value"]), ("확정", "searchfold"))
+
+    def test_choices_persist_and_reach_only_requested_components(self):
         catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
         self.write_catalog(catalog)
         components = {component["id"]: component for component in catalog["components"]}
-        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition")
+        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs")
 
         def choose(component, dimension):
             body = {
@@ -710,6 +734,16 @@ class RealCatalogTests(unittest.TestCase):
         self.assertEqual(match("긴 기술 글 읽기"), ["article"])
         self.assertEqual(match("블로그 글 목록"), ["postlist"])
         self.assertEqual(match("질문에서 글로 이동"), ["posttransition"])
+        self.assertIn("formdialog", match("modal + form 조합"))
+        self.assertIn("longformdialog", match("긴 설정 폼 모달"))
+        self.assertIn("stepformdialog", match("단계별 폼 모달"))
+        self.assertIn("formclose", match("작성 중 폼 모달 닫기"))
+        self.assertIn("formfailure", match("폼 모달 저장 실패"))
+        self.assertIn("manyoptions", match("선택지가 많은 입력"))
+        self.assertIn("listdetail", match("목록에서 상세 보기"))
+        self.assertIn("manyfilters", match("필터 조건이 많을 때"))
+        self.assertIn("mobiletable", match("휴대폰에서 많은 열의 표 보기"))
+        self.assertIn("rapidtabs", match("탭을 빠르게 연속 선택"))
         for component in catalog["components"]:
             self.assertTrue((Path(lab.LABS_DIR) / component["file"]).exists(), component["file"])
 
