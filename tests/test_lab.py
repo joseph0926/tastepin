@@ -15,7 +15,7 @@ TASTE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TASTE_ROOT))
 
 import taste
-from tastelib import lab, store
+from tastelib import context, lab, store
 
 CATALOG = {
     "version": 1,
@@ -598,6 +598,47 @@ class ServerVersionTests(unittest.TestCase):
         start.assert_called_once_with(4870)
 
 
+class BlogCatalogTests(LabTestCase):
+    def test_blog_choices_persist_and_reach_only_requested_components(self):
+        catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
+        self.write_catalog(catalog)
+        components = {component["id"]: component for component in catalog["components"]}
+        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition")
+
+        def choose(component, dimension):
+            body = {
+                "component": component["id"], "dimension": dimension["id"],
+                "options": [value["id"] for value in dimension["values"]],
+                "outcome": "chose", "choice": dimension["values"][1]["id"],
+                "conditions": {"theme": "dark", "frame": "mobile"},
+            }
+            lab.record_judgment(body)
+            return lab.record_judgment(body)
+
+        original = components["reading"]
+        choose(original, original["dimensions"][0])
+        original_records = lab.load_judgments()
+        for component_id in ids:
+            with self.subTest(component=component_id):
+                component = components[component_id]
+                for dimension in component["dimensions"]:
+                    record = choose(component, dimension)
+                    self.assertEqual(record["specs"][record["choice"]], dimension["values"][1]["spec"])
+                judgments = lab.load_judgments()
+                prefs = lab.component_preferences(component, judgments)
+                for dimension in component["dimensions"]:
+                    self.assertEqual(prefs[dimension["id"]]["status"], "확정")
+                    self.assertEqual(prefs[dimension["id"]]["value"], dimension["values"][1]["id"])
+                text, used = context.build(catalog, judgments, {"rules": []}, [], {"symptoms": []}, component_ids=[component_id])
+                self.assertEqual(used["components"], [component_id])
+                self.assertIn(f"### 컴포넌트: {component['label']}", text)
+                doc = context.component_doc(component, judgments, [], [])
+                for dimension in component["dimensions"]:
+                    self.assertIn(dimension["values"][1]["spec"], doc)
+        self.assertEqual(lab.load_judgments()[:len(original_records)], original_records)
+        self.assertEqual(lab.component_preferences(original, lab.load_judgments())[original["dimensions"][0]["id"]]["status"], "확정")
+
+
 class RealCatalogTests(unittest.TestCase):
     def test_labs_catalog_is_valid_when_present(self):
         if not Path(lab.catalog_path()).exists():
@@ -661,6 +702,14 @@ class RealCatalogTests(unittest.TestCase):
         self.assertEqual(match("AI 분석 결과를 표로 정리해줘"), [], "답변 형식은 AI 화면이 아니다")
         self.assertEqual(match("AI 대화 기록 화면 대시보드"), [], "대화 기록을 보는 화면은 AI 대화 화면이 아니다")
         self.assertEqual(match("스트리밍 API와 채팅 API 호출 코드"), [], "화면이 아닌 스트리밍과 채팅은 잡지 않는다")
+        self.assertEqual(match("코드 블록 줄바꿈"), ["codeblock"])
+        self.assertEqual(match("현재 절 안내 띠"), ["sectionguide"])
+        self.assertEqual(match("질문 다이얼"), ["questiondial"])
+        self.assertEqual(match("대화 인용"), ["conversation"])
+        self.assertEqual(match("본문의 보충 설명"), ["articleaside"])
+        self.assertEqual(match("긴 기술 글 읽기"), ["article"])
+        self.assertEqual(match("블로그 글 목록"), ["postlist"])
+        self.assertEqual(match("질문에서 글로 이동"), ["posttransition"])
         for component in catalog["components"]:
             self.assertTrue((Path(lab.LABS_DIR) / component["file"]).exists(), component["file"])
 
