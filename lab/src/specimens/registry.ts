@@ -15,10 +15,18 @@ import EmptyState from "./components/EmptyState";
 import Failure from "./components/Failure";
 import Field from "./components/Field";
 import Filter from "./components/Filter";
+import FormDialog from "./components/FormDialog";
+import FormClose from "./components/FormClose";
+import FormFailure from "./components/FormFailure";
 import GlobalSearch from "./components/GlobalSearch";
 import ListRow, { BlogList } from "./components/ListRow";
+import ListDetail from "./components/ListDetail";
 import Loading from "./components/Loading";
+import LongFormDialog from "./components/LongFormDialog";
 import Menu from "./components/Menu";
+import ManyOptions from "./components/ManyOptions";
+import ManyFilters from "./components/ManyFilters";
+import MobileTable from "./components/MobileTable";
 import MotionFeel from "./components/MotionFeel";
 import MotionResponse from "./components/MotionResponse";
 import MotionSpring from "./components/MotionSpring";
@@ -29,6 +37,7 @@ import PageWidth from "./components/PageWidth";
 import Reading, { BlogReading } from "./components/Reading";
 import QuestionDial from "./components/QuestionDial";
 import Refresh from "./components/Refresh";
+import RapidTabs from "./components/RapidTabs";
 import Reorder from "./components/Reorder";
 import Search from "./components/Search";
 import Segmented from "./components/Segmented";
@@ -36,6 +45,7 @@ import Selection from "./components/Selection";
 import SectionGuide from "./components/SectionGuide";
 import Sort from "./components/Sort";
 import Steps from "./components/Steps";
+import StepFormDialog from "./components/StepFormDialog";
 import StatusLine from "./components/StatusLine";
 import Surface from "./components/Surface";
 import Table from "./components/Table";
@@ -75,6 +85,24 @@ export const specimens: Record<string, SpecimenEntry> = {
   tabs: { Component: Tabs, demoInterval: 900, demoSteps: 4 },
   // 열고 닫기 반복. 늦게 오는 팀 목록(600ms)을 다 받은 뒤에도 열린 채로 보이도록 간격을 둔다
   dialog: { Component: Dialog, demoInterval: 1500, demoSteps: 4 },
+  formdialog: { Component: FormDialog, demoInterval: 1300, demoSteps: 6 },
+  longformdialog: {
+    Component: LongFormDialog,
+    demoInterval: 1300,
+    demoSteps: 6,
+  },
+  stepformdialog: {
+    Component: StepFormDialog,
+    demoInterval: 1000,
+    demoSteps: 8,
+  },
+  formclose: { Component: FormClose, demoInterval: 1200, demoSteps: 6 },
+  formfailure: { Component: FormFailure, demoInterval: 1200, demoSteps: 6 },
+  manyoptions: { Component: ManyOptions, demoInterval: 1200, demoSteps: 6 },
+  listdetail: { Component: ListDetail, demoInterval: 1200, demoSteps: 5 },
+  manyfilters: { Component: ManyFilters, demoInterval: 1200, demoSteps: 4 },
+  mobiletable: { Component: MobileTable, demoInterval: 1200, demoSteps: 4 },
+  rapidtabs: { Component: RapidTabs, demoInterval: 1100, demoSteps: 3 },
   menu: { Component: Menu, demoInterval: 600, demoSteps: 5 },
   toast: { Component: Toast, demoInterval: 700, demoSteps: 4 },
   status: { Component: StatusLine, demoInterval: 1000, demoSteps: 7 },
