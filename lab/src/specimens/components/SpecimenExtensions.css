@@ -1,0 +1,401 @@
+@import "./FormDialog.css";
+
+.sx-stage {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-width: 0;
+  min-height: 360px;
+  color: var(--sp-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sx-stage h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.sx-stage h4 {
+  margin: 12px 0;
+  font-size: 15px;
+}
+
+.sx-small {
+  margin: 0;
+  color: var(--sp-secondary);
+  font-size: 13px;
+}
+
+.sx-actions,
+.sx-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sx-actions {
+  justify-content: flex-end;
+}
+
+.sx-close-confirm,
+.sx-save-actions {
+  width: 100%;
+}
+
+.sx-confirm-copy {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.sx-save-error {
+  margin: 0 0 16px;
+  color: var(--sp-danger);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* 알림 영역은 미리 두고 내용만 바꾼다. 빈 때에도 접근성 트리에서 제거하지 않는다. */
+.sx-save-error:empty,
+.sx-confirm-copy:empty,
+.sx-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sx-select-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+}
+
+.sx-picker {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 12px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-raised);
+}
+
+.sx-picker summary,
+.sx-option-group > h4 {
+  margin: 0;
+  padding: 10px 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sx-picker summary {
+  cursor: pointer;
+}
+
+.sx-picker summary span,
+.sx-option-group > h4 span {
+  padding-left: 8px;
+  color: var(--sp-secondary);
+  font-size: 12px;
+}
+
+.sx-search-label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.sx-search-label input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 4px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+}
+
+.sx-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.sx-option small {
+  margin-left: auto;
+  color: var(--sp-secondary);
+}
+
+.sx-option:hover,
+.sx-project-trigger:hover {
+  background: var(--sp-hover);
+}
+
+.sx-detail-layout {
+  position: relative;
+  min-width: 0;
+}
+
+.sx-detail-layout[data-view="side"][data-open="true"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.sx-project-list {
+  max-height: 400px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.sx-project-list ul,
+.sx-result-list,
+.sx-project-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sx-project-list li + li,
+.sx-result-list li + li {
+  border-top: 1px solid var(--sp-line);
+}
+
+.sx-project-trigger {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 16px 8px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sx-project-trigger span {
+  color: var(--sp-secondary);
+  font-size: 12px;
+}
+
+.sx-project-trigger[aria-current="true"] {
+  background: var(--sp-surface-2);
+}
+
+.sx-detail {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-raised);
+  overflow-wrap: anywhere;
+}
+
+.sx-facts {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.sx-facts > div {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.sx-facts dt {
+  color: var(--sp-secondary);
+}
+
+.sx-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.sx-text-button {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sx-text-button:disabled {
+  color: var(--sp-muted);
+  cursor: default;
+}
+
+.sx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sx-chips[data-flow="scroll"] {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.sx-chip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--sp-control-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sx-filter-editor {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+}
+
+.sx-filter-editor label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sx-result-list li {
+  padding: 16px 8px;
+}
+
+.sx-mobile-frame {
+  width: min(360px, 100%);
+  margin-inline: auto;
+}
+
+.sx-table-scroll {
+  min-width: 0;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.sx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.sx-table[data-layout="scroll"] {
+  min-width: 680px;
+}
+
+.sx-table th,
+.sx-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--sp-line);
+  text-align: left;
+  font-weight: 400;
+}
+
+.sx-table thead th {
+  color: var(--sp-secondary);
+  font-size: 11px;
+}
+
+.sx-project-cards {
+  display: grid;
+  gap: 16px;
+}
+
+.sx-project-cards li {
+  padding: 16px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+}
+
+.sx-project-cards h4 {
+  margin: 0;
+}
+
+.sx-rapid-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--sp-line);
+}
+
+.sx-rapid-tabs button {
+  position: relative;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.sx-rapid-tabs [aria-selected="true"] {
+  color: var(--sp-text);
+  font-weight: 650;
+}
+
+.sx-rapid-indicator {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 25%;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+  pointer-events: none;
+}
+
+.sx-tab-panel {
+  min-height: 160px;
+  padding: 8px;
+}
+
+.sx-stage :is(button, input, summary, [tabindex="0"]):focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+@container stage (max-width: 420px) {
+  .sx-detail-layout[data-view="side"][data-open="true"] {
+    display: block;
+    min-height: 400px;
+  }
+
+  .sx-detail-layout[data-view="side"] > .sx-detail {
+    position: absolute;
+    inset: 0 0 0 16%;
+    overflow-y: auto;
+    box-shadow: var(--sp-overlay-shadow);
+  }
+}
