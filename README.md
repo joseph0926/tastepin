@@ -50,6 +50,27 @@ python3 -B taste.py lab codeblock
 
 블로그용 비교는 일반 화면의 글, 목록과 화면 전환 선택과 별도로 기록합니다. 긴 글의 폭은 같은 무대 안의 비율을 비교하며, 실제 픽셀 폭을 확정하는 값은 아닙니다.
 
+모달과 폼을 함께 쓰는 비교도 있습니다. 각 항목은 기존 대화상자와 입력 필드 취향과 별도로 기록합니다.
+
+- 짧은 폼 모달(`formdialog`): 입력 배치, 처음 포커스와 저장 후 처리
+- 긴 설정 폼 모달(`longformdialog`): 스크롤 범위, 묶음 접기와 오류 요약
+- 단계별 폼 모달(`stepformdialog`): 단계 안내, 높이 변경과 마지막 확인
+
+```sh
+python3 -B taste.py lab formdialog
+```
+
+판정한 시편을 상황별로 넓히는 비교는 다음 7건입니다. 기존 선택과 별도로 기록합니다.
+
+- 폼 작성 중 닫기(`formclose`), 저장 실패와 재시도(`formfailure`)
+- 선택지가 많은 입력(`manyoptions`), 목록에서 상세 보기(`listdetail`)
+- 조건이 많은 필터(`manyfilters`), 휴대폰에서 많은 열 보기(`mobiletable`)
+- 탭을 빠르게 연속 선택(`rapidtabs`)
+
+```sh
+python3 -B taste.py lab formclose
+```
+
 ### 2. 스킬로 취향 적용하기
 
 저장소 루트에서 [tastepin 스킬](skills/tastepin/SKILL.md)을 연결합니다.
