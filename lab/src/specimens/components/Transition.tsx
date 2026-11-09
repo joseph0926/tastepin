@@ -1,14 +1,24 @@
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   AnimatePresence,
   LayoutGroup,
   motion,
+  useIsPresent,
+  useReducedMotion,
   type TargetAndTransition,
 } from "motion/react";
 import { ChevronLeft, FileText, LoaderCircle } from "lucide-react";
 import { EASE_OUT_CUBIC, useDemo, useSeconds } from "../stage";
 import type { SpecimenProps } from "../types";
 import "./Transition.css";
+import { blogPosts } from "./blogPosts";
+import "./Blog.css";
 
 // params: kind(shared | near | fade), back(mirror | fade | instant), pending(wait | skeleton | bar), scroll(restore | top)
 // 휴대폰 크기의 앱 틀 안에서 목록과 상세를 오간다. 상세 내용은 600ms 뒤에 '도착'한다고 흉내 낸다.
@@ -246,5 +256,114 @@ export default function Transition({ params }: SpecimenProps) {
         </LayoutGroup>
       </div>
     </div>
+  );
+}
+
+// 기존 문서 전환과 같은 layoutId 방식을 긴 질문형 제목에 적용한다.
+export function BlogTransition({ params }: SpecimenProps) {
+  const [detail, setDetail] = useState(false);
+  const seconds = useSeconds();
+  const reduced = useReducedMotion();
+  const groupId = useId();
+  const duration = reduced
+    ? 0
+    : seconds(
+        ({ quick: 180, regular: 300, slow: 450 } as Record<string, number>)[
+          params.duration
+        ] ?? 300,
+      );
+  const delay = params.content === "after" ? duration : 0;
+  const post = blogPosts[0];
+  useDemo((tick) => setDetail(tick % 3 !== 0));
+
+  const title = (
+    <motion.span
+      className="blog-transition-title"
+      layoutId="post-title"
+      transition={{ duration, ease: EASE_OUT_CUBIC }}
+    >
+      {post.title}
+    </motion.span>
+  );
+
+  return (
+    <div className="blog-sample blog-transition">
+      <LayoutGroup id={groupId}>
+        <AnimatePresence initial={false}>
+          {detail ? (
+            <BlogTransitionScreen
+              key="detail"
+              duration={reduced ? 0 : seconds(120)}
+            >
+              <button
+                type="button"
+                className="blog-button"
+                onClick={() => setDetail(false)}
+              >
+                모든 글로
+              </button>
+              <article className="blog-transition-article">
+                <h3 className="blog-transition-heading">{title}</h3>
+                <motion.div
+                  className="blog-transition-body"
+                  initial={reduced ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay, duration: reduced ? 0 : seconds(180) }}
+                >
+                  <p className="blog-meta">
+                    {post.date}, {post.readingTime}분
+                  </p>
+                  <p>{post.description}</p>
+                  <p>
+                    주소와 화면이 각각 조건을 갖고 있었습니다. 입력 중인 값은
+                    검색창에 남기고, 확정한 조건은 주소에서 읽도록 바꿨습니다.
+                  </p>
+                </motion.div>
+              </article>
+            </BlogTransitionScreen>
+          ) : (
+            <BlogTransitionScreen
+              key="list"
+              duration={reduced ? 0 : seconds(120)}
+            >
+              <p className="blog-meta">최근에 쓴 글</p>
+              <button
+                type="button"
+                className="blog-transition-open"
+                onClick={() => setDetail(true)}
+              >
+                {title}
+                <span className="blog-meta">
+                  {post.date}, {post.readingTime}분
+                </span>
+              </button>
+              <p className="blog-transition-other">{blogPosts[1].title}</p>
+            </BlogTransitionScreen>
+          )}
+        </AnimatePresence>
+      </LayoutGroup>
+    </div>
+  );
+}
+
+function BlogTransitionScreen({
+  children,
+  duration,
+}: {
+  children: ReactNode;
+  duration: number;
+}) {
+  const present = useIsPresent();
+  return (
+    <motion.div
+      className="blog-transition-screen"
+      inert={!present}
+      aria-hidden={!present || undefined}
+      initial={false}
+      exit={{ opacity: 0 }}
+      transition={{ duration }}
+    >
+      {children}
+    </motion.div>
   );
 }

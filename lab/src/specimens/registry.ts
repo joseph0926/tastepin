@@ -1,8 +1,11 @@
 import type { ComponentType } from "react";
 import Assistant from "./components/Assistant";
+import ArticleAside from "./components/ArticleAside";
 import Badge from "./components/Badge";
 import Button from "./components/Button";
 import Confirm from "./components/Confirm";
+import CodeBlock from "./components/CodeBlock";
+import Conversation from "./components/Conversation";
 import DataTable from "./components/DataTable";
 import DatePicker from "./components/DatePicker";
 import Dialog from "./components/Dialog";
@@ -13,7 +16,7 @@ import Failure from "./components/Failure";
 import Field from "./components/Field";
 import Filter from "./components/Filter";
 import GlobalSearch from "./components/GlobalSearch";
-import ListRow from "./components/ListRow";
+import ListRow, { BlogList } from "./components/ListRow";
 import Loading from "./components/Loading";
 import Menu from "./components/Menu";
 import MotionFeel from "./components/MotionFeel";
@@ -23,12 +26,14 @@ import MotionSwap from "./components/MotionSwap";
 import Nav from "./components/Nav";
 import Notice from "./components/Notice";
 import PageWidth from "./components/PageWidth";
-import Reading from "./components/Reading";
+import Reading, { BlogReading } from "./components/Reading";
+import QuestionDial from "./components/QuestionDial";
 import Refresh from "./components/Refresh";
 import Reorder from "./components/Reorder";
 import Search from "./components/Search";
 import Segmented from "./components/Segmented";
 import Selection from "./components/Selection";
+import SectionGuide from "./components/SectionGuide";
 import Sort from "./components/Sort";
 import Steps from "./components/Steps";
 import StatusLine from "./components/StatusLine";
@@ -37,7 +42,7 @@ import Table from "./components/Table";
 import Tabs from "./components/Tabs";
 import Toast from "./components/Toast";
 import Tooltip from "./components/Tooltip";
-import Transition from "./components/Transition";
+import Transition, { BlogTransition } from "./components/Transition";
 import Upload from "./components/Upload";
 import type { SpecimenProps } from "./types";
 
@@ -105,4 +110,16 @@ export const specimens: Record<string, SpecimenEntry> = {
   globalsearch: { Component: GlobalSearch, demoInterval: 1100, demoSteps: 5 },
   // 질문 쓰기, 보내기, 기다림과 받기 세 칸, 처음으로
   assistant: { Component: Assistant, demoInterval: 1200, demoSteps: 6 },
+  codeblock: { Component: CodeBlock, demoInterval: 1600, demoSteps: 3 },
+  sectionguide: { Component: SectionGuide, demoInterval: 1100, demoSteps: 5 },
+  questiondial: { Component: QuestionDial, demoInterval: 1100, demoSteps: 9 },
+  conversation: { Component: Conversation, demoInterval: 0, demoSteps: 0 },
+  articleaside: { Component: ArticleAside, demoInterval: 1200, demoSteps: 2 },
+  article: { Component: BlogReading, demoInterval: 0, demoSteps: 0 },
+  postlist: { Component: BlogList, demoInterval: 0, demoSteps: 0 },
+  posttransition: {
+    Component: BlogTransition,
+    demoInterval: 1300,
+    demoSteps: 3,
+  },
 };

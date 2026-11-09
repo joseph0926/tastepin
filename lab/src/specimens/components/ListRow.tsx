@@ -3,6 +3,8 @@ import { animate, type AnimationPlaybackControls } from "motion/react";
 import { EASE_OUT, useDemo, useSeconds } from "../stage";
 import type { SpecimenProps } from "../types";
 import "./ListRow.css";
+import { blogPosts } from "./blogPosts";
+import "./Blog.css";
 
 // params: lines(one | two | three), meta(badge | text | none), group(flat | header | sticky)
 // 같이 재생은 목록 영역을 한 번 내림, 한 번 더 내림, 맨 위로를 한다. 머리글 고정은 CSS sticky라 손으로 스크롤해도 같다.
@@ -292,5 +294,45 @@ function Row({
         <span className="lst-author">{report.author}</span>
       </div>
     </li>
+  );
+}
+
+export function BlogList({ params }: SpecimenProps) {
+  return (
+    <section
+      className="blog-sample blog-list-sample"
+      data-titlelines={params.titlelines}
+      data-description={params.description}
+    >
+      <h3>최근에 쓴 글</h3>
+      <div
+        className="blog-list-scroll"
+        role="region"
+        aria-label="블로그 글 목록 비교"
+        tabIndex={0}
+      >
+        <ul>
+          {blogPosts.map((post) => {
+            const meta = (
+              <p className="blog-meta">
+                <time dateTime={post.date}>{post.date}</time>
+                <span>{post.readingTime}분</span>
+                <span>{post.topic}</span>
+              </p>
+            );
+            return (
+              <li key={post.id}>
+                <h4>{post.title}</h4>
+                {params.metaposition === "title" && meta}
+                {params.description !== "hidden" && (
+                  <p className="blog-list-description">{post.description}</p>
+                )}
+                {params.metaposition !== "title" && meta}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
   );
 }

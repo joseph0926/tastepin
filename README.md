@@ -39,6 +39,17 @@ python3 -B taste.py lab
 
 Lab: `http://127.0.0.1:5181/specimens`
 
+블로그 관련 시편도 같은 목록에서 고를 수 있습니다. 명령 뒤에 ID를 붙이면 해당 시편부터 엽니다.
+
+```sh
+python3 -B taste.py lab codeblock
+```
+
+- 새 비교: 코드 블록(`codeblock`), 현재 절 안내(`sectionguide`), 질문 다이얼(`questiondial`), 대화 인용(`conversation`), 인용과 보충 설명(`articleaside`)
+- 기존 시편을 넓힌 비교: 긴 기술 글 읽기(`article`), 블로그 글 목록(`postlist`), 질문에서 글로 이동(`posttransition`)
+
+블로그용 비교는 일반 화면의 글, 목록과 화면 전환 선택과 별도로 기록합니다. 긴 글의 폭은 같은 무대 안의 비율을 비교하며, 실제 픽셀 폭을 확정하는 값은 아닙니다.
+
 ### 2. 스킬로 취향 적용하기
 
 저장소 루트에서 [tastepin 스킬](skills/tastepin/SKILL.md)을 연결합니다.
