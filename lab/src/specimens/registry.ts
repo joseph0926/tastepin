@@ -58,6 +58,12 @@ import Toast from "./components/Toast";
 import Tooltip from "./components/Tooltip";
 import Transition, { BlogTransition } from "./components/Transition";
 import Upload from "./components/Upload";
+import WorklistScreen from "./screens/WorklistScreen";
+import DetailScreen from "./screens/DetailScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import ReadingScreen from "./screens/ReadingScreen";
+import CreateScreen from "./screens/CreateScreen";
+import AssistantScreen from "./screens/AssistantScreen";
 import type { SpecimenProps } from "./types";
 
 export interface SpecimenEntry {
@@ -70,6 +76,36 @@ export interface SpecimenEntry {
 
 // catalog.json의 컴포넌트 id와 같아야 한다. 없는 id는 평가 화면이 "시편 없음"으로 알린다
 export const specimens: Record<string, SpecimenEntry> = {
+  "screen-worklist": {
+    Component: WorklistScreen,
+    demoInterval: 1300,
+    demoSteps: 7,
+  },
+  "screen-detail": {
+    Component: DetailScreen,
+    demoInterval: 1300,
+    demoSteps: 7,
+  },
+  "screen-settings": {
+    Component: SettingsScreen,
+    demoInterval: 1300,
+    demoSteps: 7,
+  },
+  "screen-reading": {
+    Component: ReadingScreen,
+    demoInterval: 1300,
+    demoSteps: 6,
+  },
+  "screen-create": {
+    Component: CreateScreen,
+    demoInterval: 1300,
+    demoSteps: 8,
+  },
+  "screen-assistant": {
+    Component: AssistantScreen,
+    demoInterval: 1600,
+    demoSteps: 7,
+  },
   surface: { Component: Surface, demoInterval: 0, demoSteps: 0 },
   reading: { Component: Reading, demoInterval: 0, demoSteps: 0 },
   // 화면 폭은 움직임이 없어 같이 재생을 숨긴다

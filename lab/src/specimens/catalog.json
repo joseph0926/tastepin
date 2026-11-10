@@ -5408,6 +5408,186 @@
           ]
         }
       ]
+    },
+    {
+      "id": "screen-worklist",
+      "label": "관리 목록 화면",
+      "layout": "screen",
+      "file": "src/specimens/screens/WorklistScreen.tsx",
+      "aliases": [
+        "관리 ?목록 ?화면",
+        "프로젝트 ?목록 ?화면",
+        "\\bscreen[ -]worklist\\b"
+      ],
+      "dimensions": [
+        {
+          "id": "tools",
+          "label": "검색과 필터 배치",
+          "question": "검색하고 조건을 적용한 뒤 여러 프로젝트를 완료해 보세요. 검색과 필터는 어떻게 배치하는 쪽이 좋나요?",
+          "values": [
+            {
+              "id": "joined",
+              "label": "검색 옆에 필터",
+              "spec": "관리 목록 화면에서 검색 입력과 필터 버튼을 같은 줄에 둔다. 적용한 조건은 아래 줄, 결과는 표, 페이지 이동은 번호, 선택한 항목의 일괄 작업은 하단에 둔다"
+            },
+            {
+              "id": "split",
+              "label": "안내 옆에 필터",
+              "spec": "같은 관리 목록 화면에서 필터 버튼을 구역 안내 옆에 두고 검색 입력은 그 아래 한 줄을 채운다. 조건 표시와 결과, 일괄 작업의 동작은 같다"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screen-detail",
+      "label": "상세와 수정 화면",
+      "layout": "screen",
+      "file": "src/specimens/screens/DetailScreen.tsx",
+      "aliases": [
+        "상세와 ?수정 ?화면",
+        "프로젝트 ?상세 ?화면",
+        "\\bscreen[ -]detail\\b"
+      ],
+      "dimensions": [
+        {
+          "id": "summary",
+          "label": "요약 정보 위치",
+          "question": "프로젝트를 확인하고 수정한 뒤 목록으로 돌아가 보세요. 요약 정보는 어디에 있는 쪽이 좋나요?",
+          "values": [
+            {
+              "id": "top",
+              "label": "본문 위 요약",
+              "spec": "프로젝트 상세 화면의 담당자, 상태, 마감, 진행률과 예산을 본문 위에 가로로 배치하며 좁으면 줄바꿈한다. 수정은 폼 대화상자에서 하고 결과를 상세와 목록에 반영한다"
+            },
+            {
+              "id": "side",
+              "label": "본문 옆 요약",
+              "spec": "같은 프로젝트 상세 화면에서 요약 정보를 본문 왼쪽에 세로로 배치한다. 수정 대화상자와 미저장 확인, 저장 결과와 목록 복귀의 동작은 같다"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screen-settings",
+      "label": "긴 설정 화면",
+      "layout": "screen",
+      "file": "src/specimens/screens/SettingsScreen.tsx",
+      "aliases": [
+        "긴 ?설정 ?화면",
+        "팀 ?설정 ?화면",
+        "\\bscreen[ -]settings\\b"
+      ],
+      "dimensions": [
+        {
+          "id": "description",
+          "label": "설명과 입력 배치",
+          "question": "여러 설정을 바꾸고 저장해 보세요. 첫 저장은 실패하고 다시 저장하면 성공합니다. 설정 설명은 어디에 있는 쪽이 좋나요?",
+          "values": [
+            {
+              "id": "above",
+              "label": "설명 아래 입력",
+              "spec": "긴 설정 화면에서 각 구역의 제목과 설명 아래에 입력을 쌓는다. 구역 탐색과 변경 표시를 두고 폼 끝에서 저장한다. 입력 오류는 해당 필드, 저장 실패는 버튼 옆에 표시하고 입력을 보존한다"
+            },
+            {
+              "id": "aside",
+              "label": "설명 옆 입력",
+              "spec": "같은 긴 설정 화면에서 구역 제목과 설명은 왼쪽, 입력은 오른쪽에 둔다. 구역 탐색과 변경 표시, 저장과 오류 복구 동작은 같다"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screen-reading",
+      "label": "글 읽기 화면",
+      "layout": "screen",
+      "file": "src/specimens/screens/ReadingScreen.tsx",
+      "aliases": [
+        "글 ?읽기 ?화면",
+        "블로그 ?독서 ?화면",
+        "\\bscreen[ -]reading\\b"
+      ],
+      "dimensions": [
+        {
+          "id": "toc",
+          "label": "목차와 본문 배치",
+          "question": "목차로 이동하고 코드를 펼치며 읽어 보세요. 전체 목차는 어디에 있는 쪽이 좋나요?",
+          "values": [
+            {
+              "id": "side",
+              "label": "본문 왼쪽 목차",
+              "spec": "코드와 보충 설명이 있는 글 화면에서 전체 목차를 본문 왼쪽에 고정한다. 현재 절 표시와 헤더 아래 읽기 진행, 코드 줄바꿈과 펼치기, 보충 설명과 맨 위로 가기를 함께 둔다"
+            },
+            {
+              "id": "above",
+              "label": "본문 위 목차",
+              "spec": "같은 글 화면에서 전체 목차를 본문 위에 둔다. 목차는 본문과 함께 스크롤하며 현재 절 표시와 코드, 보충 설명, 읽기 진행 동작은 같다"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screen-create",
+      "label": "신청과 생성 화면",
+      "layout": "screen",
+      "file": "src/specimens/screens/CreateScreen.tsx",
+      "aliases": [
+        "신청과 ?생성 ?화면",
+        "프로젝트 ?생성 ?화면",
+        "\\bscreen[ -]create\\b"
+      ],
+      "dimensions": [
+        {
+          "id": "summary",
+          "label": "입력 중 요약 표시",
+          "question": "프로젝트 정보와 첨부를 입력하고 최종 확인까지 진행해 보세요. 입력 중에도 요약이 보이는 쪽이 좋나요?",
+          "values": [
+            {
+              "id": "live",
+              "label": "입력 옆에도 요약",
+              "spec": "프로젝트 생성 화면에서 정보 입력과 참가 및 첨부 단계에 입력 요약을 오른쪽에 함께 둔다. 전체 단계는 위에 표시하고 이전으로 돌아가도 값을 유지한다. 마지막 확인 단계 뒤에 생성한다"
+            },
+            {
+              "id": "review",
+              "label": "마지막에 요약",
+              "spec": "같은 프로젝트 생성 화면에서 앞선 입력 단계는 폼에 집중하고 요약은 마지막 확인 단계에서 보여 준다. 첨부와 이전 이동, 값 보존과 생성 동작은 같다"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "screen-assistant",
+      "label": "AI와 함께 작업하는 화면",
+      "layout": "screen",
+      "file": "src/specimens/screens/AssistantScreen.tsx",
+      "aliases": [
+        "AI와 ?함께 ?작업",
+        "AI ?작업 ?화면",
+        "\\bscreen[ -]assistant\\b"
+      ],
+      "dimensions": [
+        {
+          "id": "result",
+          "label": "대화와 결과 배치",
+          "question": "회의 초안을 짧게 바꿔 달라고 요청하고 결과를 수정해 반영해 보세요. 대화와 결과는 어떻게 배치하는 쪽이 좋나요?",
+          "values": [
+            {
+              "id": "beside",
+              "label": "대화 옆 결과",
+              "spec": "AI와 작업하는 화면에서 대화와 아래 입력창은 왼쪽, 편집 가능한 결과 미리보기와 참고 자료, 반영 버튼은 오른쪽에 둔다. 답은 낱말마다 표시하고 중지해도 이전 초안을 보존한다"
+            },
+            {
+              "id": "below",
+              "label": "대화 아래 결과",
+              "spec": "같은 AI 작업 화면에서 대화와 입력창 아래에 결과 미리보기와 참고 자료, 반영 버튼을 둔다. 응답과 편집, 중지와 반영의 동작은 같다"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
