@@ -656,7 +656,7 @@ class ExtendedCatalogTests(LabTestCase):
         catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
         self.write_catalog(catalog)
         components = {component["id"]: component for component in catalog["components"]}
-        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading")
+        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading", "screen-worklist", "screen-detail", "screen-settings", "screen-reading", "screen-create", "screen-assistant")
 
         def choose(component, dimension):
             body = {
@@ -773,6 +773,12 @@ class RealCatalogTests(unittest.TestCase):
         self.assertIn("manyfilters", match("필터 조건이 많을 때"))
         self.assertIn("mobiletable", match("휴대폰에서 많은 열의 표 보기"))
         self.assertIn("rapidtabs", match("탭을 빠르게 연속 선택"))
+        self.assertIn("screen-worklist", match("관리 목록 화면"))
+        self.assertIn("screen-detail", match("상세와 수정 화면"))
+        self.assertIn("screen-settings", match("긴 설정 화면"))
+        self.assertIn("screen-reading", match("글 읽기 화면"))
+        self.assertIn("screen-create", match("신청과 생성 화면"))
+        self.assertIn("screen-assistant", match("AI와 함께 작업하는 화면"))
         self.assertIn("mobiledialog", match("휴대폰에서 모달이 너무 커요"))
         self.assertIn("mobiledialog", match("모바일 화면에서 회의 시간 바꾸는 모달 만들어줘"))
         self.assertIn("mobileform", match("모바일 배송지 입력 화면"))
