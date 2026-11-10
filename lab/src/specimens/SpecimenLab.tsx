@@ -169,6 +169,9 @@ function ComponentIndex({
               {component.scope === "global" && (
                 <span className="lab-index-scope">전역</span>
               )}
+              {component.frame === "phone" && (
+                <span className="lab-index-scope">휴대폰</span>
+              )}
               {!item.next && (
                 <Check
                   className="lab-index-done"
@@ -954,11 +957,13 @@ export default function SpecimenLab() {
                       <p className="lab-hint">
                         {comparison.recheck
                           ? `${comparison.recheck.label}에서 다시 묻는 비교예요. 처음 고른 값은 그대로 두고, 이 조건에서 고른 값을 따로 기록해요.`
-                          : animated
-                            ? "무대 안에서 직접 눌러 보거나 같이 재생으로 나란히 비교하세요."
-                            : componentState?.scope === "global"
-                              ? "화면 전체에 적용되는 값이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."
-                              : "움직임이 없는 시편이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."}
+                          : component.frame === "phone"
+                            ? "무대 안에 휴대폰 화면을 그린 시편이에요. 휴대폰 폭(M)은 바꾸지 않아도 돼요. 직접 눌러 보거나 같이 재생으로 비교하세요."
+                            : animated
+                              ? "무대 안에서 직접 눌러 보거나 같이 재생으로 나란히 비교하세요."
+                              : componentState?.scope === "global"
+                                ? "화면 전체에 적용되는 값이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."
+                                : "움직임이 없는 시편이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."}
                       </p>
                     </div>
                     <PlaybackControls

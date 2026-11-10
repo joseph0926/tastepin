@@ -26,6 +26,10 @@ import LongFormDialog from "./components/LongFormDialog";
 import Menu from "./components/Menu";
 import ManyOptions from "./components/ManyOptions";
 import ManyFilters from "./components/ManyFilters";
+import MobileDialog from "./components/MobileDialog";
+import MobileForm from "./components/MobileForm";
+import MobilePage from "./components/MobilePage";
+import MobileReading from "./components/MobileReading";
 import MobileTable from "./components/MobileTable";
 import MotionFeel from "./components/MotionFeel";
 import MotionResponse from "./components/MotionResponse";
@@ -103,6 +107,14 @@ export const specimens: Record<string, SpecimenEntry> = {
   manyfilters: { Component: ManyFilters, demoInterval: 1200, demoSteps: 4 },
   mobiletable: { Component: MobileTable, demoInterval: 1200, demoSteps: 4 },
   rapidtabs: { Component: RapidTabs, demoInterval: 1100, demoSteps: 3 },
+  // 휴대폰 전용: 열기, 다른 시간 고르기, 닫기(끌어서 닫는 값은 끌어 내리며), 쉬기
+  mobiledialog: { Component: MobileDialog, demoInterval: 1300, demoSteps: 4 },
+  // 입력(키보드 열림), 다른 칸으로 이동, 키보드 닫고 끝까지 내림, 맨 위로
+  mobileform: { Component: MobileForm, demoInterval: 1200, demoSteps: 4 },
+  // 휴대폰 화면 기본값은 움직임이 없어 같이 재생을 숨긴다
+  mobilepage: { Component: MobilePage, demoInterval: 0, demoSteps: 0 },
+  // 표까지 내림, 표 넘김, 끝 가까이, 조금 위로, 맨 위로
+  mobilereading: { Component: MobileReading, demoInterval: 1200, demoSteps: 5 },
   menu: { Component: Menu, demoInterval: 600, demoSteps: 5 },
   toast: { Component: Toast, demoInterval: 700, demoSteps: 4 },
   status: { Component: StatusLine, demoInterval: 1000, demoSteps: 7 },

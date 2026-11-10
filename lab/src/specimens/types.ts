@@ -28,6 +28,8 @@ export interface CatalogComponent {
   scope?: "global";
   // 전역 시편이 시각 요청과 모션 요청 중 어디에 들어가는지
   axis?: "visual" | "motion";
+  // phone이면 시편이 무대 안에 휴대폰 화면을 직접 그린다. 원장은 평가 화면의 폭(M)과 관계없이 휴대폰에서 본 판정으로 센다
+  frame?: "phone";
   file: string;
   aliases: string[];
   dimensions: CatalogDimension[];
