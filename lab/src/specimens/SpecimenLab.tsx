@@ -38,8 +38,7 @@ const LETTERS = ["A", "B", "C"];
 const SLOW_FACTOR = 4;
 const DEMO_ROUNDS = 2;
 const VIEW_KEY = "tastepin-specimen-view";
-const TASTE_OPEN_COMMAND =
-  "python3 -B taste.py open --no-browser";
+const TASTE_OPEN_COMMAND = "python3 -B taste.py open --no-browser";
 
 type Phase =
   | { kind: "choose" }
@@ -312,7 +311,7 @@ function SelectedPreview({
   const entry = specimens[component.id];
   if (!entry) return null;
   return (
-    <div className="lab-preview-layout">
+    <div className="lab-preview-layout" data-layout={component.layout}>
       <section className="stage" aria-label={`${component.label} 미리보기`}>
         <div className="stage-viewport">
           <LayoutGroup id={`preview-${component.id}`}>
@@ -957,13 +956,15 @@ export default function SpecimenLab() {
                       <p className="lab-hint">
                         {comparison.recheck
                           ? `${comparison.recheck.label}에서 다시 묻는 비교예요. 처음 고른 값은 그대로 두고, 이 조건에서 고른 값을 따로 기록해요.`
-                          : component.frame === "phone"
-                            ? "무대 안에 휴대폰 화면을 그린 시편이에요. 휴대폰 폭(M)은 바꾸지 않아도 돼요. 직접 눌러 보거나 같이 재생으로 비교하세요."
-                            : animated
-                              ? "무대 안에서 직접 눌러 보거나 같이 재생으로 나란히 비교하세요."
-                              : componentState?.scope === "global"
-                                ? "화면 전체에 적용되는 값이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."
-                                : "움직임이 없는 시편이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."}
+                          : component.layout === "screen"
+                            ? "같은 작업을 두 화면에서 진행하며 배치를 비교하세요. 같이 재생으로 흐름도 볼 수 있어요."
+                            : component.frame === "phone"
+                              ? "무대 안에 휴대폰 화면을 그린 시편이에요. 휴대폰 폭(M)은 바꾸지 않아도 돼요. 직접 눌러 보거나 같이 재생으로 비교하세요."
+                              : animated
+                                ? "무대 안에서 직접 눌러 보거나 같이 재생으로 나란히 비교하세요."
+                                : componentState?.scope === "global"
+                                  ? "화면 전체에 적용되는 값이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."
+                                  : "움직임이 없는 시편이에요. 라이트와 다크(D), 휴대폰 폭(M)에서도 보고 고르세요."}
                       </p>
                     </div>
                     <PlaybackControls
@@ -974,7 +975,11 @@ export default function SpecimenLab() {
                     />
                   </div>
 
-                  <div className="lab-stages" data-count={shown.length}>
+                  <div
+                    className="lab-stages"
+                    data-count={shown.length}
+                    data-layout={component.layout}
+                  >
                     {shown.map((option, index) => (
                       <Stage
                         key={option}

@@ -343,6 +343,15 @@
   overflow-x: auto;
 }
 
+.lab-stages[data-layout="screen"],
+.lab-preview-layout[data-layout="screen"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lab[data-frame="mobile"] .lab-stages[data-layout="screen"] {
+  grid-template-columns: 390px;
+}
+
 .stage {
   display: grid;
   grid-template-rows: auto 1fr auto;

@@ -30,6 +30,8 @@ export interface CatalogComponent {
   axis?: "visual" | "motion";
   // phone이면 시편이 무대 안에 휴대폰 화면을 직접 그린다. 원장은 평가 화면의 폭(M)과 관계없이 휴대폰에서 본 판정으로 센다
   frame?: "phone";
+  // 화면 조합은 두 시안을 한 줄씩 충분한 폭으로 비교한다.
+  layout?: "screen";
   file: string;
   aliases: string[];
   dimensions: CatalogDimension[];
