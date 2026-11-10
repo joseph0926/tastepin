@@ -288,6 +288,35 @@ class ConditionTests(LabTestCase):
         comparison = lab.lab_state("tabs", self.MOBILE)["queue"][0]
         self.assertNotEqual(comparison["dimension"], "travel", "휴대폰 폭에서 글자만을 골랐으면 표시 이동은 묻지 않는다")
 
+    def test_phone_specimen_counts_every_screen_width_as_phone(self):
+        catalog = json.loads(json.dumps(CATALOG))
+        next(c for c in catalog["components"] if c["id"] == "tabs")["frame"] = "phone"
+        self.write_catalog(catalog)
+        dark_mobile = {"theme": "dark", "frame": "mobile"}
+        self.judge_in("underline", theme="dark")
+        self.judge_in("underline", theme="dark")
+        pref = self.prefs()
+        self.assertEqual(pref["conditions"], {"theme": ["dark"], "frame": ["mobile"]}, "휴대폰 틀을 그린 시편은 휴대폰에서 본 판정이다")
+        self.assertEqual(lab.load_judgments()[0]["conditions"]["frame"], "desktop", "기록은 평가 화면의 조건 그대로 남긴다")
+        tabs = next(c for c in lab.lab_state("tabs", dark_mobile)["components"] if c["id"] == "tabs")
+        self.assertNotEqual(tabs["next"]["dimension"], "indicator", "M으로 바꿔도 같은 차원을 다시 묻지 않는다")
+        self.judge_in("pill", theme="dark", frame="mobile")
+        self.judge_in("pill", theme="dark", frame="mobile")
+        pref = self.prefs()
+        self.assertEqual((pref["status"], pref["value"], pref["variants"]), ("확정", "pill", {}), "M에서 고른 값도 기준으로 센다")
+        for name in ("travel", "panel"):
+            for _ in range(2):
+                self.judge(name, "same")
+        comparison = lab.lab_state("tabs", {"theme": "light", "frame": "desktop"})["queue"][0]
+        self.assertEqual(comparison["recheck"]["key"], "light", "테마 재확인은 그대로 묻는다")
+
+    def test_catalog_rejects_unknown_frame(self):
+        catalog = json.loads(json.dumps(CATALOG))
+        catalog["components"][0]["frame"] = "tablet"
+        self.write_catalog(catalog)
+        with self.assertRaises(ValueError):
+            lab.load_catalog()
+
     def test_same_value_in_recheck_is_noted_on_the_base_line(self):
         self.judge_in("underline", theme="dark")
         self.judge_in("underline", theme="dark")
@@ -627,7 +656,7 @@ class ExtendedCatalogTests(LabTestCase):
         catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
         self.write_catalog(catalog)
         components = {component["id"]: component for component in catalog["components"]}
-        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs")
+        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading")
 
         def choose(component, dimension):
             body = {
@@ -744,6 +773,16 @@ class RealCatalogTests(unittest.TestCase):
         self.assertIn("manyfilters", match("필터 조건이 많을 때"))
         self.assertIn("mobiletable", match("휴대폰에서 많은 열의 표 보기"))
         self.assertIn("rapidtabs", match("탭을 빠르게 연속 선택"))
+        self.assertIn("mobiledialog", match("휴대폰에서 모달이 너무 커요"))
+        self.assertIn("mobiledialog", match("모바일 화면에서 회의 시간 바꾸는 모달 만들어줘"))
+        self.assertIn("mobileform", match("모바일 배송지 입력 화면"))
+        self.assertIn("mobileform", match("모바일 폼에서 키보드가 저장 버튼을 가려요"))
+        self.assertIn("mobilepage", match("모바일 화면 대응해줘"))
+        self.assertIn("mobilepage", match("반응형 레이아웃 정리"))
+        self.assertIn("mobilereading", match("모바일에서 블로그 글 읽을 때 맨 위로 버튼"))
+        self.assertNotIn("mobilereading", match("모바일 글자 크기"), "글자는 글 읽기가 아니다")
+        phone = {c["id"] for c in catalog["components"] if lab.is_phone(c)}
+        self.assertEqual(phone, {"mobiletable", "mobiledialog", "mobileform", "mobilepage", "mobilereading"})
         for component in catalog["components"]:
             self.assertTrue((Path(lab.LABS_DIR) / component["file"]).exists(), component["file"])
 
