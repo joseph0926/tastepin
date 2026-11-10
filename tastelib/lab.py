@@ -72,6 +72,8 @@ def load_catalog():
             raise ValueError(f"시편 카탈로그 항목에 id나 dimensions가 없습니다: {component.get('id')}")
         if component.get("scope") not in (None, "global"):
             raise ValueError(f"{component['id']}: scope는 생략하거나 global이어야 합니다")
+        if component.get("frame") not in (None, "phone"):
+            raise ValueError(f"{component['id']}: frame은 생략하거나 phone이어야 합니다")
         if is_global(component) and component.get("aliases"):
             raise ValueError(f"{component['id']}: 전역 시편은 화면 작업마다 주입되므로 별칭을 두지 않습니다")
         if is_global(component) and component.get("axis") not in GLOBAL_AXES:
@@ -84,6 +86,17 @@ def load_catalog():
 
 def is_global(component):
     return component.get("scope") == "global"
+
+
+def is_phone(component):
+    """무대 안에 휴대폰 틀을 직접 그리는 시편. 평가 화면의 폭(M)과 관계없이 휴대폰에서 본 판정이다."""
+    return component.get("frame") == "phone"
+
+
+def _phone_view(component, view):
+    if view and is_phone(component):
+        return {**view, "frame": "mobile"}
+    return view
 
 
 def load_judgments():
@@ -212,6 +225,9 @@ def _dimension_entry(dimension, judgments):
 def component_preferences(component, judgments):
     """차원 id별 선호. requires 조건이 현재 값과 맞지 않는 차원은 '해당 없음'으로 바꾼다."""
     own = [j for j in judgments if j["component"] == component["id"]]
+    if is_phone(component):
+        # 기록은 평가 화면의 조건 그대로 두고, 계산할 때만 폭을 휴대폰으로 맞춰 M 전환이 재확인을 만들지 않게 한다
+        own = [{**j, "conditions": {**(j.get("conditions") or {}), "frame": "mobile"}} for j in own]
     prefs = {
         dimension["id"]: _dimension_entry(dimension, [j for j in own if j["dimension"] == dimension["id"]])
         for dimension in component["dimensions"]
@@ -235,6 +251,7 @@ def _variant_for(pref, view):
 
 def current_params(component, prefs, view=None):
     """지금 값. 보고 있는 조건을 주면 그 조건에서 고른 재확인 값을 앞세운다."""
+    view = _phone_view(component, view)
     params = {}
     for dim_id, pref in prefs.items():
         variant = _variant_for(pref, view)
@@ -265,6 +282,7 @@ def recheck_comparison(component, prefs, view):
     그다음 재확인 중 관찰인 차원을 오래된 순서로 고른다."""
     if not view:
         return None
+    view = _phone_view(component, view)
     candidates = []
     # 그 조건에서 고른 값 때문에 쓰이지 않는 차원(requires)은 묻지 않는다
     viewed = current_params(component, prefs, view)
