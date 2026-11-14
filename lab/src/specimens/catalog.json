@@ -4205,7 +4205,12 @@
       "id": "codeblock",
       "label": "코드 블록",
       "file": "src/specimens/components/CodeBlock.tsx",
-      "aliases": ["코드 ?(블록|예제|복사)", "\\bcode[ -]?block\\b"],
+      "aliases": [
+        "코드 ?(블록|예제|복사)",
+        "코드 ?(예시|스니펫|조각)",
+        "\\bcode[ -]?block\\b",
+        "\\bsnippets?\\b"
+      ],
       "dimensions": [
         {
           "id": "wrap",
@@ -4268,6 +4273,7 @@
         "현재 ?절",
         "절 ?(안내|다이얼)",
         "(본문|글) ?목차",
+        "(글|본문|블로그|포스트|상세)[^,.]{0,8}목차",
         "\\bsection[ -]?(guide|dial)\\b"
       ],
       "dimensions": [
@@ -4533,7 +4539,10 @@
         "기술 ?글.*?(폭|간격|읽기)",
         "블로그 ?본문",
         "장문 ?읽기",
-        "\\blong[ -]?read(ing)?\\b"
+        "글 ?상세",
+        "포스트 ?(상세|본문)",
+        "\\blong[ -]?read(ing)?\\b",
+        "\\bpost[ -]?detail\\b"
       ],
       "dimensions": [
         {
@@ -4714,6 +4723,8 @@
       "aliases": [
         "모달.*(폼|form)",
         "(폼|form).*모달",
+        "(모달|다이얼로그|대화 ?상자).{0,12}(입력|작성)(?! ?창)",
+        "(입력|작성|등록|추가|생성|수정|편집) ?(모달|다이얼로그|대화 ?상자|팝업)",
         "\\bmodal\\s*\\+?\\s*form\\b",
         "\\bform[ -]?dialog\\b"
       ],
@@ -4936,7 +4947,11 @@
       "id": "formfailure",
       "label": "폼 저장 실패와 재시도",
       "file": "src/specimens/components/FormFailure.tsx",
-      "aliases": ["(폼|모달).*저장.*실패", "\\bform[ -]?failure\\b"],
+      "aliases": [
+        "(폼|모달).*저장.*실패",
+        "저장 ?(실패|오류|에러) ?(하면|할 ?때|시|했을 ?때|문구|메시지|안내|표시|처리)",
+        "\\bform[ -]?failure\\b"
+      ],
       "dimensions": [
         {
           "id": "place",
@@ -4961,7 +4976,11 @@
       "id": "manyoptions",
       "label": "선택지가 많은 입력",
       "file": "src/specimens/components/ManyOptions.tsx",
-      "aliases": ["선택지.*많", "\\bmany[ -]?options\\b"],
+      "aliases": [
+        "선택지.*많",
+        "(드롭 ?다운|셀렉트|(?<![a-z])select(?![a-z])|선택 ?(상자|박스|창)|옵션)[이가은는]?.{0,10}많",
+        "\\bmany[ -]?options\\b"
+      ],
       "dimensions": [
         {
           "id": "kind",
@@ -5030,7 +5049,13 @@
       "id": "manyfilters",
       "label": "조건이 많은 필터",
       "file": "src/specimens/components/ManyFilters.tsx",
-      "aliases": ["필터.*조건.*많", "조건.*많.*필터", "\\bmany[ -]?filters\\b"],
+      "aliases": [
+        "필터.*조건.*많",
+        "조건.*많.*필터",
+        "필터[가이]? ?(너무 )?(많|여러)",
+        "(많은|여러 ?개?의?) ?필터",
+        "\\bmany[ -]?filters\\b"
+      ],
       "dimensions": [
         {
           "id": "flow",
@@ -5120,6 +5145,8 @@
       "aliases": [
         "(휴대폰|모바일).{0,16}(모달|대화 ?상자|다이얼로그|팝업)",
         "(모달|대화 ?상자|다이얼로그|팝업).{0,12}(휴대폰|모바일)",
+        "(휴대폰|모바일).{0,16}(바텀|하단) ?시트",
+        "(바텀|하단) ?시트.{0,12}(휴대폰|모바일)",
         "\\bmobile[ -]?(modal|dialog)s?\\b"
       ],
       "dimensions": [
@@ -5417,6 +5444,10 @@
       "aliases": [
         "관리 ?목록 ?화면",
         "프로젝트 ?목록 ?화면",
+        "(?<!글 )(?<!글)(목록|리스트) ?(화면|페이지)",
+        "(관리자?|어드민|admin) ?(화면|페이지)",
+        "검색(이랑|과|하고|와)? ?필터",
+        "필터(랑|와|하고|과)? ?검색",
         "\\bscreen[ -]worklist\\b"
       ],
       "dimensions": [
@@ -5447,6 +5478,9 @@
       "aliases": [
         "상세와 ?수정 ?화면",
         "프로젝트 ?상세 ?화면",
+        "(?<!글 )(?<!글)상세 ?(화면|페이지)(?!으?로)",
+        "(수정|편집) ?(화면|페이지)",
+        "\\bdetail ?(page|view)\\b",
         "\\bscreen[ -]detail\\b"
       ],
       "dimensions": [
@@ -5477,6 +5511,8 @@
       "aliases": [
         "긴 ?설정 ?화면",
         "팀 ?설정 ?화면",
+        "설정 ?(화면|페이지)",
+        "\\bsettings? ?(page|screen)\\b",
         "\\bscreen[ -]settings\\b"
       ],
       "dimensions": [
@@ -5507,6 +5543,8 @@
       "aliases": [
         "글 ?읽기 ?화면",
         "블로그 ?독서 ?화면",
+        "글 ?상세 ?(화면|페이지)",
+        "(글|본문|블로그|포스트|상세)[^,.]{0,8}목차",
         "\\bscreen[ -]reading\\b"
       ],
       "dimensions": [
@@ -5537,6 +5575,7 @@
       "aliases": [
         "신청과 ?생성 ?화면",
         "프로젝트 ?생성 ?화면",
+        "(신청|가입|등록|생성) ?(화면|페이지|폼|플로우|흐름)",
         "\\bscreen[ -]create\\b"
       ],
       "dimensions": [
@@ -5567,6 +5606,8 @@
       "aliases": [
         "AI와 ?함께 ?작업",
         "AI ?작업 ?화면",
+        "AI ?(와|랑|과) ?(함께|같이)",
+        "(AI|챗봇|어시스턴트).{0,30}(반영|편집).{0,10}(화면|패널|영역|UI)",
         "\\bscreen[ -]assistant\\b"
       ],
       "dimensions": [
