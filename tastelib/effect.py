@@ -40,13 +40,26 @@ class ScreenSession:
         return self.started.astimezone().date()
 
 
+def _catalog_aliases():
+    """화면 작업 판별에 쓰는 카탈로그 별칭. 재생과 같이 카탈로그를 읽지 못하면 별칭이 없는 것으로 본다."""
+    try:
+        components = lab.load_catalog()["components"]
+    except (OSError, ValueError):
+        return []
+    return sorted([c["id"], c.get("aliases", [])] for c in components if c.get("aliases"))
+
+
 def classifier_version():
-    """화면 작업 판별과 판정 수집 기준이 든 두 파일의 해시. 고정한 기준선과 지금 기준이 같은지 확인한다."""
+    """화면 작업 판별과 판정 수집 기준의 해시. 고정한 기준선과 지금 기준이 같은지 확인한다.
+
+    판별과 수집 코드 세 파일에 더해, 컴포넌트 언급도 화면 작업으로 세므로 카탈로그 별칭을 넣는다.
+    시편 설명과 값은 판별에 쓰지 않으므로 넣지 않는다."""
     digest = hashlib.sha1()
     for module in (inject, harvest):
         with open(module.__file__, "rb") as handle:
             digest.update(handle.read())
     digest.update(Path(__file__).read_bytes())
+    digest.update(json.dumps(_catalog_aliases(), ensure_ascii=False).encode("utf-8"))
     return digest.hexdigest()[:10]
 
 
