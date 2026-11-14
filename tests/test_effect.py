@@ -111,6 +111,26 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(set(sessions), {"codex-1"}, "codex exec 세션은 사람의 작업이 아니다")
         self.assertEqual([v["text"] for v in sessions["codex-1"].complaints], ["레이아웃이 어색해요"])
 
+    def write_catalog(self, aliases, dimension_label="모양"):
+        path = self.root / "labs" / "src" / "specimens" / "catalog.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        component = {
+            "id": "dialog", "label": "대화상자", "file": "Dialog.tsx", "aliases": aliases,
+            "dimensions": [{"id": "shape", "label": dimension_label, "values": [{"id": "a"}, {"id": "b"}]}],
+        }
+        path.write_text(json.dumps({"components": [component]}, ensure_ascii=False), encoding="utf-8")
+
+    def test_classifier_version_changes_when_catalog_aliases_change(self):
+        """카탈로그 별칭도 화면 작업 세션을 고르므로, 별칭이 바뀌면 고정한 기준선과 다른 판정 기준이다."""
+        self.write_catalog(["모달"])
+        first = effect.classifier_version()
+        self.write_claude("screen", [claude_line("user", "모달 열림 수정", "2026-09-10T00:01:00Z")])
+        self.assertEqual(set(self.replay()), {"screen"}, "별칭에 걸린 요청은 화면 작업 세션이다")
+        self.write_catalog(["모달", "입력 모달"], dimension_label="모양")
+        self.assertNotEqual(effect.classifier_version(), first)
+        self.write_catalog(["모달"], dimension_label="바뀐 설명")
+        self.assertEqual(effect.classifier_version(), first, "별칭이 아닌 시편 설명은 판정 기준이 아니다")
+
     def test_frozen_baseline_is_not_overwritten(self):
         self.write_claude("screen", [claude_line("user", "랜딩 페이지 디자인을 만들어줘", "2026-09-10T00:01:00Z")])
         first, created = effect.freeze_baseline()
