@@ -792,6 +792,54 @@ class RealCatalogTests(unittest.TestCase):
         for component in catalog["components"]:
             self.assertTrue((Path(lab.LABS_DIR) / component["file"]).exists(), component["file"])
 
+    def test_everyday_requests_reach_situational_specimens(self):
+        """시편 이름이 아니라 평소 화면 작업을 부탁하는 말로도 상황별, 화면 시편의 고른 값이 붙는다."""
+        if not Path(lab.catalog_path()).exists():
+            self.skipTest("labs 카탈로그가 없는 머신")
+        match = lab.component_matcher(lab.load_catalog())
+        reached = [
+            ("블로그 글 상세 화면 만들어줘", "article"),
+            ("블로그 글 상세 화면 만들어줘", "screen-reading"),
+            ("글 상세에 목차 추가", "sectionguide"),
+            ("글 상세에 목차 추가", "screen-reading"),
+            ("글 본문에 코드 예시 넣기", "codeblock"),
+            ("설정 화면 만들어줘", "screen-settings"),
+            ("알림 설정 페이지 추가", "screen-settings"),
+            ("관리자 페이지 유저 목록 화면 만들어줘", "screen-worklist"),
+            ("트레이너 목록 화면 개선", "screen-worklist"),
+            ("어드민 테이블에 검색이랑 필터 추가", "screen-worklist"),
+            ("상세 페이지에서 수정 기능 추가", "screen-detail"),
+            ("단계별 신청 화면", "screen-create"),
+            ("회원가입 페이지 만들어줘", "screen-create"),
+            ("챗봇 답변을 문서에 반영하는 화면", "screen-assistant"),
+            ("모달로 정보 입력 받기", "formdialog"),
+            ("등록 모달 만들어줘", "formdialog"),
+            ("저장 실패하면 재시도", "formfailure"),
+            ("드롭다운 항목이 너무 많음", "manyoptions"),
+            ("필터가 많은 검색 화면", "manyfilters"),
+            ("모바일 바텀시트 추가", "mobiledialog"),
+        ]
+        for request, component_id in reached:
+            with self.subTest(request=request, component=component_id):
+                self.assertIn(component_id, match(request))
+        not_reached = [
+            ("블로그 글 목록 화면", "screen-worklist", "블로그 글 목록은 관리 목록이 아니다"),
+            ("블로그 글 상세 화면 만들어줘", "screen-detail", "글 상세는 수정 화면이 아니다"),
+            ("상세 페이지로 이동하는 전환", "screen-detail", "상세로 넘어가는 전환은 화면 전환이 맡는다"),
+            ("README 업데이트하고 목차 추가", "sectionguide", "문서의 목차는 화면이 아니다"),
+            ("README 업데이트하고 목차 추가", "screen-reading", "문서의 목차는 화면이 아니다"),
+            ("S3 저장 실패 로그 확인", "formfailure", "화면이 아닌 저장 실패는 잡지 않는다"),
+            ("목록 항목이 너무 많아서 느려요", "manyoptions", "목록 항목은 선택지가 아니다"),
+            ("AI 응답 파싱 코드 수정", "screen-assistant", "화면이 아닌 AI 응답 처리는 잡지 않는다"),
+            ("확인 모달 문구", "formdialog", "입력이 없는 모달은 폼 모달이 아니다"),
+            ("검색 팝업 화면은 입력창 아래에 최근 검색 박스", "formdialog", "검색 팝업의 입력창은 폼 모달이 아니다"),
+            ("모달 안의 검색 입력창", "formdialog", "검색 입력창 하나뿐인 모달은 폼 모달이 아니다"),
+            ("바텀시트 열림 애니메이션", "mobiledialog", "휴대폰을 말하지 않은 시트는 드로어가 맡는다"),
+        ]
+        for request, component_id, reason in not_reached:
+            with self.subTest(request=request, component=component_id):
+                self.assertNotIn(component_id, match(request), reason)
+
 
 if __name__ == "__main__":
     unittest.main()
