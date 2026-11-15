@@ -656,7 +656,7 @@ class ExtendedCatalogTests(LabTestCase):
         catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
         self.write_catalog(catalog)
         components = {component["id"]: component for component in catalog["components"]}
-        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading", "screen-worklist", "screen-detail", "screen-settings", "screen-reading", "screen-create", "screen-assistant")
+        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading", "screen-worklist", "screen-detail", "screen-settings", "screen-reading", "screen-create", "screen-assistant", "videoresume", "videolist", "videocontrols", "videoseek")
 
         def choose(component, dimension):
             body = {
@@ -787,8 +787,22 @@ class RealCatalogTests(unittest.TestCase):
         self.assertIn("mobilepage", match("반응형 레이아웃 정리"))
         self.assertIn("mobilereading", match("모바일에서 블로그 글 읽을 때 맨 위로 버튼"))
         self.assertNotIn("mobilereading", match("모바일 글자 크기"), "글자는 글 읽기가 아니다")
+        self.assertIn("videoresume", match("영상을 닫았다가 다시 열면 이어보기"))
+        self.assertIn("videoresume", match("보던 곳부터 재생"))
+        self.assertNotIn("videoresume", match("다음 작업 이어서 진행해줘"), "작업을 이어 하는 말은 이어보기가 아니다")
+        self.assertIn("videolist", match("최근 영상 목록 화면"))
+        self.assertIn("videolist", match("폴더별 동영상 목록"))
+        self.assertNotIn("screen-worklist", match("최근 영상 목록 화면"), "영상 목록은 관리 목록이 아니다")
+        self.assertIn("videocontrols", match("동영상 플레이어 조작 화면"))
+        self.assertIn("videocontrols", match("재생 화면의 버튼 배치"))
+        self.assertIn("videoseek", match("탐색 막대를 끌 때 시간 표시"))
+        self.assertIn("videoseek", match("seek bar 두께"))
+        self.assertNotIn("videoseek", match("작업 진행 막대"), "진행 막대 단독은 로딩 표시다")
         phone = {c["id"] for c in catalog["components"] if lab.is_phone(c)}
-        self.assertEqual(phone, {"mobiletable", "mobiledialog", "mobileform", "mobilepage", "mobilereading"})
+        self.assertEqual(phone, {
+            "mobiletable", "mobiledialog", "mobileform", "mobilepage", "mobilereading",
+            "videoresume", "videolist", "videocontrols", "videoseek",
+        })
         for component in catalog["components"]:
             self.assertTrue((Path(lab.LABS_DIR) / component["file"]).exists(), component["file"])
 
