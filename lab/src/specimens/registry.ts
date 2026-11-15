@@ -58,6 +58,10 @@ import Toast from "./components/Toast";
 import Tooltip from "./components/Tooltip";
 import Transition, { BlogTransition } from "./components/Transition";
 import Upload from "./components/Upload";
+import VideoControls from "./components/VideoControls";
+import VideoList from "./components/VideoList";
+import VideoResume from "./components/VideoResume";
+import VideoSeek from "./components/VideoSeek";
 import WorklistScreen from "./screens/WorklistScreen";
 import DetailScreen from "./screens/DetailScreen";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -151,6 +155,14 @@ export const specimens: Record<string, SpecimenEntry> = {
   mobilepage: { Component: MobilePage, demoInterval: 0, demoSteps: 0 },
   // 표까지 내림, 표 넘김, 끝 가까이, 조금 위로, 맨 위로
   mobilereading: { Component: MobileReading, demoInterval: 1200, demoSteps: 5 },
+  // 이어볼 영상 열기, (묻는 값이면) 이어보기 누르기, 거의 다 본 영상 열기, 닫기
+  videoresume: { Component: VideoResume, demoInterval: 1800, demoSteps: 4 },
+  // 영상 목록은 움직임이 없어 같이 재생을 숨긴다
+  videolist: { Component: VideoList, demoInterval: 0, demoSteps: 0 },
+  // 재생, 그대로 두기(자동 숨김), 영상 눌러 조작 보이기, 일시정지
+  videocontrols: { Component: VideoControls, demoInterval: 1800, demoSteps: 4 },
+  // 손잡이를 잡고 끌기, 놓기, 쉬기
+  videoseek: { Component: VideoSeek, demoInterval: 1400, demoSteps: 3 },
   menu: { Component: Menu, demoInterval: 600, demoSteps: 5 },
   toast: { Component: Toast, demoInterval: 700, demoSteps: 4 },
   status: { Component: StatusLine, demoInterval: 1000, demoSteps: 7 },
