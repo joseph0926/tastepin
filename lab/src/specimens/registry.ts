@@ -59,7 +59,10 @@ import Tooltip from "./components/Tooltip";
 import Transition, { BlogTransition } from "./components/Transition";
 import Upload from "./components/Upload";
 import VideoControls from "./components/VideoControls";
+import VideoFile from "./components/VideoFile";
+import VideoFailure from "./components/VideoFailure";
 import VideoList from "./components/VideoList";
+import VideoRecent from "./components/VideoRecent";
 import VideoResume from "./components/VideoResume";
 import VideoSeek from "./components/VideoSeek";
 import WorklistScreen from "./screens/WorklistScreen";
@@ -155,6 +158,12 @@ export const specimens: Record<string, SpecimenEntry> = {
   mobilepage: { Component: MobilePage, demoInterval: 0, demoSteps: 0 },
   // 표까지 내림, 표 넘김, 끝 가까이, 조금 위로, 맨 위로
   mobilereading: { Component: MobileReading, demoInterval: 1200, demoSteps: 5 },
+  // 파일 창 열기, 파일 선택, 재생 확인, 보기, 닫기
+  videofile: { Component: VideoFile, demoInterval: 1500, demoSteps: 5 },
+  // 최근 영상 열기, 위치 갱신, 기록 지우기, 확인, 쉬기, 처음으로
+  videorecent: { Component: VideoRecent, demoInterval: 1500, demoSteps: 6 },
+  // 접근 실패, 파일 다시 선택, 새 파일 재생, 보기, 목록으로
+  videofailure: { Component: VideoFailure, demoInterval: 1500, demoSteps: 5 },
   // 이어볼 영상 열기, (묻는 값이면) 이어보기 누르기, 거의 다 본 영상 열기, 닫기
   videoresume: { Component: VideoResume, demoInterval: 1800, demoSteps: 4 },
   // 영상 목록은 움직임이 없어 같이 재생을 숨긴다

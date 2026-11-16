@@ -1,0 +1,98 @@
+.vlib-base {
+  position: absolute;
+  inset: 0;
+}
+
+.vlib-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background: var(--sp-surface);
+}
+
+.vlib-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vlib-description,
+.vlib-day {
+  margin: 12px 16px;
+  color: var(--sp-secondary);
+  font-size: 13px;
+}
+
+.vlib-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.vlib-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.vlib-empty .ph-button {
+  width: 100%;
+}
+
+.vlib-path {
+  align-self: stretch;
+  overflow-wrap: anywhere;
+  opacity: 0.75;
+}
+
+.vlib-failed-player {
+  background: #000;
+  color: #fff;
+}
+
+.vlib-controls {
+  padding: 12px 16px;
+}
+
+.vlib-controls input {
+  width: 100%;
+  accent-color: var(--sp-accent);
+}
+
+.vlib-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.vlib-recent-row {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.vlib-recent-row .vrs-row {
+  flex: 1;
+  min-width: 0;
+  padding-right: 4px;
+}
+
+.vlib-recent-row .vrs-thumb {
+  width: 88px;
+}
+
+.vlib-confirm {
+  margin: 8px 16px;
+  padding: 12px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-raised);
+  font-size: 13px;
+}
+
+.vlib-confirm p {
+  margin: 0 0 8px;
+}
