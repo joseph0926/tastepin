@@ -656,7 +656,7 @@ class ExtendedCatalogTests(LabTestCase):
         catalog = json.loads((TASTE_ROOT / "lab/src/specimens/catalog.json").read_text())
         self.write_catalog(catalog)
         components = {component["id"]: component for component in catalog["components"]}
-        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading", "screen-worklist", "screen-detail", "screen-settings", "screen-reading", "screen-create", "screen-assistant", "videoresume", "videolist", "videocontrols", "videoseek")
+        ids = ("codeblock", "sectionguide", "questiondial", "conversation", "articleaside", "article", "postlist", "posttransition", "formdialog", "longformdialog", "stepformdialog", "formclose", "formfailure", "manyoptions", "listdetail", "manyfilters", "mobiletable", "rapidtabs", "mobiledialog", "mobileform", "mobilepage", "mobilereading", "screen-worklist", "screen-detail", "screen-settings", "screen-reading", "screen-create", "screen-assistant", "videoresume", "videolist", "videocontrols", "videoseek", "videofile", "videorecent", "videofailure")
 
         def choose(component, dimension):
             body = {
@@ -787,6 +787,15 @@ class RealCatalogTests(unittest.TestCase):
         self.assertIn("mobilepage", match("반응형 레이아웃 정리"))
         self.assertIn("mobilereading", match("모바일에서 블로그 글 읽을 때 맨 위로 버튼"))
         self.assertNotIn("mobilereading", match("모바일 글자 크기"), "글자는 글 읽기가 아니다")
+        self.assertIn("videofile", match("동영상 파일 선택 화면"))
+        self.assertIn("videofile", match("파일 선택 후 영상 재생"))
+        self.assertNotIn("videofile", match("설정 파일 선택"))
+        self.assertIn("videorecent", match("최근 영상 목록 화면"))
+        self.assertIn("videorecent", match("영상 시청 기록 지우기"))
+        self.assertNotIn("videorecent", match("최근 작업 기록"))
+        self.assertIn("videofailure", match("파일 접근 실패 안내"))
+        self.assertIn("videofailure", match("영상 파일을 찾을 수 없어요"))
+        self.assertNotIn("videofailure", match("설정 파일 읽기 실패"))
         self.assertIn("videoresume", match("영상을 닫았다가 다시 열면 이어보기"))
         self.assertIn("videoresume", match("보던 곳부터 재생"))
         self.assertNotIn("videoresume", match("다음 작업 이어서 진행해줘"), "작업을 이어 하는 말은 이어보기가 아니다")
@@ -801,7 +810,7 @@ class RealCatalogTests(unittest.TestCase):
         phone = {c["id"] for c in catalog["components"] if lab.is_phone(c)}
         self.assertEqual(phone, {
             "mobiletable", "mobiledialog", "mobileform", "mobilepage", "mobilereading",
-            "videoresume", "videolist", "videocontrols", "videoseek",
+            "videoresume", "videolist", "videocontrols", "videoseek", "videofile", "videorecent", "videofailure",
         })
         for component in catalog["components"]:
             self.assertTrue((Path(lab.LABS_DIR) / component["file"]).exists(), component["file"])
