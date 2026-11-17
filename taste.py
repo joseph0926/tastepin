@@ -223,6 +223,14 @@ def cmd_lab(args):
         lab.ensure_labs_server()
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as error:
         sys.exit(str(error))
+    if getattr(args, "study", None):
+        from tastelib import studies
+        studies.state(args.study)
+        url = f"http://127.0.0.1:{lab.LABS_PORT}/studies?study={args.study}"
+        print(f"시안 비교: {url}")
+        if not args.no_browser:
+            webbrowser.open(url)
+        return
     url = lab.labs_url(args.component or "")
     state = lab.lab_state(args.component or "")
     print(f"시편 비교: {url}")
@@ -319,6 +327,9 @@ def cmd_apply_context(args):
         catalog, lab.load_judgments(), store.load_rules(), store.load_verdicts(), store.load_symptoms(),
         request=args.request or "", component_ids=components,
     )
+    if getattr(args, "study", None):
+        from tastelib import studies
+        text += "\n" + studies.context(args.study)
     # 치환되지 않은 ${CLAUDE_SESSION_ID} 같은 자리표시자는 세션 id가 아니다
     session = "" if "$" in args.session else args.session.strip()
     if not args.no_log:
@@ -354,10 +365,10 @@ def cmd_apply(args):
 
     try:
         if args.check:
-            repo, expected, warnings = repo_copy.plan(args.repo)
+            repo, expected, warnings = repo_copy.plan(args.repo, getattr(args, "study", None))
             changed = repo_copy.stale(expected)
         else:
-            repo, changed, warnings = repo_copy.apply(args.repo)
+            repo, changed, warnings = repo_copy.apply(args.repo, getattr(args, "study", None))
     except ValueError as error:
         sys.exit(str(error))
     for warning in warnings:
@@ -594,6 +605,30 @@ def cmd_export(args):
     print(f"생성: {path}")
 
 
+def cmd_study(args):
+    from tastelib import studies
+
+    try:
+        action = args.study_action
+        if action == "list":
+            result = studies.state()
+        elif action == "show":
+            result = studies.state(args.study_id)
+        elif action == "import":
+            result = studies.import_reference(args.study_id, args.directory)
+        elif action == "register":
+            result = studies.register_revision(args.study_id, args.directory)
+        elif action == "event":
+            result = studies.record(json.load(sys.stdin))
+        elif action == "feedback-export":
+            result = studies.export_feedback(args.study_id, args.output)
+        else:
+            result = studies.export_adopted(args.study_id, args.output, args.chrome)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    except (OSError, ValueError, LookupError, subprocess.CalledProcessError) as error:
+        sys.exit(str(error))
+
+
 def main():
     parser = argparse.ArgumentParser(description="디자인 취향 원장")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -621,6 +656,7 @@ def main():
     apply_context = add("apply-context", cmd_apply_context, "/taste 적용: 화면 작업에 넣을 취향 출력")
     apply_context.add_argument("--request", help="작업 설명. 나온 시편 컴포넌트의 고른 값을 붙인다")
     apply_context.add_argument("--components", help="쉼표로 나눈 시편 컴포넌트 id (예: toast,dialog)")
+    apply_context.add_argument("--study", help="이번 화면에 적용할 채택 시안 ID")
     apply_context.add_argument("--session", default="", help="Claude Code 스킬은 ${CLAUDE_SESSION_ID}를 넘긴다")
     apply_context.add_argument("--surface", choices=("claude", "codex", "copilot"), default="claude")
     apply_context.add_argument(
@@ -640,6 +676,7 @@ def main():
     apply_cmd = add("apply", cmd_apply, "저장소에 취향 사본 남기기")
     apply_cmd.add_argument("repo", help="작업 저장소 경로")
     apply_cmd.add_argument("--check", action="store_true", help="쓰지 않고 사본이 낡았는지만 확인 (낡으면 종료 코드 1)")
+    apply_cmd.add_argument("--study", help="프로젝트에 함께 저장할 채택 시안 ID")
 
     stop_track = add("stop-track", cmd_stop_track, "이전 PostToolUse 훅 호환 명령 (동작 없음)")
     stop_track.add_argument("--surface", choices=("codex",), default="codex")
@@ -682,6 +719,21 @@ def main():
     lab_cmd = add("lab", cmd_lab, "labs 시편 비교 화면 열기 (원장 서버와 labs 개발 서버를 필요하면 띄운다)")
     lab_cmd.add_argument("component", nargs="?", help="먼저 평가할 컴포넌트 id (예: tabs)")
     lab_cmd.add_argument("--no-browser", action="store_true")
+    lab_cmd.add_argument("--study", help="시안 비교 ID. 생략한 일반 시편 동작은 그대로다")
+
+    study_cmd = add("study", cmd_study, "시안 가져오기, 수정본 등록과 채택 결과 내보내기")
+    study_commands = study_cmd.add_subparsers(dest="study_action", required=True)
+    study_commands.add_parser("list")
+    for action in ("import", "register", "show", "feedback-export", "export"):
+        sub = study_commands.add_parser(action)
+        sub.add_argument("study_id")
+        if action in ("import", "register"):
+            sub.add_argument("directory")
+        if action in ("feedback-export", "export"):
+            sub.add_argument("output")
+        if action == "export":
+            sub.add_argument("--chrome", help="설치된 Chrome 실행 파일 경로")
+    study_commands.add_parser("event", help="stdin의 JSON으로 평가, 피드백과 채택을 기록한다")
 
     args = parser.parse_args()
     problems = store.location_problems()

@@ -11,7 +11,7 @@ import uuid
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
-from . import harvest, lab, store
+from . import harvest, lab, store, studies
 
 WEB_DIR = os.path.join(store.ROOT, "web")
 
@@ -193,6 +193,11 @@ def _open_lab(body):
     return {"url": url + (f"?c={component}" if component else "")}
 
 
+def _study_event(body):
+    studies.record(body)
+    return studies.state(body["study"])
+
+
 POST_ROUTES = {
     "/api/verdicts/update": _update_verdict,
     "/api/verdicts/add": _add_verdict,
@@ -203,6 +208,7 @@ POST_ROUTES = {
     "/api/lab/judge": _judge,
     "/api/lab/undo": _undo,
     "/api/lab/open": _open_lab,
+    "/api/studies/event": _study_event,
 }
 
 
@@ -266,6 +272,26 @@ class Handler(SimpleHTTPRequestHandler):
         url = urlparse(self.path)
         if url.path == "/api/ping":
             return self._send_json(200, {"ok": True, "code": LOADED_VERSION, "pid": os.getpid(), "root": store.ROOT, "data": store.DATA_ROOT})
+        if url.path == "/api/studies":
+            try:
+                return self._send_json(200, studies.state(parse_qs(url.query).get("id", [None])[0]))
+            except (OSError, ValueError, KeyError):
+                return self._send_json(400, {"error": "시안 자료를 읽지 못했습니다. 원본과 수정본을 확인하세요"})
+        if url.path.startswith("/api/studies/file/"):
+            try:
+                parts = url.path.removeprefix("/api/studies/file/").split("/")
+                if len(parts) != 3:
+                    raise ValueError("잘못된 자료 경로입니다")
+                data, content_type = studies.public_file(*parts)
+                self.send_response(200)
+                self.send_header("Content-Type", content_type)
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("X-Content-Type-Options", "nosniff")
+                self.end_headers()
+                return self.wfile.write(data)
+            except (OSError, ValueError, KeyError):
+                return self._send_json(404, {"error": "등록한 이미지나 실행 화면을 찾을 수 없습니다"})
         if url.path == "/api/state":
             return self._send_json(200, _state_payload())
         if url.path == "/api/lab/state":
@@ -289,12 +315,16 @@ class Handler(SimpleHTTPRequestHandler):
             return self._send_json(404, {"error": "없는 경로입니다"})
         try:
             length = int(self.headers.get("Content-Length") or 0)
+            if length < 0 or length > 1024 * 1024:
+                raise ValueError("요청 본문이 크기 한도를 초과했습니다")
             body = json.loads(self.rfile.read(length) or b"{}")
             if not isinstance(body, dict):
                 raise TypeError("본문은 JSON 객체여야 합니다")
             return self._send_json(200, route(body))
         except (ValueError, LookupError, TypeError) as error:
             return self._send_json(400, {"error": str(error)})
+        except OSError:
+            return self._send_json(400, {"error": "자료를 읽거나 저장하지 못했습니다"})
 
 
 def serve(port):

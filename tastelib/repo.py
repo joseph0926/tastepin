@@ -97,7 +97,7 @@ def _with_pointer(text):
     return text.rstrip("\n") + ("\n\n" if text.strip() else "") + block + "\n"
 
 
-def plan(repo):
+def plan(repo, study_id=None):
     """쓰거나 확인할 파일 전체(경로, 기대 내용)와 경고."""
     repo = os.path.abspath(os.path.expanduser(repo))
     if not os.path.isdir(repo):
@@ -109,6 +109,10 @@ def plan(repo):
     files = generated_files(
         catalog, lab.load_judgments(), store.load_rules(), store.load_verdicts(), store.load_symptoms(),
     )
+    if study_id:
+        from . import studies
+        files.update(studies.portable_files(study_id))
+        files[".taste/AGENT.md"] += f"\n이번 화면에 지정한 채택 시안은 `.taste/studies/{study_id}/AGENT.md`를 읽는다. 이 시안을 다른 화면의 기본 취향으로 확대하지 않는다.\n"
     skills, missing = skill_files()
     files.update(skills)
     warnings = [f"tastepin 스킬 원본이 없어 저장소 사본을 만들지 못했습니다: {path}" for path in missing]
@@ -129,8 +133,8 @@ def stale(expected):
     changed = []
     for path, text in expected.items():
         try:
-            with open(path, encoding="utf-8") as handle:
-                if handle.read() != text:
+            with open(path, "rb") as handle:
+                if handle.read() != (text if isinstance(text, bytes) else text.encode()):
                     changed.append(path)
         except OSError:
             changed.append(path)
@@ -143,8 +147,8 @@ def stale(expected):
     return changed
 
 
-def apply(repo):
-    repo, expected, warnings = plan(repo)
+def apply(repo, study_id=None):
+    repo, expected, warnings = plan(repo, study_id)
     written = []
     # 원장에서 없어진 컴포넌트의 사본만 지운다
     components = os.path.join(repo, ".taste", "components")
@@ -154,15 +158,16 @@ def apply(repo):
             os.remove(path)
             written.append(path)
     for path, text in expected.items():
+        data = text if isinstance(text, bytes) else text.encode()
         os.makedirs(os.path.dirname(path), exist_ok=True)
         try:
-            with open(path, encoding="utf-8") as handle:
-                if handle.read() == text:
+            with open(path, "rb") as handle:
+                if handle.read() == data:
                     continue
         except OSError:
             pass
-        with open(path, "w", encoding="utf-8") as handle:
-            handle.write(text)
+        with open(path, "wb") as handle:
+            handle.write(data)
         written.append(path)
     _remember(repo)
     return repo, written, warnings
