@@ -1,135 +1,533 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
 .study-app {
-  max-width: 1280px;
-  margin: auto;
-  padding: 32px 24px 100px;
-  color: #252522;
-  background: #f7f7f4;
-  font:
-    15px/1.6 system-ui,
-    sans-serif;
+  --page: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #e8ebf0;
+  --text: #1b1d22;
+  --secondary: #4d5360;
+  --muted: #626977;
+  --control-line: #c2c7cf;
+  --halo: rgb(27 29 34 / 16%);
+  --done: #1d7a4b;
+  --waiting: #a2580a;
+  --failed: #b43b43;
+
+  color-scheme: light;
+  /* AnimatePresence popLayout이 나가는 화면을 이 기준으로 띄운다 */
+  position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--page);
+  color: var(--text);
+  font-family: "Pretendard Variable", Pretendard, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
 }
-.study-app header,
-.study-section-title {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: baseline;
+
+@media (prefers-color-scheme: dark) {
+  .study-app {
+    --page: #101318;
+    --surface: #181b21;
+    --surface-2: #23272f;
+    --text: #eceef2;
+    --secondary: #b2b8c3;
+    --muted: #969daa;
+    --control-line: #4b515c;
+    --halo: rgb(236 238 242 / 20%);
+    --done: #72d3a0;
+    --waiting: #f0b562;
+    --failed: #ff9ea2;
+
+    color-scheme: dark;
+  }
 }
+
+.study-app main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 24px 96px;
+}
+
 .study-app h1 {
-  font-size: 28px;
-  letter-spacing: -0.04em;
-  margin: 12px 0 24px;
+  margin: 0;
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.35;
 }
+
 .study-app h2 {
-  font-size: 20px;
-  margin: 0 0 16px;
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 650;
 }
+
 .study-app a {
   color: inherit;
   text-underline-offset: 4px;
 }
-.study-app button {
-  border: 1px solid #cecec6;
-  background: #fff;
-  color: inherit;
+
+.study-app :focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--text),
+    0 0 0 4px var(--halo);
+}
+
+/* 머리글 */
+
+.study-nav {
+  display: flex;
+  gap: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  font-size: 14px;
+}
+
+.study-nav a {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+.study-nav a:hover,
+.study-nav a[aria-current="page"] {
+  color: var(--text);
+}
+
+.study-nav a[aria-current="page"] {
+  font-weight: 600;
+}
+
+/* 버튼 */
+
+.study-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid var(--control-line);
   border-radius: 6px;
-  padding: 9px 14px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    filter 120ms ease-out,
+    transform 120ms ease-out;
 }
-.study-app button:disabled {
-  opacity: 0.45;
+
+.study-button.is-primary {
+  min-width: 112px;
+  overflow: hidden;
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
 }
-.study-app .study-primary {
-  background: #292c27;
-  color: #fff;
+
+.study-button:hover:not(:disabled) {
+  filter: brightness(0.88);
 }
-.study-section {
-  padding: 28px 0;
-  border-top: 1px solid #d8d8d0;
+
+.study-button:active:not(:disabled) {
+  transform: scale(0.95);
 }
-.study-controls,
-.study-actions {
+
+.study-button:disabled,
+.study-text-button:disabled {
+  opacity: 0.4;
+}
+
+.study-text-button,
+.study-back {
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--secondary);
+  font-size: 14px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+}
+
+.study-text-button:hover:not(:disabled),
+.study-back:hover {
+  color: var(--text);
+}
+
+.study-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+.study-row-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin: 12px 0 20px;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 12px;
 }
-.study-app label {
+
+/* 세그먼트: 트랙 없이 밑줄만 */
+
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+
+.seg-option {
+  position: relative;
+  padding: 6px 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--secondary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 120ms ease-out;
+}
+
+.seg-option:hover:not(:disabled),
+.seg-option.is-active {
+  color: var(--text);
+}
+
+.seg-option.is-active {
+  font-weight: 600;
+}
+
+.seg-thumb {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--text);
+}
+
+/* 배지와 식별자 */
+
+.study-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.study-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.study-badge[data-tone="done"] .study-badge-dot {
+  background: var(--done);
+}
+
+.study-badge[data-tone="waiting"] .study-badge-dot {
+  background: var(--waiting);
+}
+
+.study-mono {
+  color: var(--muted);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 시안 목록 */
+
+.study-list {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.study-list-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  transition: background-color 120ms ease-out;
+}
+
+.study-list-row:hover {
+  background: var(--surface-2);
+}
+
+.study-list-title {
+  font-weight: 600;
+}
+
+.study-empty {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin: 12px 0;
+  align-items: center;
+  gap: 12px;
+  padding: 96px 16px;
+  color: var(--secondary);
+  text-align: center;
 }
-.study-app select,
-.study-app textarea {
-  padding: 9px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
-  color: #222;
+
+.study-empty p {
+  margin: 0;
 }
-.study-app textarea {
-  min-height: 100px;
-  width: 100%;
-  resize: vertical;
+
+.study-failure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin: 20px 0;
+  color: var(--failed);
 }
-.study-pair,
-.study-comparisons {
+
+/* 시안 상세 */
+
+.study-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 28px;
+  margin-bottom: 28px;
+}
+
+.study-title-side {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.study-statement {
+  margin: 2px 0 0;
+  color: var(--secondary);
+}
+
+.study-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 40px;
+}
+
+.study-stage {
+  min-width: 0;
+}
+
+.study-stage-body {
+  position: relative;
+  margin-top: 20px;
+}
+
+.study-stage-body > div > .seg {
+  margin-bottom: 20px;
+}
+
+.study-frames {
   display: flex;
   gap: 24px;
   overflow-x: auto;
   padding-bottom: 12px;
 }
+
 .study-app figure {
-  margin: 0;
   flex: 0 0 auto;
+  margin: 0;
 }
+
 .study-app figcaption {
-  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  margin-top: 12px;
   font-weight: 600;
 }
-.study-reference {
+
+.study-frame {
   display: block;
+  max-width: none;
+  border: 0;
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+
+.study-reference {
   width: 390px;
   height: auto;
 }
-.study-screen {
-  overflow: auto;
-  max-width: 100%;
+
+.study-state {
+  max-width: 68ch;
+  margin: 8px 0 0;
+  color: var(--secondary);
 }
-.study-screen iframe {
-  display: block;
-  border: 1px solid #ddd;
-  background: #fff;
+
+/* 오른쪽 작업 열 */
+
+.study-panel {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
-.study-muted {
-  color: #64645e;
+
+.study-primary-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.study-status {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.study-status-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+  min-width: 0;
+  color: var(--secondary);
   font-size: 14px;
 }
-.study-message {
-  position: sticky;
-  bottom: 12px;
-  padding: 14px 18px;
-  background: #252522;
-  color: #fff;
-  border-radius: 7px;
+
+.study-status-text.is-failed {
+  color: var(--failed);
 }
-.study-message button {
-  color: #222;
-  margin: 8px 8px 0 0;
+
+.study-status-line {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.study-app li {
-  padding: 8px 0;
+
+.study-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
 }
+
+.study-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.study-input {
+  width: 100%;
+  min-height: 96px;
+  padding: 9px 12px;
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.study-input:focus-visible {
+  border-color: var(--text);
+  box-shadow: 0 0 0 1px var(--text);
+}
+
+.study-adopted {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-top: 8px;
+}
+
+.study-history {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.study-history li {
+  padding: 11px 0;
+}
+
+.study-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.study-history-head b {
+  font-weight: 600;
+}
+
+.study-history-head span:not(.study-mono) {
+  color: var(--secondary);
+}
+
+.study-history-head .study-text-button {
+  margin-left: auto;
+}
+
+.study-history p {
+  margin: 2px 0 0;
+  color: var(--secondary);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1000px) {
+  .study-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .study-panel {
+    position: static;
+  }
+}
+
 @media (max-width: 600px) {
-  .study-app {
-    padding: 20px 16px 80px;
+  .study-app main,
+  .study-nav {
+    padding-right: 16px;
+    padding-left: 16px;
   }
-  .study-app header {
-    display: block;
-  }
-  .study-pair,
-  .study-comparisons {
+
+  .study-frames {
     gap: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .study-button:active:not(:disabled) {
+    transform: none;
   }
 }

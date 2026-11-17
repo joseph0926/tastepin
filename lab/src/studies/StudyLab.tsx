@@ -1,4 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
+import { ChevronLeft, Images } from "lucide-react";
+import {
+  Badge,
+  EASE,
+  Segmented,
+  StatusSlot,
+  useNotice,
+  type Tone,
+} from "./controls";
 import "./studies.css";
 
 type Params = Record<string, string>;
@@ -24,6 +34,10 @@ interface StudyEvent {
   params: Params;
   note: string;
   digest: string;
+  dimension?: string;
+  outcome?: string;
+  choice?: string;
+  target?: string | null;
 }
 interface Study {
   id: string;
@@ -37,6 +51,10 @@ interface Study {
   events: StudyEvent[];
   adopted: StudyEvent | null;
   expected: string | null;
+}
+interface StudyItem {
+  id: string;
+  title: string;
 }
 const API = "/taste-api/studies";
 
@@ -56,9 +74,85 @@ async function request<T>(url: string, body?: unknown): Promise<T> {
   return data as T;
 }
 
+function errorText(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function screenUrl(study: string, revision: string, params: Params) {
   return `${API}/file/${study}/${revision}/screen.html?params=${encodeURIComponent(JSON.stringify(params))}`;
 }
+
+function lastParams(study: Study, snapshot: Snapshot | undefined) {
+  if (!snapshot) return {};
+  const recorded = [...study.events]
+    .reverse()
+    .find(
+      (e) =>
+        e.revision === snapshot.revision.id &&
+        ["adopt", "judge"].includes(e.action),
+    )?.params;
+  return (
+    recorded ??
+    Object.fromEntries(
+      snapshot.revision.dimensions.map((d) => [d.id, d.values[0].id]),
+    )
+  );
+}
+
+function isVerified(study: Study, snapshot: Snapshot) {
+  return study.events.some(
+    (e) => e.action === "reproduction" && e.digest === snapshot.digest,
+  );
+}
+
+function sameParams(a: Params, b: Params) {
+  const keys = Object.keys(a);
+  return (
+    keys.length === Object.keys(b).length && keys.every((k) => a[k] === b[k])
+  );
+}
+
+const ACTION_LABELS: Record<string, string> = {
+  reproduction: "재현 확인",
+  judge: "비교",
+  feedback: "수정 요청",
+  adopt: "채택",
+  revert: "되돌리기",
+};
+const OUTCOME_LABELS: Record<string, string> = {
+  same: "차이 없음",
+  none: "다 별로",
+};
+
+function eventDetail(study: Study, e: StudyEvent) {
+  if (e.action === "judge") {
+    if (e.outcome && OUTCOME_LABELS[e.outcome])
+      return OUTCOME_LABELS[e.outcome];
+    const dimension = study.revisions
+      .find((r) => r.revision.id === e.revision)
+      ?.revision.dimensions.find((d) => d.id === e.dimension);
+    const value = dimension?.values.find((v) => v.id === e.choice);
+    return dimension && value ? `${dimension.label}: ${value.label}` : "";
+  }
+  if (e.action === "revert") return e.target ? "이전 채택" : "채택 해제";
+  return "";
+}
+
+// 같은 장면 전환 값: 옆으로 24px, 흐림 2px, 겹쳐 교차 240ms
+const slide = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction * 24,
+    filter: "blur(2px)",
+  }),
+  center: { opacity: 1, x: 0, filter: "blur(0px)" },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction * -24,
+    filter: "blur(2px)",
+  }),
+};
+const slideTransition = { duration: 0.24, ease: EASE };
 
 function Screen({
   study,
@@ -72,19 +166,20 @@ function Screen({
   title: string;
 }) {
   return (
-    <div className="study-screen">
-      <iframe
-        title={title}
-        sandbox="allow-scripts"
-        src={screenUrl(study, snapshot.revision.id, params)}
-        style={{
-          width: snapshot.revision.viewport.width,
-          height: snapshot.revision.viewport.height,
-        }}
-      />
-    </div>
+    <iframe
+      className="study-frame"
+      title={title}
+      sandbox="allow-scripts"
+      src={screenUrl(study, snapshot.revision.id, params)}
+      style={{
+        width: snapshot.revision.viewport.width,
+        height: snapshot.revision.viewport.height,
+      }}
+    />
   );
 }
+
+type Mode = "reference" | "compare" | "revisions";
 
 function Revision({
   study,
@@ -96,22 +191,29 @@ function Revision({
   onChange: (study: Study) => void;
 }) {
   const meta = snapshot.revision;
-  const latest = [...study.events]
-    .reverse()
-    .find(
-      (e) => e.revision === meta.id && ["adopt", "judge"].includes(e.action),
-    );
-  const [params, setParams] = useState<Params>(
-    () =>
-      latest?.params ??
-      Object.fromEntries(meta.dimensions.map((d) => [d.id, d.values[0].id])),
+  const verified = isVerified(study, snapshot);
+  const others = study.revisions.filter((r) => r.revision.id !== meta.id);
+  const modes: { id: Mode; label: string }[] = [
+    { id: "reference", label: "원본과 비교" },
+    { id: "compare", label: "항목 비교" },
+    ...(others.length > 0
+      ? [{ id: "revisions" as const, label: "수정 전후" }]
+      : []),
+  ];
+  const [params, setParams] = useState<Params>(() =>
+    lastParams(study, snapshot),
   );
+  const [mode, setMode] = useState<Mode>(verified ? "compare" : "reference");
+  const [direction, setDirection] = useState(1);
   const [dimension, setDimension] = useState(meta.dimensions[0].id);
+  const [previous, setPrevious] = useState(() => {
+    const index = study.revisions.findIndex((r) => r.revision.id === meta.id);
+    return (study.revisions[index - 1] ?? others[0])?.revision.id ?? "";
+  });
   const [note, setNote] = useState("");
-  const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [retry, setRetry] = useState<Record<string, unknown> | null>(null);
-  const [previous, setPrevious] = useState("");
+  const status = useNotice();
   const requestSequence = useRef(0);
   useEffect(
     () => () => {
@@ -120,43 +222,39 @@ function Revision({
     },
     [],
   );
-  const verified = study.events.some(
-    (e) => e.action === "reproduction" && e.digest === snapshot.digest,
-  );
   const activeDimension = meta.dimensions.find((d) => d.id === dimension)!;
-  const oldSnapshot = study.revisions.find((r) => r.revision.id === previous);
-  const oldParams =
-    [...study.events]
-      .reverse()
-      .find(
-        (e) => e.revision === previous && ["adopt", "judge"].includes(e.action),
-      )?.params ??
-    Object.fromEntries(
-      (oldSnapshot?.revision.dimensions ?? []).map((d) => [
-        d.id,
-        d.values[0].id,
-      ]),
-    );
+  const oldSnapshot = others.find((r) => r.revision.id === previous);
+  const disabled = busy || retry !== null;
+  const adoptedHere =
+    study.adopted?.revision === meta.id &&
+    sameParams(study.adopted.params, params);
+
+  function changeMode(next: Mode) {
+    const from = modes.findIndex((m) => m.id === mode);
+    const to = modes.findIndex((m) => m.id === next);
+    setDirection(to >= from ? 1 : -1);
+    setMode(next);
+  }
 
   async function submit(body: Record<string, unknown>) {
     if (busy) return;
     const sequence = ++requestSequence.current;
     setBusy(true);
-    setMessage("");
+    status.clear();
     try {
       const next = await request<Study>(API + "/event", body);
       if (sequence !== requestSequence.current) return;
       onChange(next);
       setRetry(null);
       setNote("");
-      setMessage(
-        body.action === "adopt"
-          ? "이 화면에 적용할 결과를 저장했습니다"
-          : "기록했습니다",
+      if (body.action === "reproduction") changeMode("compare");
+      status.show(
+        "done",
+        body.action === "adopt" ? "채택했습니다" : "기록했습니다",
       );
     } catch (error) {
       if (sequence !== requestSequence.current) return;
-      setMessage(error instanceof Error ? error.message : String(error));
+      status.show("failed", errorText(error));
       setRetry(body);
     } finally {
       if (sequence === requestSequence.current) setBusy(false);
@@ -171,9 +269,10 @@ function Revision({
       if (sequence !== requestSequence.current) return;
       onChange(next);
       setRetry(null);
-      setMessage("저장 상태를 다시 읽었습니다");
+      status.show("done", "다시 읽었습니다");
     } catch (error) {
-      if (sequence === requestSequence.current) setMessage(String(error));
+      if (sequence === requestSequence.current)
+        status.show("failed", errorText(error));
     } finally {
       if (sequence === requestSequence.current) setBusy(false);
     }
@@ -187,367 +286,484 @@ function Revision({
       expected: study.expected,
       request_id: crypto.randomUUID(),
       action,
+      // 메모는 다음 기록 하나에 붙는다. 채택의 메모는 내보낸 결과의 사용자 원문이 된다.
       note,
       ...extra,
     });
   }
-  const disabled = busy || retry !== null;
-  const adopts = study.events.filter(
-    (e) => e.action === "adopt" && e.id !== study.adopted?.id,
-  );
+  function copyNote() {
+    void navigator.clipboard
+      .writeText(`시안 ${study.id}, 수정본 ${meta.id}\n${note}`)
+      .then(
+        () => status.show("done", "복사했습니다"),
+        () => status.show("done", "복사하지 못했습니다. 직접 복사해 주세요"),
+      );
+  }
+
+  const primary = verified
+    ? {
+        label: "채택",
+        run: () => event("adopt"),
+        off: disabled || adoptedHere,
+      }
+    : { label: "재현 확인", run: () => event("reproduction"), off: disabled };
+
   return (
-    <>
-      <section className="study-section">
-        <div className="study-section-title">
-          <h2>원본과 재현 확인</h2>
-          <span>
-            {meta.viewport.width} × {meta.viewport.height} / {meta.theme}
-          </span>
-        </div>
-        <p>{meta.state}</p>
-        <div className="study-pair">
-          <figure>
-            <figcaption>출발한 시안</figcaption>
-            <img
-              className="study-reference"
-              src={`${API}/file/${study.id}/reference/${study.reference.image.file}`}
-              alt="원본 레퍼런스"
-            />
-          </figure>
-          <figure>
-            <figcaption>현재 코드 시편</figcaption>
-            <Screen
-              study={study.id}
-              snapshot={snapshot}
-              params={params}
-              title="현재 코드 시편"
-            />
-          </figure>
-        </div>
-        <p className="study-muted">
-          대체한 이미지와 글꼴, 구현에서 달라진 부분도 확인하세요. 재현 확인은
-          취향 채택과 별개입니다.
-        </p>
-        <button
-          disabled={disabled || verified}
-          onClick={() => event("reproduction")}
-        >
-          {verified ? "이 수정본의 재현 확인됨" : "재현 상태 확인했어요"}
-        </button>
-      </section>
-
-      <section className="study-section">
-        <h2>비교와 수정</h2>
-        <div className="study-controls">
-          <label>
-            비교할 항목
-            <select
-              aria-label="비교할 항목"
-              value={dimension}
-              onChange={(e) => setDimension(e.target.value)}
-            >
-              {meta.dimensions.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          {meta.dimensions
-            .filter((d) => d.id !== dimension)
-            .map((d) => (
-              <label key={d.id}>
-                {d.label}
-                <select
-                  aria-label={d.label}
-                  value={params[d.id]}
-                  onChange={(e) =>
-                    setParams({ ...params, [d.id]: e.target.value })
-                  }
-                >
-                  {d.values.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ))}
-        </div>
-        <div className="study-comparisons">
-          {activeDimension.values.map((value, i) => {
-            const candidate = { ...params, [dimension]: value.id };
-            return (
-              <figure key={value.id}>
-                <figcaption>{String.fromCharCode(65 + i)}</figcaption>
-                <Screen
-                  study={study.id}
-                  snapshot={snapshot}
-                  params={candidate}
-                  title={`비교 ${String.fromCharCode(65 + i)}`}
-                />
-                <button
-                  disabled={disabled || !verified}
-                  onClick={() => {
-                    setParams(candidate);
-                    event("judge", {
-                      params: candidate,
-                      dimension,
-                      outcome: "chose",
-                      choice: value.id,
-                    });
-                  }}
-                >
-                  이쪽 선택
-                </button>
-              </figure>
-            );
-          })}
-        </div>
-        <div className="study-actions">
-          <button
-            disabled={disabled || !verified}
-            onClick={() => event("judge", { dimension, outcome: "same" })}
-          >
-            차이 없음
-          </button>
-          <button
-            disabled={disabled || !verified}
-            onClick={() => event("judge", { dimension, outcome: "none" })}
-          >
-            다 별로
-          </button>
-        </div>
-        <label className="study-note">
-          수정할 부분 또는 선택 이유
-          <textarea
-            value={note}
-            maxLength={4000}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="유지할 부분과 바꾸고 싶은 부분을 적어 주세요"
-          />
-        </label>
-        <div className="study-actions">
-          <button
-            disabled={disabled || !note.trim()}
-            onClick={() => event("feedback")}
-          >
-            수정 요청 저장
-          </button>
-          <button
-            disabled={!note.trim()}
-            onClick={() => {
-              void navigator.clipboard
-                .writeText(`시안 ${study.id}, 수정본 ${meta.id}\n${note}`)
-                .then(
-                  () => setMessage("수정 요청을 복사했습니다"),
-                  () =>
-                    setMessage(
-                      "복사하지 못했습니다. 입력한 문장을 직접 복사해 주세요",
-                    ),
-                );
-            }}
-          >
-            대화로 가져갈 요청 복사
-          </button>
-        </div>
-        <p className="study-muted">
-          요청을 저장한 뒤 대화에서 이어서 수정을 요청하세요. AI가 새 수정본을
-          등록하면 이곳에서 다시 비교할 수 있습니다.
-        </p>
-        {study.revisions.length > 1 && (
-          <>
-            <label>
-              수정 전 기준
-              <select
-                aria-label="수정 전 기준"
-                value={previous}
-                onChange={(e) => setPrevious(e.target.value)}
-              >
-                <option value="">선택하지 않음</option>
-                {study.revisions
-                  .filter((r) => r.revision.id !== meta.id)
-                  .map((r) => (
-                    <option key={r.revision.id}>{r.revision.id}</option>
-                  ))}
-              </select>
-            </label>
-            {oldSnapshot && (
-              <div className="study-pair">
-                <figure>
-                  <figcaption>수정 전 {previous}</figcaption>
-                  <Screen
-                    study={study.id}
-                    snapshot={oldSnapshot}
-                    params={oldParams}
-                    title="수정 전"
-                  />
-                </figure>
-                <figure>
-                  <figcaption>수정 후 {meta.id}</figcaption>
-                  <Screen
-                    study={study.id}
-                    snapshot={snapshot}
-                    params={params}
-                    title="수정 후"
-                  />
-                </figure>
-              </div>
-            )}
-          </>
-        )}
-      </section>
-
-      <section className="study-section">
-        <h2>선택한 전체 화면</h2>
-        <div className="study-controls">
-          {meta.dimensions.map((d) => (
-            <label key={d.id}>
-              {d.label}
-              <select
-                aria-label={d.label}
-                value={params[d.id]}
-                onChange={(e) =>
-                  setParams({ ...params, [d.id]: e.target.value })
-                }
-              >
-                {d.values.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
-        <Screen
-          study={study.id}
-          snapshot={snapshot}
-          params={params}
-          title="선택한 전체 화면"
+    <div className="study-workspace">
+      <div className="study-stage">
+        <Segmented
+          label="보기"
+          options={modes}
+          value={mode}
+          onChange={(id) => changeMode(id as Mode)}
         />
-        <p>이 시안에만 적용합니다. 다른 화면의 기본 취향은 바뀌지 않습니다.</p>
-        <button
-          className="study-primary"
-          disabled={disabled || !verified}
-          onClick={() => event("adopt")}
-        >
-          이 전체 화면을 채택
-        </button>
-        <p>
-          {study.adopted
-            ? `현재 채택: ${study.adopted.revision}`
-            : "아직 채택한 결과가 없습니다"}
-        </p>
-        {study.adopted && (
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={screenUrl(
-              study.id,
-              study.adopted.revision,
-              study.adopted.params,
-            )}
-          >
-            채택한 화면만 다시 열기
-          </a>
-        )}
-        {adopts.length > 0 && (
-          <label>
-            이전 채택으로 되돌리기
-            <select
-              aria-label="이전 채택으로 되돌리기"
-              defaultValue=""
-              disabled={disabled}
-              onChange={(e) => {
-                if (e.target.value) event("revert", { target: e.target.value });
-                e.target.value = "";
-              }}
+        <div className="study-stage-body">
+          <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+            <motion.div
+              key={mode}
+              custom={direction}
+              variants={slide}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={slideTransition}
             >
-              <option value="">이전 결과 선택</option>
-              {adopts.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.revision} / {e.id.slice(0, 8)}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {study.adopted && (
+              {mode === "reference" && (
+                <>
+                  <div className="study-frames">
+                    <figure>
+                      <img
+                        className="study-frame"
+                        style={{ width: meta.viewport.width }}
+                        src={`${API}/file/${study.id}/reference/${study.reference.image.file}`}
+                        alt="원본 시안"
+                      />
+                      <figcaption>원본</figcaption>
+                    </figure>
+                    <figure>
+                      <Screen
+                        study={study.id}
+                        snapshot={snapshot}
+                        params={params}
+                        title="코드 시편"
+                      />
+                      <figcaption>코드 시편</figcaption>
+                    </figure>
+                  </div>
+                  {meta.state && <p className="study-state">{meta.state}</p>}
+                </>
+              )}
+              {mode === "compare" && (
+                <>
+                  {meta.dimensions.length > 1 && (
+                    <Segmented
+                      label="비교할 항목"
+                      options={meta.dimensions}
+                      value={dimension}
+                      onChange={setDimension}
+                    />
+                  )}
+                  <div className="study-frames">
+                    {activeDimension.values.map((value, i) => {
+                      const candidate = { ...params, [dimension]: value.id };
+                      const letter = String.fromCharCode(65 + i);
+                      return (
+                        <figure key={value.id}>
+                          <Screen
+                            study={study.id}
+                            snapshot={snapshot}
+                            params={candidate}
+                            title={`비교 ${letter}`}
+                          />
+                          <figcaption>
+                            {letter}
+                            <button
+                              className="study-button"
+                              disabled={disabled || !verified}
+                              onClick={() => {
+                                setParams(candidate);
+                                event("judge", {
+                                  params: candidate,
+                                  dimension,
+                                  outcome: "chose",
+                                  choice: value.id,
+                                });
+                              }}
+                            >
+                              {letter} 선택
+                            </button>
+                          </figcaption>
+                        </figure>
+                      );
+                    })}
+                  </div>
+                  <div className="study-row-actions">
+                    <button
+                      className="study-text-button"
+                      disabled={disabled || !verified}
+                      onClick={() =>
+                        event("judge", { dimension, outcome: "same" })
+                      }
+                    >
+                      차이 없음
+                    </button>
+                    <button
+                      className="study-text-button"
+                      disabled={disabled || !verified}
+                      onClick={() =>
+                        event("judge", { dimension, outcome: "none" })
+                      }
+                    >
+                      다 별로
+                    </button>
+                  </div>
+                </>
+              )}
+              {mode === "revisions" && oldSnapshot && (
+                <>
+                  {others.length > 1 && (
+                    <Segmented
+                      label="비교할 수정본"
+                      options={others.map((r) => ({
+                        id: r.revision.id,
+                        label: r.revision.id,
+                      }))}
+                      value={previous}
+                      onChange={setPrevious}
+                    />
+                  )}
+                  <div className="study-frames">
+                    <figure>
+                      <Screen
+                        study={study.id}
+                        snapshot={oldSnapshot}
+                        params={lastParams(study, oldSnapshot)}
+                        title={`수정 전 ${previous}`}
+                      />
+                      <figcaption>{previous}</figcaption>
+                    </figure>
+                    <figure>
+                      <Screen
+                        study={study.id}
+                        snapshot={snapshot}
+                        params={params}
+                        title={`지금 ${meta.id}`}
+                      />
+                      <figcaption>{meta.id}</figcaption>
+                    </figure>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <aside className="study-panel">
+        <div className="study-primary-row">
           <button
-            disabled={disabled}
-            onClick={() => event("revert", { target: null })}
+            className="study-button is-primary"
+            disabled={primary.off}
+            onClick={primary.run}
           >
-            채택 해제
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.span
+                key={primary.label}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.16, delay: 0.04, ease: EASE },
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -6,
+                  transition: { duration: 0.1, ease: EASE },
+                }}
+              >
+                {primary.label}
+              </motion.span>
+            </AnimatePresence>
           </button>
-        )}
-        <p className="study-muted">
-          전체 화면 이미지와 재실행 자료가 필요하면 대화에서 이 시안의 채택 결과
-          내보내기를 요청하세요. Viewgrain 등록 없이도 보관할 수 있습니다.
-        </p>
-      </section>
-      <section className="study-section">
-        <h2>수정과 선택 기록</h2>
-        <ol>
-          {[...study.events].reverse().map((e) => (
-            <li key={e.id}>
-              <b>
-                {e.revision} /{" "}
-                {
-                  {
-                    reproduction: "재현 확인",
-                    judge: "비교",
-                    feedback: "수정 요청",
-                    adopt: "채택",
-                    revert: "되돌리기",
-                  }[e.action]
-                }
-              </b>
-              {e.note && <p>{e.note}</p>}
-            </li>
+          <StatusSlot notice={status.notice}>
+            {retry && (
+              <>
+                <button
+                  className="study-text-button"
+                  disabled={busy}
+                  onClick={() => void submit(retry)}
+                >
+                  다시 시도
+                </button>
+                <button
+                  className="study-text-button"
+                  disabled={busy}
+                  onClick={() => void reload()}
+                >
+                  다시 읽기
+                </button>
+              </>
+            )}
+          </StatusSlot>
+        </div>
+
+        <section className="study-group">
+          <h2>선택 값</h2>
+          {meta.dimensions.map((d) => (
+            <div key={d.id} className="study-field">
+              <span className="study-label">{d.label}</span>
+              <Segmented
+                label={d.label}
+                options={d.values}
+                value={params[d.id]}
+                onChange={(id) => setParams({ ...params, [d.id]: id })}
+              />
+            </div>
           ))}
-        </ol>
-      </section>
-      {message && (
-        <div className="study-message" role="status">
-          {message}
-          {retry && (
-            <div>
-              <button disabled={busy} onClick={() => void submit(retry)}>
-                같은 요청 다시 보내기
-              </button>
-              <button disabled={busy} onClick={() => void reload()}>
-                저장 상태 다시 읽기
+          {study.adopted && (
+            <div className="study-adopted">
+              <span>
+                채택{" "}
+                <span className="study-mono">{study.adopted.revision}</span>
+              </span>
+              <a
+                className="study-text-button"
+                target="_blank"
+                rel="noreferrer"
+                href={screenUrl(
+                  study.id,
+                  study.adopted.revision,
+                  study.adopted.params,
+                )}
+              >
+                새 창에서 열기
+              </a>
+              <button
+                className="study-text-button"
+                disabled={disabled}
+                onClick={() => event("revert", { target: null })}
+              >
+                해제
               </button>
             </div>
           )}
+        </section>
+
+        <section className="study-group">
+          <label className="study-field">
+            <span className="study-label">메모</span>
+            <textarea
+              className="study-input"
+              value={note}
+              maxLength={4000}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="선택 이유나 바꿀 부분"
+            />
+          </label>
+          <div className="study-row-actions">
+            <button
+              className="study-button"
+              disabled={disabled || !note.trim()}
+              onClick={() => event("feedback")}
+            >
+              수정 요청
+            </button>
+            <button
+              className="study-text-button"
+              disabled={!note.trim()}
+              onClick={copyNote}
+            >
+              복사
+            </button>
+          </div>
+        </section>
+
+        <section className="study-group">
+          <h2>기록</h2>
+          <ol className="study-history">
+            {[...study.events].reverse().map((e) => {
+              const detail = eventDetail(study, e);
+              const restorable =
+                e.action === "adopt" && e.id !== study.adopted?.id;
+              return (
+                <li key={e.id}>
+                  <div className="study-history-head">
+                    <span className="study-mono">{e.revision}</span>
+                    <b>{ACTION_LABELS[e.action] ?? e.action}</b>
+                    {detail && <span>{detail}</span>}
+                    {restorable && (
+                      <button
+                        className="study-text-button"
+                        disabled={disabled}
+                        onClick={() => event("revert", { target: e.id })}
+                      >
+                        되돌리기
+                      </button>
+                    )}
+                  </div>
+                  {e.note && <p>{e.note}</p>}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      </aside>
+    </div>
+  );
+}
+
+function StudyDetail({
+  study,
+  revisionId,
+  onRevision,
+  onChange,
+}: {
+  study: Study;
+  revisionId: string;
+  onRevision: (id: string) => void;
+  onChange: (study: Study) => void;
+}) {
+  const snapshot = study.revisions.find((r) => r.revision.id === revisionId);
+  let badge: { tone: Tone; label: string } | null = null;
+  if (snapshot) {
+    if (study.adopted?.revision === revisionId)
+      badge = { tone: "done", label: "채택됨" };
+    else if (isVerified(study, snapshot))
+      badge = { tone: "neutral", label: "확인됨" };
+    else badge = { tone: "waiting", label: "확인 전" };
+  }
+  const statement = study.reference.selection?.user_statement;
+  return (
+    <>
+      <div className="study-title">
+        <div>
+          <h1>{study.reference.title}</h1>
+          {statement && <p className="study-statement">“{statement}”</p>}
+        </div>
+        <div className="study-title-side">
+          {study.revisions.length > 1 ? (
+            <Segmented
+              label="수정본"
+              options={study.revisions.map((r) => ({
+                id: r.revision.id,
+                label: r.revision.id,
+              }))}
+              value={revisionId}
+              onChange={onRevision}
+            />
+          ) : (
+            snapshot && <span className="study-mono">{revisionId}</span>
+          )}
+          {badge && <Badge tone={badge.tone}>{badge.label}</Badge>}
+        </div>
+      </div>
+      {snapshot ? (
+        <Revision
+          key={`${study.id}:${snapshot.digest}`}
+          study={study}
+          snapshot={snapshot}
+          onChange={onChange}
+        />
+      ) : (
+        <div className="study-frames">
+          <figure>
+            <img
+              className="study-frame study-reference"
+              src={`${API}/file/${study.id}/reference/${study.reference.image.file}`}
+              alt="원본 시안"
+            />
+            <figcaption>대화에서 코드 시편을 요청하세요</figcaption>
+          </figure>
         </div>
       )}
     </>
   );
 }
 
-export default function StudyLab() {
-  const [list, setList] = useState<{ id: string; title: string }[]>([]);
-  const [selected, setSelected] = useState(
-    new URLSearchParams(location.search).get("study") || "",
+function StudyList({
+  list,
+  error,
+  focusId,
+  onOpen,
+  onRetry,
+}: {
+  list: StudyItem[] | null;
+  error: string;
+  focusId: string;
+  onOpen: (id: string) => void;
+  onRetry: () => void;
+}) {
+  if (error)
+    return (
+      <p className="study-failure" role="alert">
+        {error}
+        <button className="study-text-button" onClick={onRetry}>
+          다시 시도
+        </button>
+      </p>
+    );
+  if (!list) return null;
+  if (list.length === 0)
+    return (
+      <div className="study-empty">
+        <Images size={32} strokeWidth={1.5} aria-hidden />
+        <p>대화에서 이미지나 Viewgrain 시안을 지정해 시작하세요</p>
+      </div>
+    );
+  return (
+    <ul className="study-list">
+      {list.map((item) => (
+        <li key={item.id}>
+          <button
+            className="study-list-row"
+            autoFocus={item.id === focusId}
+            onClick={() => onOpen(item.id)}
+          >
+            <span className="study-list-title">{item.title}</span>
+            <span className="study-mono">{item.id}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
   );
+}
+
+function selectedFromUrl() {
+  return new URLSearchParams(location.search).get("study") || "";
+}
+
+export default function StudyLab() {
+  const [list, setList] = useState<StudyItem[] | null>(null);
+  const [listError, setListError] = useState("");
+  const [listAttempt, setListAttempt] = useState(0);
+  const [selected, setSelected] = useState(selectedFromUrl);
+  const [focusId, setFocusId] = useState("");
   const [study, setStudy] = useState<Study | null>(null);
   const [revisionId, setRevisionId] = useState("");
-  const [error, setError] = useState("");
+  const [studyError, setStudyError] = useState("");
+  const [studyAttempt, setStudyAttempt] = useState(0);
+
+  useEffect(() => {
+    const onPop = () => setSelected(selectedFromUrl());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   useEffect(() => {
     let active = true;
-    request<{ studies: typeof list }>(API)
+    request<{ studies: StudyItem[] }>(API)
       .then((data) => {
-        if (active) setList(data.studies);
+        if (active) {
+          setList(data.studies);
+          setListError("");
+        }
       })
       .catch((e) => {
-        if (active) setError(String(e));
+        if (active) setListError(errorText(e));
       });
     return () => {
       active = false;
     };
-  }, []);
+  }, [listAttempt]);
   useEffect(() => {
     let active = true;
     if (selected)
@@ -556,95 +772,93 @@ export default function StudyLab() {
           if (active) {
             setStudy(data);
             setRevisionId(data.revisions.at(-1)?.revision.id || "");
-            setError("");
+            setStudyError("");
           }
         })
         .catch((e) => {
-          if (active) setError(String(e));
+          if (active) setStudyError(errorText(e));
         });
     return () => {
       active = false;
     };
-  }, [selected]);
-  const snapshot =
-    study?.id === selected
-      ? study.revisions.find((r) => r.revision.id === revisionId)
-      : undefined;
+  }, [selected, studyAttempt]);
+
+  function open(id: string) {
+    history.pushState(null, "", `/studies?study=${encodeURIComponent(id)}`);
+    setStudyError("");
+    setSelected(id);
+  }
+  function back() {
+    history.pushState(null, "", "/studies");
+    setFocusId(selected);
+    setSelected("");
+  }
+  const current = study?.id === selected ? study : null;
+
   return (
-    <div className="study-app">
-      <header>
-        <div>
+    <MotionConfig reducedMotion="user">
+      <div className="study-app">
+        <nav className="study-nav">
           <a href="/specimens">일반 시편</a>
-          <h1>시안에서 고른 화면</h1>
-        </div>
-        <a href="/studies">목록 새로 읽기</a>
-      </header>
-      <div className="study-controls">
-        <label>
-          시안
-          <select
-            aria-label="시안"
-            value={selected}
-            onChange={(e) => {
-              setSelected(e.target.value);
-              history.replaceState(
-                null,
-                "",
-                `/studies?study=${e.target.value}`,
-              );
-            }}
+          <a href="/studies" aria-current="page">
+            시안
+          </a>
+        </nav>
+        <AnimatePresence
+          initial={false}
+          mode="popLayout"
+          custom={selected ? 1 : -1}
+        >
+          <motion.main
+            key={selected ? "detail" : "list"}
+            custom={selected ? 1 : -1}
+            variants={slide}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={slideTransition}
           >
-            <option value="">시안 선택</option>
-            {list.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        {study && study.id === selected && (
-          <label>
-            수정본
-            <select
-              aria-label="수정본"
-              value={revisionId}
-              onChange={(e) => setRevisionId(e.target.value)}
-            >
-              {study.revisions.map((r) => (
-                <option key={r.revision.id}>{r.revision.id}</option>
-              ))}
-            </select>
-          </label>
-        )}
+            {selected ? (
+              <>
+                <button className="study-back" onClick={back}>
+                  <ChevronLeft size={16} aria-hidden />
+                  시안 목록
+                </button>
+                {studyError && (
+                  <p className="study-failure" role="alert">
+                    {studyError}
+                    <button
+                      className="study-text-button"
+                      onClick={() => setStudyAttempt((n) => n + 1)}
+                    >
+                      다시 시도
+                    </button>
+                  </p>
+                )}
+                {current && (
+                  <StudyDetail
+                    study={current}
+                    revisionId={revisionId}
+                    onRevision={setRevisionId}
+                    onChange={setStudy}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <h1>시안</h1>
+                <StudyList
+                  list={list}
+                  error={listError}
+                  focusId={focusId}
+                  onOpen={open}
+                  onRetry={() => setListAttempt((n) => n + 1)}
+                />
+              </>
+            )}
+          </motion.main>
+        </AnimatePresence>
       </div>
-      {error && <p role="alert">{error}</p>}
-      {list.length === 0 && !error && (
-        <p>
-          아직 가져온 시안이 없습니다. 대화에서 이미지나 Viewgrain 시안을 지정해
-          Lab 비교를 요청하세요.
-        </p>
-      )}
-      {study && study.id === selected && (
-        <>
-          <h2>{study.reference.title}</h2>
-          {study.reference.selection?.user_statement && (
-            <blockquote>{study.reference.selection.user_statement}</blockquote>
-          )}
-          {snapshot ? (
-            <Revision
-              key={`${study.id}:${snapshot.digest}`}
-              study={study}
-              snapshot={snapshot}
-              onChange={setStudy}
-            />
-          ) : (
-            <p>
-              이미지를 가져왔습니다. 대화에서 코드 시편 생성을 요청하면 이곳에서
-              확인할 수 있습니다.
-            </p>
-          )}
-        </>
-      )}
-    </div>
+    </MotionConfig>
   );
 }
