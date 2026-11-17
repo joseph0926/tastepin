@@ -816,6 +816,7 @@ export default function SpecimenLab() {
         <header className="lab-top">
           <div className="lab-brand">
             <b>시편 평가</b>
+            <a href="/studies">시안 비교</a>
             <span>고른 값이 다음 UI 작업의 기본값이 됩니다</span>
           </div>
           <div className="lab-toggles" role="group" aria-label="보기">
