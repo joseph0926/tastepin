@@ -16,6 +16,8 @@ disable-model-invocation: true
 
 ## 요청 처리
 
+시안으로 Lab 비교를 만들거나 수정 및 전체 화면 재사용을 요청하면 저장소의 `docs/studies.md`를 읽는다. 이미지를 읽고 사람이 수정할 React 시편을 작성한 뒤 `study import`, `study register`, `lab --study`를 사용한다. 원장과 등록한 수정본을 직접 편집하지 않는다. 사용자의 재현 확인, 비교와 채택을 대신 기록하지 않는다. 시안 피드백은 `study event`에 해당 시안과 버전을 지정하며 일반 판정으로 복제하지 않는다. 채택 결과를 구현에 쓰라는 요청에서는 `apply-context --study <id>`를 사용한다. 전체 화면 내보내기와 Viewgrain 등록은 각각 요청된 범위에서만 수행한다. Viewgrain이 없으면 일반 이미지나 이미 가져온 사본으로 진행한다.
+
 - UI 작업 설명이면 `apply-context --surface codex --session "${CODEX_SESSION_ID:-}" --request "<요청 원문>"`을 실행한다. 출력은 이번 작업의 기본값이다. 취향 적용을 짧게 알리고 사용자가 요청한 작업을 이어간다.
 - 화면에 대한 평가이면 `record --surface codex --session "${CODEX_SESSION_ID:-}"`에 평가 원문을 stdin으로 전달한다. 평가와 수정 요청이 함께 있으면 기록 후 적용한다. 따옴표나 셸 문자가 실행되지 않도록 입력을 안전하게 전달한다.
 - 이미지에 대한 평가에는 원문 뒤에 문제 요소의 위치와 모양을 짧게 설명한다. 이미지 자체는 원장에 저장되지 않는다.
