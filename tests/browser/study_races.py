@@ -56,6 +56,11 @@ class StudyRaceTests(unittest.TestCase):
         self.page.goto(os.environ.get("STUDY_LAB_URL", "http://127.0.0.1:5187") + "/studies?study=a")
         expect(self.page.get_by_role("heading", name="시안 a", exact=True)).to_be_visible()
 
+    def open_study(self, title):
+        self.page.get_by_role("button", name="시안 목록").click()
+        self.page.get_by_role("button", name=title).click()
+        expect(self.page.get_by_role("heading", name=title, exact=True)).to_be_visible()
+
     def release_old_response(self):
         self.assertEqual(len(self.pending), 1)
         self.pending.pop().fulfill(json=study("a", "오래된 응답"))
@@ -63,29 +68,26 @@ class StudyRaceTests(unittest.TestCase):
         self.page.wait_for_timeout(200)
 
     def test_late_save_does_not_replace_new_study(self):
-        self.page.get_by_role("button", name="재현 상태 확인했어요").click()
-        self.page.get_by_label("시안", exact=True).select_option("b")
-        expect(self.page.get_by_role("heading", name="시안 b", exact=True)).to_be_visible()
+        self.page.get_by_role("button", name="재현 확인").click()
+        self.open_study("시안 b")
         self.release_old_response()
         expect(self.page.get_by_role("heading", name="시안 b", exact=True)).to_be_visible()
 
     def test_late_reload_does_not_replace_new_study(self):
         self.fail_save = True
-        self.page.get_by_role("button", name="재현 상태 확인했어요").click()
-        expect(self.page.get_by_role("button", name="저장 상태 다시 읽기")).to_be_visible()
+        self.page.get_by_role("button", name="재현 확인").click()
+        expect(self.page.get_by_role("button", name="다시 읽기")).to_be_visible()
         self.delay_read = True
-        self.page.get_by_role("button", name="저장 상태 다시 읽기").click()
-        self.page.get_by_label("시안", exact=True).select_option("b")
-        expect(self.page.get_by_role("heading", name="시안 b", exact=True)).to_be_visible()
+        self.page.get_by_role("button", name="다시 읽기").click()
+        self.open_study("시안 b")
         self.release_old_response()
         expect(self.page.get_by_role("heading", name="시안 b", exact=True)).to_be_visible()
 
     def test_returning_to_same_study_does_not_accept_previous_visit_response(self):
-        self.page.get_by_role("button", name="재현 상태 확인했어요").click()
-        self.page.get_by_label("시안", exact=True).select_option("b")
-        expect(self.page.get_by_role("heading", name="시안 b", exact=True)).to_be_visible()
+        self.page.get_by_role("button", name="재현 확인").click()
+        self.open_study("시안 b")
         self.current_a = study("a", "새 A 기록")
-        self.page.get_by_label("시안", exact=True).select_option("a")
+        self.open_study("시안 a")
         expect(self.page.get_by_text("새 A 기록", exact=True)).to_be_visible()
         self.release_old_response()
         expect(self.page.get_by_text("새 A 기록", exact=True)).to_be_visible()
