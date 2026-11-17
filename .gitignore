@@ -1,4 +1,5 @@
 state/
+/studies/
 data/rules.json
 TASTE.md
 .env
