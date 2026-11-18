@@ -707,7 +707,7 @@ function StudyList({
     return (
       <div className="study-empty">
         <Images size={32} strokeWidth={1.5} aria-hidden />
-        <p>대화에서 이미지나 Viewgrain 시안을 지정해 시작하세요</p>
+        <p>대화에서 시안 이미지를 지정해 시작하세요</p>
       </div>
     );
   return (
