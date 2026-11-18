@@ -3,10 +3,10 @@
 
   python3 -B taste.py open      새 판정을 수집하고 대시보드를 연다 (서버는 백그라운드)
   python3 -B taste.py status    터미널 요약
-  python3 -B taste.py apply-context  /taste 적용: 화면 작업에 넣을 취향 (--request, --components)
+  python3 -B taste.py apply-context  /tastepin 적용: 화면 작업에 넣을 취향 (--request, --components)
   python3 -B taste.py block     요청서에 붙일 취향 블록 출력 (--for design|agent)
   python3 -B taste.py tokens    고른 값을 CSS 변수, Tailwind 테마, Motion 프리셋으로 내보내기 (--out 폴더)
-  python3 -B taste.py apply 저장소  저장소에 취향 사본(.taste/, taste 스킬, 지침 한 줄)을 남긴다 (--check)
+  python3 -B taste.py apply 저장소  저장소에 취향 사본(.taste/, tastepin 스킬, 지침 한 줄)을 남긴다 (--check)
   python3 -B taste.py harvest   수집만 실행
   python3 -B taste.py lint URL  화면을 열어 값으로 잴 수 있는 취향 위반 점검
   python3 -B taste.py lab [컴포넌트]  labs 시편 비교 화면을 띄우고 연다
@@ -317,7 +317,7 @@ def cmd_block(args):
 
 
 def cmd_apply_context(args):
-    """/taste 적용. 스킬이 출력을 그대로 읽어 이번 화면 작업에 쓴다."""
+    """/tastepin 적용. 스킬이 출력을 그대로 읽어 이번 화면 작업에 쓴다."""
     from tastelib import context
 
     try:
@@ -413,7 +413,7 @@ def cmd_stop_track(args):
 def cmd_doctor(args):
     from tastelib import doctor
 
-    text, problems = doctor.report()
+    text, problems = doctor.report(args.skill_source)
     print(text, end="")
     sys.exit(1 if problems else 0)
 
@@ -449,7 +449,7 @@ def cmd_hook(args):
 
 
 def cmd_record(args):
-    """/taste에 붙인 판정을 원장에 바로 기록한다. 사용자가 판정이라고 직접 표시한 입력이라 신호어 검사를 하지 않는다."""
+    """/tastepin에 붙인 판정을 원장에 바로 기록한다. 사용자가 판정이라고 직접 표시한 입력이라 신호어 검사를 하지 않는다."""
     from tastelib import harvest, inject
 
     text = sys.stdin.read().replace("\ufffd", "").strip()
@@ -662,7 +662,7 @@ def main():
 
     add("stop", cmd_stop, "백그라운드 서버 종료")
     add("status", cmd_status, "터미널 요약")
-    apply_context = add("apply-context", cmd_apply_context, "/taste 적용: 화면 작업에 넣을 취향 출력")
+    apply_context = add("apply-context", cmd_apply_context, "/tastepin 적용: 화면 작업에 넣을 취향 출력")
     apply_context.add_argument("--request", help="작업 설명. 나온 시편 컴포넌트의 고른 값을 붙인다")
     apply_context.add_argument("--components", help="쉼표로 나눈 시편 컴포넌트 id (예: toast,dialog)")
     apply_context.add_argument("--study", help="이번 화면에 적용할 채택 시안 ID")
@@ -670,7 +670,7 @@ def main():
     apply_context.add_argument("--surface", choices=("claude", "codex", "copilot"), default="claude")
     apply_context.add_argument(
         "--via", choices=("skill", "handoff-implement"), default="skill",
-        help="전달 경로 기록용. /taste는 skill, design-handoff 구현 단계는 handoff-implement",
+        help="전달 경로 기록용. /tastepin은 skill, design-handoff 구현 단계는 handoff-implement",
     )
     apply_context.add_argument("--no-log", action="store_true", help="확인만 하고 전달 기록을 남기지 않는다")
 
@@ -691,11 +691,12 @@ def main():
     stop_track.add_argument("--surface", choices=("codex",), default="codex")
     stop_check = add("stop-check", cmd_stop_check, "이전 Stop 훅 호환 명령 (동작 없음)")
     stop_check.add_argument("--surface", choices=("claude", "codex"), default="claude")
-    add("doctor", cmd_doctor, "소비 경로 점검")
+    doctor_cmd = add("doctor", cmd_doctor, "소비 경로 점검")
+    doctor_cmd.add_argument("--skill-source", help="홈에 배포한 tastepin 스킬의 원본 폴더")
 
     hook = add("hook", cmd_hook, "프롬프트 제출 훅")
     hook.add_argument("--surface", choices=("claude", "codex", "copilot"), default="claude")
-    record = add("record", cmd_record, "/taste로 준 판정을 원장에 기록 (stdin으로 판정 문장)")
+    record = add("record", cmd_record, "/tastepin으로 준 판정을 원장에 기록 (stdin으로 판정 문장)")
     record.add_argument("--surface", choices=("claude", "codex", "copilot"), required=True)
     record.add_argument("--session", default="", help="Claude Code 스킬은 ${CLAUDE_SESSION_ID}를 넘긴다")
     classify = add("classify", cmd_classify, "판정 분류 (id 없이 부르면 분류 전 판정 목록)")
@@ -711,7 +712,7 @@ def main():
     lint.add_argument("--only", choices=("light", "dark", "mobile"), action="append", help="특정 화면 조건만")
     lint.add_argument("--shots", metavar="DIR", help="조건별 전체 스크린숏 저장 폴더")
     lint.add_argument("--json", action="store_true")
-    lint.add_argument("--session", default="", help="/taste로 취향을 받은 세션 id (Claude Code는 ${CLAUDE_SESSION_ID})")
+    lint.add_argument("--session", default="", help="/tastepin으로 취향을 받은 세션 id (Claude Code는 ${CLAUDE_SESSION_ID})")
     lint.add_argument("--no-log", action="store_true", help="state/lint.jsonl에 남기지 않는다")
     add("export", cmd_export, "TASTE.md 생성")
     effect_cmd = add("effect", cmd_effect, "훅 도입 전후의 지적 빈도를 같은 기준으로 비교")

@@ -27,13 +27,16 @@ def _hook_lines():
     return [(True, "훅은 선택 기능입니다. Tastepin은 전역 훅을 자동 설치하지 않습니다")]
 
 
-def _skill_lines():
-    source = _read(os.path.join(SKILL_DIR, "SKILL.md"))
-    results = [(bool(source and "apply-context" in source), "동봉된 tastepin 스킬")]
+def _skill_lines(skill_source=None):
+    source = _read(os.path.join(skill_source or SKILL_DIR, "SKILL.md"))
+    label = f"지정한 tastepin 스킬 원본 {skill_source}" if skill_source else "동봉된 tastepin 스킬"
+    results = [(bool(source and "apply-context" in source), label)]
     installed = os.path.join(HOME, ".agents", "skills", "tastepin", "SKILL.md")
     content = _read(installed)
     if content is not None:
-        results.append((content == source, "설치된 tastepin 스킬이 동봉본과 같다"))
+        results.append((content == source, "설치된 tastepin 스킬과 원본의 내용 일치"))
+    elif skill_source:
+        results.append((False, "홈에 tastepin 스킬이 없습니다"))
     else:
         results.append((True, "홈 스킬 설치 생략됨. README의 스킬 설치 안내를 따르세요"))
     return results
@@ -87,17 +90,17 @@ def _recent_lines():
     lints = store.load_lint_log()
     verdicts = store.load_verdicts()
     lines = [
-        f"마지막 /taste 적용: {applied[-1]['ts'][:16] if applied else '없음'}",
+        f"마지막 /tastepin 적용: {applied[-1]['ts'][:16] if applied else '없음'}",
         f"마지막 lint 기록: {lints[-1]['ts'][:16] if lints else '없음'}",
         f"마지막 판정: {verdicts[-1]['ts'][:16] if verdicts else '없음'}",
     ]
     return lines
 
 
-def report():
+def report(skill_source=None):
     sections = (
         ("훅", _hook_lines()),
-        ("스킬", _skill_lines()),
+        ("스킬", _skill_lines(skill_source)),
         ("원장", _ledger_lines()),
         ("도구", _tool_lines()),
         ("저장소 사본", _repo_lines()),
