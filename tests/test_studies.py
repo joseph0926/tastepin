@@ -119,6 +119,31 @@ class StudyTests(unittest.TestCase):
         self.assertIn('window.__adoptedParams={"gap": "wide"}', files['.taste/studies/sample/screen.html'])
         self.assertNotIn("외부로 나가면", "\n".join(str(v) for v in files.values()))
 
+    def test_doctor_preserves_current_and_legacy_project_studies(self):
+        from tastelib import doctor
+        self.event("reproduction")
+        self.event("adopt")
+        project = self.directory / "project"
+        project.mkdir()
+        applied = self.directory / "state" / "applied.json"
+        with (
+            patch.object(repo, "APPLIED_PATH", str(applied)),
+            patch.object(repo.lab, "LABS_DIR", str(self.directory / "empty-lab")),
+            patch.object(repo.lab, "JUDGMENTS_PATH", str(self.directory / "choices.jsonl")),
+            patch.multiple(store, RULES_PATH=str(self.directory / "rules.json"),
+                           VERDICTS_PATH=str(self.directory / "verdicts.jsonl")),
+        ):
+            repo.apply(str(project), "sample")
+            agent = project / ".taste" / "AGENT.md"
+            for legacy in (False, True):
+                if legacy:
+                    applied.write_text(json.dumps({str(project): "2026-11-01"}))
+                self.assertEqual(doctor._repo_lines(), [(True, f"{project}: 취향 사본 최신")])
+                agent.write_text(agent.read_text() + "변경\n")
+                self.assertIn("--study sample", doctor._repo_lines()[0][1])
+                repo.apply(str(project), "sample")
+                self.assertIn(".taste/studies/sample/AGENT.md", agent.read_text())
+
     def test_registered_bundle_has_no_remote_script_or_runtime_dependency(self):
         html = studies.read_file(studies.root() / "sample/revisions/r1", "screen.html").decode()
         self.assertIn("connect-src 'none'", html)
