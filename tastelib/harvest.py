@@ -58,10 +58,10 @@ VERDICT_WORDS = re.compile(
 # "더 깔끔하게", "부드럽지 않", "부자연스럽"처럼 바꿔 달라거나 부정하는 말은 칭찬으로 세지 않는다
 PRAISE_STEMS = r"(?<![더덜안] )(?:깔끔|부드럽|부드러|(?<!부)자연스럽|(?<!부)자연스러)(?!하?게|하?지 ?않)"
 POSITIVE = re.compile(
-    r"좋네|훨씬 좋|취향 ?저격|마음에 쏙|마음에 듭|마음에 들|거의 완벽|통과|좋아졌|나아짐|예쁘|이쁘|정상|" + PRAISE_STEMS
+    r"좋네|훨씬 좋|취향 ?저격|마음에 쏙|마음에 듭|마음에 들(?!지\s*(?:않|못))|거의 완벽|통과|좋아졌|나아짐|예쁘|이쁘|정상|" + PRAISE_STEMS
 )
 NEGATIVE = re.compile(
-    r"촌스|어색|별로|아쉬|안 ?보|끊기듯|밋밋|과한|과하|많고|많음|많습니다|튀|짤|잘린|싼티|누리끼리|칙칙|"
+    r"마음에 들지\s*(?:않|못)|촌스|어색|별로|아쉬|안 ?보|끊기듯|밋밋|과한|과하|많고|많음|많습니다|튀|짤|잘린|싼티|누리끼리|칙칙|"
     r"지저분|심심|어지럽|정신없|느려|느림|거슬|부자연|딱딱|뚝뚝|깜빡|번쩍|ppt|가독성|남아 ?있|이질|못하|없음|"
     r"ai ?스러|ai ?티|slop|밀도가|빽빽|순간 ?이동",
     re.I,
@@ -108,7 +108,10 @@ def codex_event(record, state):
         # 훅 입력의 session_id와 같은 값이라 전달 기록과 판정을 세션으로 이을 수 있다
         state["session_id"] = payload.get("id", "")
         source = json.dumps(payload.get("source", ""), ensure_ascii=False)
-        state["is_subagent"] = "subagent" in source
+        state["tool_session"] = (
+            "subagent" in source or payload.get("source") == "exec"
+            or payload.get("thread_source") not in (None, "user")
+        )
         return None
     if kind == "event_msg" and payload.get("type") == "user_message":
         return "user", (payload.get("message") or "").strip(), record.get("timestamp"), state.get("cwd", "")
@@ -122,6 +125,15 @@ def codex_event(record, state):
         )
         return "assistant", text.strip(), record.get("timestamp"), state.get("cwd", "")
     return None
+
+
+def session_event(source, record, state):
+    if source == "claude":
+        if str(record.get("entrypoint", "")).startswith("sdk"):
+            state["tool_session"] = True
+        return None if state.get("tool_session") else claude_event(record)
+    event = codex_event(record, state)
+    return None if state.get("tool_session") else event
 
 
 def verdict_id(source, session, text):
@@ -184,12 +196,7 @@ def scan_lines(lines, session, source, file_state, since, match_symptoms):
             record = json.loads(raw)
         except ValueError:
             continue
-        if source == "claude":
-            event = claude_event(record)
-        else:
-            event = codex_event(record, file_state)
-            if file_state.get("is_subagent"):
-                continue
+        event = session_event(source, record, file_state)
         if not event:
             continue
         role, text, ts_raw, cwd = event
@@ -269,6 +276,7 @@ def compressed_predecessor(files, path):
 def harvest(cursor, since, match_symptoms):
     """cursor를 갱신하며 새 판정 후보 목록을 돌려준다."""
     files = cursor.setdefault("files", {})
+    cutoff = since.timestamp()
     found = []
     scanned = 0
     for path, source in session_files():
@@ -276,44 +284,42 @@ def harvest(cursor, since, match_symptoms):
             stat = os.stat(path)
         except OSError:
             continue
-        if stat.st_mtime < since.timestamp():
+        if stat.st_mtime < cutoff:
             continue
+        state = files.get(path)
+        predecessor = None
+        if state is None and path.endswith(COMPRESSED):
+            predecessor = compressed_predecessor(files, path)
+            state = files.get(predecessor)
+        # 이전 형식에는 수집 기간이 없다. 기간을 확인할 수 없거나 늘린 경우 한 번 다시 읽는다.
+        if state is None or "since" not in state or cutoff < state["since"]:
+            state = new_file_state()
+        work = dict(state, since=cutoff)
         if path.endswith(COMPRESSED):
             # 압축본의 offset은 풀린 바이트라 파일 크기와 비교할 수 없다. 끝까지 읽은 파일에 크기와 수정 시각을 남긴다.
             stamp = [stat.st_size, stat.st_mtime_ns]
-            state = files.get(path)
-            if state is not None and state.get("compressed") == stamp:
-                continue
-            predecessor = None if state is not None else compressed_predecessor(files, path)
-            if state is not None:
-                previous = state
-            elif predecessor is not None:
-                previous = files[predecessor]
-            else:
-                previous = new_file_state()
-            # 읽다 실패하면 cursor를 그대로 두고 다음 실행에서 다시 읽도록 사본에서 진행한다
-            work = dict(previous)
-            try:
-                found_here = scan_compressed(path, source, work, since, match_symptoms)
-            except READ_ERRORS:
+            if state.get("compressed") == stamp:
                 continue
             work["compressed"] = stamp
-            files[path] = work
-            if predecessor is not None:
-                del files[predecessor]
-            scanned += 1
-            found.extend(found_here)
-            continue
-        state = files.get(path)
-        if state is None or stat.st_size < state["offset"]:
-            state = new_file_state()
-            files[path] = state
-        if stat.st_size == state["offset"]:
-            continue
+            scan = scan_compressed
+        else:
+            if stat.st_size < work["offset"]:
+                work = dict(new_file_state(), since=cutoff)
+            if stat.st_size == work["offset"]:
+                if not stat.st_size:
+                    files[path] = work
+                continue
+            scan = scan_file
         try:
-            found_here = scan_file(path, source, state, since, match_symptoms)
-        except OSError:
-            continue  # stat 뒤에 Codex가 압축하며 지운 원본이다. 압축본으로 이어 읽는다
+            found_here = scan(path, source, work, since, match_symptoms)
+        except READ_ERRORS:
+            continue  # 읽기에 실패하면 마지막으로 끝낸 위치에서 다음 실행을 시작한다.
+        if predecessor is not None:
+            del files[predecessor]
+        files[path] = work
+        if source == "codex" and file_session(path) != work.get("session_id"):
+            for verdict in found_here:
+                verdict["_legacy_id"] = verdict_id(source, file_session(path), verdict["text"])
         scanned += 1
         found.extend(found_here)
     cursor["last_run"] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")

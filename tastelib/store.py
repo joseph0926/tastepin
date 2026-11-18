@@ -201,8 +201,12 @@ def merge_verdicts(existing, incoming):
     known_keys = {utterance_key(v) for v in existing}
     added = []
     for verdict in incoming:
+        # Codex의 이전 수집기는 세션 번호 대신 파일 이름으로 판정 번호를 만들었다.
+        legacy_id = verdict.get("_legacy_id")
+        if legacy_id:
+            verdict = {k: v for k, v in verdict.items() if k != "_legacy_id"}
         key = utterance_key(verdict)
-        if verdict["id"] in known_ids or key in known_keys:
+        if verdict["id"] in known_ids or legacy_id in known_ids or key in known_keys:
             continue
         known_ids.add(verdict["id"])
         known_keys.add(key)
