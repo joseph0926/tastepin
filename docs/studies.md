@@ -1,6 +1,6 @@
 # 시안에서 코드 시편, 채택한 전체 화면까지
 
-Viewgrain이나 일반 이미지의 사본을 가져와 코드로 비교하고 수정한다. Viewgrain의 설치나 실행은 필수가 아니다. 일반 시편과 기존 선택 기록은 그대로 사용한다.
+시안 이미지의 사본을 가져와 코드로 비교하고 수정한다. 일반 시편과 기존 선택 기록은 그대로 사용한다.
 
 ## 저장과 역할
 
@@ -12,7 +12,7 @@ Viewgrain이나 일반 이미지의 사본을 가져와 코드로 비교하고 �
 
 ## 자료 가져오기
 
-`reference.json`과 PNG를 같은 폴더에 둔다. Viewgrain에서는 `node src/transfer.mjs export <묶음> <버전> <이미지> <출력 폴더>`로 만든다. 일반 이미지도 아래 형식으로 준비할 수 있다. `source`와 `selection`은 출처가 있을 때만 적으며, AI가 사용자의 선택을 만들어 넣지 않는다.
+`reference.json`과 PNG를 같은 폴더에 두고 아래 형식으로 준비한다. `source`와 `selection`은 출처가 있을 때만 적으며, AI가 사용자의 선택을 만들어 넣지 않는다.
 
 ```json
 {
@@ -89,8 +89,6 @@ python3 -B taste.py study feedback-export collection /path/to/revision-request
 `reference.json`, `screen.png`, `implementation/`을 함께 보관한다. `implementation/screen.html`은 채택한 값이 들어 있어 도구가 없는 환경에서도 열 수 있다. 코드는 수정에, PNG는 다음 디자인의 레퍼런스로 쓴다. 같은 채택을 다시 내보내면 처음 캡처한 자료를 사용한다. 화면 캡처는 사용자 만족이나 실제 기기 검증을 뜻하지 않는다.
 
 `implementation/revision/`은 등록 당시 코드와 실행 화면 및 해시를 그대로 보존한다. 채택한 값이 들어간 실행 화면과 원본 수정본을 따로 두어 원본 해시도 다시 확인할 수 있다.
-
-Viewgrain에 보관하려면 그 도구의 `node src/transfer.mjs import <자료 폴더> <새 묶음 ID> <버전>`을 명시적으로 실행한다. Viewgrain은 원본과 새 결과를 출처로 연결하며 원본을 덮어쓰지 않는다. MCP로 전체 화면 PNG와 구현 자료의 식별 정보를 다시 읽을 수 있고, 구현 파일은 Viewgrain 내보내기로 받는다.
 
 피드백 내보내기는 해당 시안의 평가 원문과 수정 요청을 포함한다. 필요한 시안만 지정하고 다른 개인 원장은 포함하지 않는다. 새 시안을 만드는 자료이며 자동 생성이나 자동 등록은 하지 않는다.
 
