@@ -1,8 +1,8 @@
 """프롬프트 제출 훅의 판정 기록과, 효과 측정이 함께 쓰는 화면 작업 판별.
 
-훅은 대화에 아무것도 넣지 않는다. 취향은 사용자가 화면 작업을 시작하며 `/tastepin`로 부를 때
+훅은 대화에 아무것도 넣지 않는다. 취향은 사용자가 화면 작업을 시작하며 `/tastepin`으로 부를 때
 `taste.py apply-context`가 넣는다(tastelib/context.py). 훅은 프롬프트가 화면에 대한 판정이면 원장에 분류 전으로
-기록만 한다. 진단과 수정법은 `/taste <판정>`이 보여 준다.
+기록만 한다. 진단과 수정법은 `/tastepin <판정>`이 보여 준다.
 
 훅은 매 프롬프트마다 실행되므로 원장 수집이나 서버 호출 없이 파일 몇 개만 읽는다.
 """
@@ -34,7 +34,7 @@ VISUAL_WORK = re.compile(
 OPT_OUT = re.compile(r"취향 ?무시|no-taste")
 # 경로와 스킬, 저장소 이름(/example/uiux, uiux-lab, ui-library-picker)에 든 단어는 화면 작업 요청으로 세지 않는다.
 NAME_TOKEN = re.compile(r"[~\w./-]*[/_-][~\w./-]*")
-# 취향 원장 자체를 말하는 프롬프트는 화면 작업이 아니라 도구 관리다. /taste의 판정은 스킬이 record로 기록한다
+# 취향 원장 자체를 말하는 프롬프트는 화면 작업이 아니라 도구 관리다. /tastepin의 판정은 스킬이 record로 기록한다
 TOOL_MENTION = re.compile(r"\btaste(?:pin)?\b|취향 ?원장", re.I)
 # Claude Code는 백그라운드 서브에이전트 보고, 예약 작업, 다른 세션의 메시지에도 이 훅을 실행하고
 # 출처를 알리는 입력 필드가 없다. 작업 중 대기열로 들어온 작업 알림이 접두어 검사를 지나 주입된 일이
@@ -118,7 +118,7 @@ def is_screen_work(text_without_names, components):
 
 
 def _taste_session(session):
-    """/taste로 취향을 받은 세션. 화면 단어가 없는 짧은 판정("뚝뚝 끊겨요")도 이 세션에서는 판정으로 본다."""
+    """/tastepin으로 취향을 받은 세션. 화면 단어가 없는 짧은 판정("뚝뚝 끊겨요")도 이 세션에서는 판정으로 본다."""
     if not session:
         return False
     return any(d["session"] == session for d in store.load_deliveries())

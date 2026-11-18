@@ -324,7 +324,7 @@ def report(today):
         linted = {r["session"] for r in lints if r["session"]} & applied_sessions
         failed = sum(1 for r in lints if r["fail"])
         lines.append(
-            f"/taste 적용 세션 {len(applied_sessions)}개 중 lint를 돌린 세션 {len(linted)}개, "
+            f"/tastepin 적용 세션 {len(applied_sessions)}개 중 lint를 돌린 세션 {len(linted)}개, "
             f"lint {len(lints)}회 중 실패가 있던 회 {failed}회"
         )
     if current["sessions"] < MIN_SESSIONS:

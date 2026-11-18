@@ -272,7 +272,7 @@ def main(argv=None):
     parser.add_argument("--only", choices=tuple(SCENARIOS), action="append", help="특정 화면 조건만 (여러 번 지정 가능)")
     parser.add_argument("--shots", metavar="DIR", help="조건별 전체 스크린숏을 저장할 폴더")
     parser.add_argument("--json", action="store_true", help="합친 결과를 JSON으로 출력")
-    parser.add_argument("--session", default="", help="/taste로 취향을 받은 세션 id. 적용률을 세는 데 쓴다")
+    parser.add_argument("--session", default="", help="/tastepin으로 취향을 받은 세션 id. 적용률을 세는 데 쓴다")
     parser.add_argument("--no-log", action="store_true", help="state/lint.jsonl에 남기지 않는다")
     args = parser.parse_args(argv)
 

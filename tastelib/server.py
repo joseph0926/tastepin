@@ -221,7 +221,7 @@ def _host_name(value):
 
 def rejection(method, path, headers):
     """다른 사이트의 페이지가 이 서버를 읽거나 쓰지 못하게 막는다. 막을 이유가 없으면 None.
-    판정 원장과 규칙은 /taste 적용 문구로 에이전트 컨텍스트에 들어가므로, 외부 페이지의 쓰기는 지시 주입이 된다."""
+    판정 원장과 규칙은 /tastepin 적용 문구로 에이전트 컨텍스트에 들어가므로, 외부 페이지의 쓰기는 지시 주입이 된다."""
     # DNS rebinding으로 외부 이름이 127.0.0.1을 가리키면 Host가 그 이름으로 온다
     if _host_name(headers.get("Host", "")) not in LOOPBACK_HOSTS:
         return "루프백 주소로만 접속할 수 있습니다"

@@ -365,7 +365,7 @@ function renderTaste() {
       </div>
     </div>`).join("");
   const likedSection = likedRows
-    ? `<h3 class="axis-title">좋아한 패턴</h3><p class="muted liked-lede">칭찬한 판정에서 나온 패턴입니다. 블록과 /taste 적용에 "맞는 자리가 있으면 더 쓴다"로 들어갑니다.</p>${likedRows}`
+    ? `<h3 class="axis-title">좋아한 패턴</h3><p class="muted liked-lede">칭찬한 판정에서 나온 패턴입니다. 블록과 /tastepin 적용에 "맞는 자리가 있으면 더 쓴다"로 들어갑니다.</p>${likedRows}`
     : "";
 
   root.innerHTML = `
@@ -517,7 +517,7 @@ function renderInbox() {
 
   const rows = list.map((v, index) => `
     <article class="verdict ${index === ui.inboxIndex ? "current" : ""}" data-verdict="${esc(v.id)}" data-index="${index}">
-      <div class="info">${shortDate(v.ts)}, ${esc(projectName(v.project))}, ${source[v.source] || "작성기"}${v.origin === "hook" ? " 실시간" : v.origin === "skill" ? " /taste" : ""},
+      <div class="info">${shortDate(v.ts)}, ${esc(projectName(v.project))}, ${source[v.source] || "작성기"}${v.origin === "hook" ? " 실시간" : v.origin === "skill" ? " /tastepin" : ""},
         <button class="text-button" type="button" data-polarity title="칭찬은 규칙 근거로 세지 않습니다. 눌러서 바꾸기">${polarity[v.polarity]}</button></div>
       <div>
         <p class="text">${esc(v.text)}</p>
@@ -637,7 +637,7 @@ function renderFlow() {
 
   const delta = recent - previous;
   const channels = [
-    ["hook", "자동 주입"], ["skill", "/taste 적용"], ["handoff-brief", "요청서"], ["handoff-implement", "구현"],
+    ["hook", "자동 주입"], ["skill", "/tastepin 적용"], ["handoff-brief", "요청서"], ["handoff-implement", "구현"],
     ["handoff-review", "검토"], ["dashboard", "대시보드 복사"], ["manual", "직접 실행"],
   ];
   const recentDeliveries = data.deliveries.filter((d) => now - Date.parse(d.ts) <= 30 * day);
@@ -679,7 +679,7 @@ function renderFlow() {
     </div>
     <div class="flow" style="margin-top:56px">
       <div>
-        <div class="section-head"><div><h2>전달했는데도 나온 지적</h2><p class="lede">자동 주입(10-21까지)이나 /taste 적용으로 규칙을 받은 세션에서 같은 규칙의 지적이 다시 나온 경우입니다. 규칙 문장을 더 구체적으로 고칠 후보입니다.</p></div></div>
+        <div class="section-head"><div><h2>전달했는데도 나온 지적</h2><p class="lede">자동 주입(10-21까지)이나 /tastepin 적용으로 규칙을 받은 세션에서 같은 규칙의 지적이 다시 나온 경우입니다. 규칙 문장을 더 구체적으로 고칠 후보입니다.</p></div></div>
         ${leakRows || `<p class="empty">아직 없습니다. 취향을 전달한 세션부터 집계합니다.</p>`}
       </div>
       <div>
@@ -805,7 +805,7 @@ function renderComponents() {
     <div class="section-head">
       <div>
         <h2>컴포넌트 취향</h2>
-        <p class="lede">labs 시편에서 한 차원만 다른 변형을 비교해 고른 값입니다. /taste로 화면 작업을 시작하면 전역 시편 값과 작업에 나온 컴포넌트의 값이 함께 들어갑니다.</p>
+        <p class="lede">labs 시편에서 한 차원만 다른 변형을 비교해 고른 값입니다. /tastepin으로 화면 작업을 시작하면 전역 시편 값과 작업에 나온 컴포넌트의 값이 함께 들어갑니다.</p>
       </div>
       <div class="button-row">
         <button class="button primary" type="button" data-lab-open="">${pending ? `시편 평가 열기 (${pending})` : "시편 평가 열기"}</button>

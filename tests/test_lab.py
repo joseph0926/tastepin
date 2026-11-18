@@ -136,7 +136,7 @@ class LabTestCase(unittest.TestCase):
         return output.getvalue()
 
     def apply(self, request="", components="", session="s1"):
-        """/taste 적용. 스킬이 실행하는 apply-context의 출력"""
+        """/tastepin 적용. 스킬이 실행하는 apply-context의 출력"""
         argv = ["taste.py", "apply-context", "--request", request, "--session", session]
         if components:
             argv += ["--components", components]

@@ -470,7 +470,7 @@ def undo_judgment(judgment_id):
     return {"undone": judgment_id}
 
 
-# 블록과 /taste 적용 문구가 함께 쓰는 값 문장
+# 블록과 /tastepin 적용 문구가 함께 쓰는 값 문장
 
 def _value_label(dimension, value_id):
     """에이전트에게 보일 값 이름과 설명. 다른 차원이 덮은 숫자나 비교 맥락이 든 spec 대신 쓰도록

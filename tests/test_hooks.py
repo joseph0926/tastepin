@@ -1,6 +1,6 @@
 """훅의 외부 계약과 기록을 임시 원장에서 검사한다. 실제 개인 기록은 사용하지 않는다.
 
-2026-10-22부터 훅은 화면 판정을 원장에 기록만 하고 아무것도 출력하지 않는다. 취향은 /taste(apply-context)가 넣는다.
+2026-10-22부터 훅은 화면 판정을 원장에 기록만 하고 아무것도 출력하지 않는다. 취향은 /tastepin(apply-context)가 넣는다.
 """
 
 import io
@@ -139,7 +139,7 @@ class PromptHookTests(unittest.TestCase):
 
     def test_short_verdict_without_screen_words_counts_only_in_a_taste_session(self):
         self.run_hook(self.copilot_payload("뚝뚝 끊겨요"))
-        self.assertEqual(store.load_verdicts(), [], "화면 단어도 /taste 기록도 없으면 다른 일의 불평일 수 있다")
+        self.assertEqual(store.load_verdicts(), [], "화면 단어도 /tastepin 기록도 없으면 다른 일의 불평일 수 있다")
         self.apply(session="copilot-session")
         self.run_hook(self.copilot_payload("뚝뚝 끊겨요"))
         verdict, = store.load_verdicts()
