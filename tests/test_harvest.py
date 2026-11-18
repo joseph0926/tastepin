@@ -11,7 +11,7 @@ from unittest.mock import patch
 TASTE_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TASTE_ROOT))
 
-from tastelib import effect, harvest
+from tastelib import effect, harvest, store
 
 SINCE = dt.datetime(2000, 1, 1, tzinfo=dt.timezone.utc)
 
@@ -31,6 +31,15 @@ class DesignWordTests(unittest.TestCase):
         lines = codex_raw(texts).splitlines(keepends=True)
         found = harvest.scan_lines(lines, "codex-1", "codex", harvest.new_file_state(), SINCE, lambda text: [])
         return [verdict["text"] for verdict in found]
+
+    def test_automated_session_and_negated_praise(self):
+        texts = ["이 디자인은 마음에 들지 않아요", "이 디자인은 마음에 들어요"]
+        raw = codex_raw(texts)
+        def classify(data):
+            rows = harvest.scan_lines(data.splitlines(keepends=True), "s", "codex", harvest.new_file_state(), SINCE, lambda _: [])
+            return [row["polarity"] for row in rows]
+        self.assertEqual(classify(raw), ["negative", "positive"])
+        self.assertEqual(classify(raw.replace(b'"cli"', b'"exec"')), [])
 
     def test_english_design_words_inside_other_words_do_not_make_a_verdict(self):
         self.assertEqual(self.verdicts(["promotions.json 승격 보고가 어색해요", "emotional 문구가 어색해요"]), [])
@@ -65,6 +74,30 @@ class CompressedHarvestTests(unittest.TestCase):
     def compress(self, original, target, raw):
         target.write_bytes(harvest.zstd.compress(raw))
         original.unlink()
+
+    def test_wider_window_backfills_plain_and_compressed_files(self):
+        raw = codex_raw(["레이아웃이 어색해요"])
+        for suffix in ("", ".zst"):
+            with self.subTest(suffix=suffix):
+                path = self.sessions / ("rollout-window.jsonl" + suffix)
+                path.write_bytes(harvest.zstd.compress(raw) if suffix else raw)
+                cursor = {}
+                recent = dt.datetime(2026, 9, 21, tzinfo=dt.timezone.utc)
+                self.assertEqual(harvest.harvest(cursor, recent, lambda _: [])[0], [])
+                older = harvest.harvest(cursor, SINCE, lambda _: [])[0]
+                self.assertEqual([v["text"] for v in older], ["레이아웃이 어색해요"])
+                self.assertEqual(harvest.harvest(cursor, SINCE, lambda _: [])[0], [])
+                path.unlink()
+
+    def test_existing_file_based_verdict_survives_cursor_upgrade(self):
+        path = self.sessions / "rollout-old.jsonl"
+        text = "레이아웃이 어색해요"
+        path.write_bytes(codex_raw([text]))
+        self.cursor["files"] = {str(path): {"offset": path.stat().st_size, "design_score": 2}}
+        old = {"id": harvest.verdict_id("codex", "rollout-old", text), "text": text,
+               "session": "rollout-old", "status": "ignored"}
+        found, _ = harvest.harvest(self.cursor, SINCE, lambda _: [])
+        self.assertEqual(store.merge_verdicts([old], found), ([old], 0))
 
     def test_record_compressed_after_reading_is_not_harvested_again(self):
         original = self.sessions / "rollout-1.jsonl"
