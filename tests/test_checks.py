@@ -87,7 +87,7 @@ class StopCheckTests(LedgerCase):
 
     def test_claude_ui_edits_do_not_require_browser_lint(self):
         store.log_delivery("skill", session="s1")
-        entries = [user("/taste 설정 화면 만들어줘"), tool("Edit", file_path="/p/src/Settings.tsx"), tool_result()]
+        entries = [user("/tastepin 설정 화면 만들어줘"), tool("Edit", file_path="/p/src/Settings.tsx"), tool_result()]
         before = {p.name: p.read_bytes() for p in self.state.iterdir() if p.is_file()}
         self.assertIsNone(self.run_stop(entries))
         self.assertIsNone(self.run_stop(entries, active=True))
@@ -141,6 +141,20 @@ class LintRecordTests(LedgerCase):
 
 
 class DoctorTests(LedgerCase):
+    def test_checks_personal_skill_against_its_own_source(self):
+        source = self.root / "personal"
+        source.mkdir()
+        (source / "SKILL.md").write_text("personal apply-context", encoding="utf-8")
+        installed = self.root / ".agents/skills/tastepin/SKILL.md"
+        installed.parent.mkdir(parents=True)
+        with patch.object(doctor, "HOME", str(self.root)):
+            self.assertFalse(all(ok for ok, _ in doctor._skill_lines(source)))
+            installed.write_text("personal apply-context", encoding="utf-8")
+            self.assertTrue(all(ok for ok, _ in doctor._skill_lines(source)))
+            self.assertFalse(all(ok for ok, _ in doctor._skill_lines()))
+            installed.write_text("old apply-context", encoding="utf-8")
+            self.assertFalse(all(ok for ok, _ in doctor._skill_lines(source)))
+
     def test_reports_missing_hooks_and_old_skill(self):
         home = self.root / "home"
         (home / ".claude" / "skills" / "taste").mkdir(parents=True)
