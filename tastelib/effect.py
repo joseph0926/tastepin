@@ -63,16 +63,6 @@ def classifier_version():
     return digest.hexdigest()[:10]
 
 
-def _is_tool_session(source, record):
-    """사람이 아니라 도구가 연 세션. 훅도 사람의 요청에만 주입하므로 분모에서 뺀다."""
-    if source == "claude":
-        return str(record.get("entrypoint", "")).startswith("sdk")
-    if record.get("type") != "session_meta":
-        return False
-    payload = record.get("payload") or {}
-    return payload.get("source") == "exec" or payload.get("thread_source") not in (None, "user")
-
-
 def replay_files():
     """수집기와 같은 기록 파일. Codex가 끝난 세션을 압축해 둔 .jsonl.zst도 들어 있다."""
     return harvest.session_files()
@@ -91,14 +81,9 @@ def _first_screen_work(path, source, match_components):
                 record = json.loads(line)
             except ValueError:
                 continue
-            if _is_tool_session(source, record):
+            event = harvest.session_event(source, record, state)
+            if state.get("tool_session"):
                 return None
-            if source == "claude":
-                event = harvest.claude_event(record)
-            else:
-                event = harvest.codex_event(record, state)
-                if state.get("is_subagent"):
-                    return None
             if not event or event[0] != "user":
                 continue
             _, text, ts_raw, cwd = event
@@ -116,7 +101,7 @@ def _first_screen_work(path, source, match_components):
     return None
 
 
-def replay(since, until):
+def replay(since, until, *, require_complete=False):
     """since부터 until까지(현지 날짜) 시작한 화면 작업 세션과, 첫 화면 작업 요청 뒤에 나온 지적을 다시 계산한다.
 
     지적은 수집기 기준(harvest)으로만 센다. 사용자가 원장에서 무시로 분류한 발화는 뺀다. 칭찬은 지적이 아니다.
@@ -129,32 +114,33 @@ def replay(since, until):
     ignored_keys = {store.utterance_key(v) for v in ignored}
     since_utc = dt.datetime.combine(since, dt.time()).astimezone(dt.timezone.utc)
     sessions = []
+    if require_complete and harvest.unreadable_compressed():
+        raise ValueError("압축 기록을 읽을 수 없습니다. compression.zstd를 지원하는 Python으로 다시 실행하세요")
     for path, source in replay_files():
         try:
             if os.stat(path).st_mtime < since_utc.timestamp():
                 continue
             found = _first_screen_work(path, source, match_components)
-        except (*harvest.READ_ERRORS, ValueError):
-            # 지금 쓰는 중이거나 압축이 덜 된 파일은 건너뛴다
-            continue
-        if found is None:
-            continue
-        started, session_id = found
-        screen = ScreenSession(source=source, session=session_id, started=started)
-        if not since <= screen.day <= until:
-            continue
-        file_state = {"offset": 0, "design_score": 0, "last_assistant": ""}
-        try:
+            if found is None:
+                continue
+            started, session_id = found
+            screen = ScreenSession(source=source, session=session_id, started=started)
+            if not since <= screen.day <= until:
+                continue
+            file_state = {"offset": 0, "design_score": 0, "last_assistant": ""}
             with _open_lines(path) as lines:
                 verdicts = harvest.scan_lines(lines, harvest.file_session(path), source, file_state, started, match_symptoms)
-        except (*harvest.READ_ERRORS, ValueError):
+        except (*harvest.READ_ERRORS, ValueError) as error:
+            if require_complete:
+                raise ValueError(f"기준선 계산 중 기록을 읽지 못했습니다: {os.path.basename(path)}") from error
             continue
         for verdict in verdicts:
             if verdict["polarity"] == "positive":
                 continue
             if verdict["id"] in ignored_ids or store.utterance_key(verdict) in ignored_keys:
                 continue
-            screen.complaints.append(verdict)
+            if dt.datetime.fromisoformat(verdict["ts"]).astimezone().date() <= until:
+                screen.complaints.append(verdict)
         sessions.append(screen)
     return sessions
 
@@ -194,16 +180,18 @@ def freeze_baseline(now=None):
     if existing is not None:
         return existing, False
     start, end = baseline_period()
-    sessions = replay(start, end)
+    sessions = replay(start, end, require_complete=True)
     payload = {
         "computed_at": (now or dt.datetime.now(dt.timezone.utc)).isoformat(timespec="seconds"),
         "classifier": classifier_version(),
         "earliest_session": min((s.day for s in sessions), default=start).isoformat(),
         "summary": summarize(sessions, start, end),
     }
-    os.makedirs(os.path.dirname(BASELINE_PATH), exist_ok=True)
-    with open(BASELINE_PATH, "w", encoding="utf-8") as handle:
-        handle.write(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+    with store.ledger_lock():
+        existing = load_baseline()
+        if existing is not None:
+            return existing, False
+        store._write_atomic(BASELINE_PATH, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
     return payload, True
 
 
@@ -221,15 +209,13 @@ def save_baseline_version(reason):
         "classifier": version,
         "reason": reason.strip(),
         "scope": "이 머신의 Claude Code와 Codex 사람 화면 작업, 현재 판별기로 두 구간 재생",
-        "summary": summarize(replay(start, end), start, end),
+        "summary": summarize(replay(start, end, require_complete=True), start, end),
         "previous": load_baseline(),
     }
-    path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        with path.open("x", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
-    except FileExistsError:
-        return path, json.loads(path.read_text(encoding="utf-8")), False
+    with store.ledger_lock():
+        if path.exists():
+            return path, json.loads(path.read_text(encoding="utf-8")), False
+        store._write_atomic(path, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
     return path, payload, True
 
 
@@ -247,21 +233,27 @@ def intervention_segments(start, end):
 
 def repeated_after_delivery(verdicts, deliveries, rules, start, end):
     """같은 세션에서 취향을 전달한 뒤에 그 규칙의 증상이 다시 지적된 판정. 대시보드 흐름 탭과 같은 기준이다."""
-    rules_by_id = {r["id"]: r for r in rules}
-    hook = [d for d in deliveries if d["via"] in CONSUMPTION_VIAS and d["session"]]
+    first_delivery = {}
+    for delivery in deliveries:
+        if delivery["via"] not in CONSUMPTION_VIAS or not delivery["session"]:
+            continue
+        sent = first_delivery.setdefault(delivery["session"], {})
+        when = dt.datetime.fromisoformat(delivery["ts"])
+        for rule_id in delivery["rules"]:
+            sent[rule_id] = min(when, sent.get(rule_id, when))
     found = []
     for verdict in verdicts:
         if verdict["status"] == "ignored" or verdict["polarity"] == "positive":
             continue
-        day = dt.datetime.fromisoformat(verdict["ts"]).astimezone().date()
+        when = dt.datetime.fromisoformat(verdict["ts"])
+        day = when.astimezone().date()
         if not start <= day <= end:
             continue
-        delivery = next((d for d in hook if d["session"] == verdict["session"] and d["ts"] < verdict["ts"]), None)
-        if delivery is None:
-            continue
+        sent = first_delivery.get(verdict["session"], {})
+        symptoms = set(verdict["symptoms"])
         matched = [
-            rules_by_id[rule_id]["title"] for rule_id in delivery["rules"]
-            if rule_id in rules_by_id and set(rules_by_id[rule_id].get("symptoms", [])) & set(verdict["symptoms"])
+            rule["title"] for rule in rules
+            if rule["id"] in sent and sent[rule["id"]] < when and symptoms.intersection(rule.get("symptoms", []))
         ]
         if matched:
             found.append({"verdict": verdict, "rules": matched})

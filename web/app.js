@@ -696,9 +696,11 @@ function deliveredButRepeated() {
   const hookDeliveries = data.deliveries.filter((d) => ["hook", "skill"].includes(d.via) && d.session);
   const results = [];
   data.verdicts.filter(countsAsComplaint).forEach((verdict) => {
-    const delivery = hookDeliveries.find((d) => d.session === verdict.session && d.ts < verdict.ts);
-    if (!delivery) return;
-    const rules = delivery.rules
+    const earlier = hookDeliveries.filter(
+      (d) => d.session === verdict.session && Date.parse(d.ts) < Date.parse(verdict.ts),
+    );
+    const deliveredIds = new Set(earlier.flatMap((delivery) => delivery.rules));
+    const rules = [...deliveredIds]
       .map((id) => ruleById.get(id))
       .filter((rule) => rule && (rule.symptoms || []).some((id) => verdict.symptoms.includes(id)));
     if (rules.length) results.push({ verdict, rules });
