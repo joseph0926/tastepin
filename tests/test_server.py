@@ -6,6 +6,7 @@ import json
 import sys
 import threading
 import unittest
+from unittest.mock import patch
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 
@@ -60,6 +61,18 @@ class RequestGuardTest(unittest.TestCase):
             "Host": "localhost:5173", "Origin": "http://localhost:5173", "Sec-Fetch-Site": "same-origin",
         })
         self.assertEqual(status, 200)
+
+    def test_open_lab_uses_the_listening_dashboard_port(self):
+        with patch.object(server.lab, "ensure_labs_server", return_value="http://127.0.0.1:5182/specimens") as launch:
+            status, result = self.request("POST", "/api/lab/open", {"Content-Type": "application/json"},
+                                          json.dumps({"component": "tabs", "port": 4871}))
+        self.assertEqual(status, 200)
+        launch.assert_called_once_with(self.port)
+        self.assertEqual(result["url"], "http://127.0.0.1:5182/specimens?c=tabs")
+
+    def test_lab_bound_to_a_different_ledger_gets_no_state(self):
+        status, _ = self.request("GET", "/api/lab/state", {"X-Tastepin-Ledger": "previous"})
+        self.assertEqual(status, 403)
 
     def test_rebound_host_is_rejected(self):
         status, _ = self.request("GET", "/api/state", {"Host": f"attacker.example:{self.port}"})

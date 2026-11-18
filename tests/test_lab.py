@@ -147,6 +147,30 @@ class LabTestCase(unittest.TestCase):
 
 
 class PreferenceTests(LabTestCase):
+    def test_retry_returns_one_judgment_and_a_distinct_choice_is_counted(self):
+        body = {"component": "tabs", "dimension": "indicator", "options": ["pill", "weight"],
+                "choice": "pill", "outcome": "chose", "request_id": "selection-001"}
+        original = taste.server._judge(body)["judgment"]
+        self.assertEqual(taste.server._judge(body)["judgment"], original)
+        with self.assertRaises(ValueError):
+            taste.server._judge({**body, "choice": "weight"})
+        taste.server._judge({**body, "request_id": "selection-002"})
+        self.assertEqual(len(lab.load_judgments()), 2)
+
+    def test_removed_choice_is_absent_from_applied_preferences(self):
+        for _ in range(2):
+            self.judge("indicator", "chose", "pill")
+        catalog = lab.load_catalog()
+        component = catalog["components"][0]
+        values = component["dimensions"][0]["values"]
+        values[:] = [v for v in values if v["id"] != "pill"]
+        self.write_catalog(catalog)
+        pref = lab.component_preferences(component, lab.load_judgments())["indicator"]
+        self.assertEqual(pref["status"], "미평가")
+        self.assertNotEqual(pref["value"], "pill")
+        self.assertNotIn("선택 표시: pill", self.apply(components="tabs"))
+        self.assertEqual(len(lab.load_judgments()), 2)
+
     def status(self, dimension="indicator"):
         return self.tabs_state()["preferences"][dimension]
 
