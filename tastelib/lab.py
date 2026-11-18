@@ -22,11 +22,13 @@
 """
 
 import datetime as dt
+import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
+import threading
 import time
 import urllib.request
 
@@ -36,9 +38,12 @@ HOME = os.path.expanduser("~")
 LABS_DIR = os.environ.get("TASTE_LABS_DIR", os.path.join(store.ROOT, "lab"))
 CATALOG_RELATIVE = os.path.join("src", "specimens", "catalog.json")
 JUDGMENTS_PATH = os.path.join(store.STATE_DIR, "judgments.jsonl")
+DEFAULT_API_PORT = 4871
 LABS_PORT = 5181
+_labs_start_lock = threading.Lock()
 LABS_PID_PATH = os.path.join(store.STATE_DIR, "labs.pid")
 LABS_LOG_PATH = os.path.join(store.STATE_DIR, "labs.log")
+LEDGER_ID = hashlib.sha256(os.fsencode(os.path.realpath(store.DATA_ROOT))).hexdigest()
 LAB_COMMAND = store.CLI + " lab"
 
 OUTCOMES = ("chose", "same", "none")
@@ -51,9 +56,14 @@ DEMAND_DAYS = 14
 DORMANT_DAYS = 30
 
 
-def labs_url(component=""):
+def labs_port(api_port):
+    # 기본 포트 쌍의 간격을 유지하고, 상한을 넘으면 일반 포트 범위 안으로 돌린다.
+    return 1024 + (api_port - 1024 + LABS_PORT - DEFAULT_API_PORT) % (65536 - 1024)
+
+
+def labs_url(component="", api_port=DEFAULT_API_PORT):
     query = f"?c={component}" if component else ""
-    return f"http://127.0.0.1:{LABS_PORT}/specimens{query}"
+    return f"http://127.0.0.1:{labs_port(api_port)}/specimens{query}"
 
 
 def catalog_path():
@@ -148,6 +158,11 @@ def dimension_preference(dimension, judgments):
         fresh = [v for v in values if v not in judgments[rejected_at]["options"]]
         if len(fresh) >= 2:
             offer, considered = fresh[:3], judgments[rejected_at + 1:]
+    # 사라진 값을 고른 뒤에는 현재 선택지로 다시 판정한 기록만 센다.
+    for index in range(len(considered) - 1, -1, -1):
+        if considered[index]["outcome"] == "chose" and considered[index]["choice"] not in values:
+            considered = considered[index + 1:]
+            break
     decisive = [j for j in considered if j["outcome"] == "chose"]
     same = sum(1 for j in considered if j["outcome"] == "same")
     value = decisive[-1]["choice"] if decisive else offer[0]
@@ -337,7 +352,7 @@ def component_demand(component_id, deliveries, verdicts, days=DEMAND_DAYS):
     return mentioned + judged
 
 
-def lab_state(requested="", view=None):
+def lab_state(requested="", view=None, api_port=DEFAULT_API_PORT):
     """평가 화면과 대시보드가 쓰는 전체 상태. 다음 비교 목록은 우선순위 순서다.
     view(평가 화면의 테마와 폭)를 주면 요청한 컴포넌트의 기준 비교가 끝난 뒤 그 조건의 재확인을 묻는다."""
     view = _view(view)
@@ -377,7 +392,7 @@ def lab_state(requested="", view=None):
         "components": components,
         "queue": [c["next"] for c in ranked],
         "judgments": judgments[-50:],
-        "labs_url": labs_url(),
+        "labs_url": labs_url(api_port=api_port),
     }
 
 
@@ -394,6 +409,18 @@ def _clean_conditions(raw):
 
 def record_judgment(body):
     """평가 화면에서 보낸 판정 하나를 카탈로그와 대조해 검증한 뒤 기록한다."""
+    judgments = load_judgments()
+    request_id = body.get("request_id")
+    if request_id is not None:
+        if not isinstance(request_id, str) or not re.fullmatch(r"[a-zA-Z0-9-]{8,80}", request_id):
+            raise ValueError("평가 요청 번호가 올바르지 않습니다")
+        request = {k: v for k, v in body.items() if k != "requested"}
+        fingerprint = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()
+        previous = _find(judgments, request_id)
+        if previous is not None:
+            if previous.get("request_hash") != fingerprint:
+                raise ValueError("이미 처리된 평가입니다. 화면을 다시 읽어 저장 결과를 확인하세요")
+            return previous
     catalog = load_catalog()
     component = _find(catalog["components"], body.get("component"))
     if component is None:
@@ -413,7 +440,7 @@ def record_judgment(body):
         raise ValueError("고른 값이 비교한 값에 없습니다")
     shown = [str(option) for option in body.get("shown", options)]
     judgment = {
-        "id": os.urandom(6).hex(),
+        "id": request_id or os.urandom(6).hex(),
         "ts": _now(),
         "component": component["id"],
         "dimension": dimension["id"],
@@ -427,7 +454,8 @@ def record_judgment(body):
         # 카탈로그 문장이 나중에 바뀌어도 당시 무엇을 비교했는지 남긴다
         "specs": {option: values[option]["spec"] for option in options},
     }
-    judgments = load_judgments()
+    if request_id is not None:
+        judgment["request_hash"] = fingerprint
     judgments.append(judgment)
     _save_judgments(judgments)
     return judgment
@@ -531,10 +559,14 @@ def _file_time(path):
 
 # labs 개발 서버
 
-def _labs_running():
+def _labs_running(api_port):
     try:
-        with urllib.request.urlopen(f"http://127.0.0.1:{LABS_PORT}/tastepin/ping", timeout=0.5) as response:
-            return json.load(response).get("root") == os.path.realpath(LABS_DIR)
+        with urllib.request.urlopen(f"http://127.0.0.1:{labs_port(api_port)}/tastepin/ping", timeout=0.5) as response:
+            identity = json.load(response)
+            return (
+                identity.get("root") == os.path.realpath(LABS_DIR)
+                and identity.get("apiPort") == api_port and identity.get("ledger") == LEDGER_ID
+            )
     except (OSError, ValueError, AttributeError):
         return False
 
@@ -551,10 +583,14 @@ def _pnpm():
     raise FileNotFoundError("pnpm이 필요합니다. pnpm을 설치하거나 Corepack을 준비하세요. README의 설치 조건을 확인하세요.")
 
 
-def ensure_labs_server():
-    """labs 시편 화면을 고정 포트에 띄운다. 이미 떠 있으면 그대로 쓴다."""
-    if _labs_running():
-        return labs_url()
+def ensure_labs_server(api_port=DEFAULT_API_PORT):
+    with _labs_start_lock:
+        return _ensure_labs_server(api_port)
+
+
+def _ensure_labs_server(api_port):
+    if _labs_running(api_port):
+        return labs_url(api_port=api_port)
     if not os.path.exists(catalog_path()):
         raise FileNotFoundError(f"labs 시편 카탈로그가 없습니다: {catalog_path()}")
     pnpm = _pnpm()
@@ -563,17 +599,23 @@ def ensure_labs_server():
         if not os.path.isdir(os.path.join(LABS_DIR, "node_modules")):
             raise FileNotFoundError("lab 의존성이 없습니다. lab/에서 pnpm install --frozen-lockfile을 먼저 실행하세요.")
         process = subprocess.Popen(
-            [*pnpm, "exec", "vite", "--host", "127.0.0.1", "--port", str(LABS_PORT), "--strictPort"],
+            [*pnpm, "exec", "vite", "--host", "127.0.0.1", "--port", str(labs_port(api_port)), "--strictPort"],
             cwd=LABS_DIR,
+            env={
+                **os.environ, "TASTEPIN_API_PORT": str(api_port), "TASTEPIN_LEDGER_ID": LEDGER_ID,
+                "TASTEPIN_OPEN_COMMAND": f"{store.CLI} open --port {api_port} --no-browser",
+            },
             stdout=log,
             stderr=log,
             start_new_session=True,
         )
-    with open(LABS_PID_PATH, "w") as handle:
-        handle.write(str(process.pid))
+    pid_path = LABS_PID_PATH if api_port == DEFAULT_API_PORT else os.path.join(store.STATE_DIR, f"labs-{api_port}.pid")
     for _ in range(100):
-        if _labs_running():
-            return labs_url()
+        if _labs_running(api_port):
+            if process.poll() is None:
+                with open(pid_path, "w") as handle:
+                    handle.write(str(process.pid))
+            return labs_url(api_port=api_port)
         if process.poll() is not None:
             break
         time.sleep(0.1)

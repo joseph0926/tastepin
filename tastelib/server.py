@@ -9,7 +9,7 @@ import subprocess
 import threading
 import uuid
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
 
 from . import harvest, lab, store, studies
 
@@ -170,27 +170,27 @@ def _export():
     return {"path": path}
 
 
-def _judge(body):
+def _judge(body, api_port=lab.DEFAULT_API_PORT):
     with store.ledger_lock():
         judgment = lab.record_judgment(body)
     # 판정한 조건이 곧 평가 화면이 보고 있는 조건이다
-    return {"judgment": judgment, "state": lab.lab_state(str(body.get("requested", "")), body.get("conditions"))}
+    return {"judgment": judgment, "state": lab.lab_state(str(body.get("requested", "")), body.get("conditions"), api_port)}
 
 
-def _undo(body):
+def _undo(body, api_port=lab.DEFAULT_API_PORT):
     with store.ledger_lock():
         lab.undo_judgment(body.get("id"))
-    return {"state": lab.lab_state(str(body.get("requested", "")), body.get("view"))}
+    return {"state": lab.lab_state(str(body.get("requested", "")), body.get("view"), api_port)}
 
 
-def _open_lab(body):
+def _open_lab(body, api_port):
     """대시보드의 평가 열기 버튼. labs 개발 서버를 띄우고 열 주소를 돌려준다."""
     try:
-        url = lab.ensure_labs_server()
+        url = lab.ensure_labs_server(api_port)
     except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
         raise ValueError(str(error)) from error
     component = str(body.get("component", ""))
-    return {"url": url + (f"?c={component}" if component else "")}
+    return {"url": url + ("?" + urlencode({"c": component}) if component else "")}
 
 
 def _study_event(body):
@@ -225,6 +225,8 @@ def rejection(method, path, headers):
     # DNS rebinding으로 외부 이름이 127.0.0.1을 가리키면 Host가 그 이름으로 온다
     if _host_name(headers.get("Host", "")) not in LOOPBACK_HOSTS:
         return "루프백 주소로만 접속할 수 있습니다"
+    if headers.get("X-Tastepin-Ledger", lab.LEDGER_ID) != lab.LEDGER_ID:
+        return "이 평가 화면에 연결된 원장이 바뀌었습니다. 대시보드에서 다시 여세요"
     if not path.startswith("/api/"):
         return None
     # 브라우저가 보낸 요청에만 있다. CLI와 ping처럼 브라우저 밖 요청은 헤더가 없어 그대로 둔다
@@ -299,7 +301,7 @@ class Handler(SimpleHTTPRequestHandler):
             requested = query.get("c", [""])[0]
             view = {"theme": query.get("theme", [""])[0], "frame": query.get("frame", [""])[0]}
             try:
-                return self._send_json(200, lab.lab_state(requested, view))
+                return self._send_json(200, lab.lab_state(requested, view, self.server.server_port))
             except ValueError as error:
                 return self._send_json(400, {"error": str(error)})
         if url.path == "/api/block":
@@ -320,6 +322,8 @@ class Handler(SimpleHTTPRequestHandler):
             body = json.loads(self.rfile.read(length) or b"{}")
             if not isinstance(body, dict):
                 raise TypeError("본문은 JSON 객체여야 합니다")
+            if route in (_open_lab, _judge, _undo):
+                return self._send_json(200, route(body, self.server.server_port))
             return self._send_json(200, route(body))
         except (ValueError, LookupError, TypeError) as error:
             return self._send_json(400, {"error": str(error)})

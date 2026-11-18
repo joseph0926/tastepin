@@ -38,7 +38,7 @@ const LETTERS = ["A", "B", "C"];
 const SLOW_FACTOR = 4;
 const DEMO_ROUNDS = 2;
 const VIEW_KEY = "tastepin-specimen-view";
-const TASTE_OPEN_COMMAND = "python3 -B taste.py open --no-browser";
+declare const __TASTE_OPEN_COMMAND__: string;
 
 type Phase =
   | { kind: "choose" }
@@ -520,16 +520,15 @@ function Offline({
     <div className="lab-summary">
       <h1>취향 원장 서버에 연결하지 못했어요</h1>
       <p>
-        {message}. 평가는 취향 원장 서버(127.0.0.1:4871)에 저장됩니다. 아래
-        명령으로 띄운 뒤 다시 시도하세요.
+        {message}. 아래 명령으로 이 평가 화면에 연결된 원장을 열고 다시 시도하세요.
       </p>
       <div className="lab-command">
-        <code>{TASTE_OPEN_COMMAND}</code>
+        <code>{__TASTE_OPEN_COMMAND__}</code>
         <button
           type="button"
           className="lab-text-button"
           onClick={() => {
-            navigator.clipboard?.writeText(TASTE_OPEN_COMMAND).then(
+            navigator.clipboard?.writeText(__TASTE_OPEN_COMMAND__).then(
               () => setCopied(true),
               () => setCopied(false),
             );
@@ -555,6 +554,7 @@ export default function SpecimenLab() {
   const [phase, setPhase] = useState<Phase>({ kind: "choose" });
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
+  const pendingJudgment = useRef<{ comparison: string; id: string } | null>(null);
   const [view, setView] = useState<View>(readView);
   const [demo, setDemo] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -666,7 +666,11 @@ export default function SpecimenLab() {
       if (!comparison || saving) return;
       setSaving(true);
       try {
+        if (pendingJudgment.current?.comparison !== comparisonKey) {
+          pendingJudgment.current = { comparison: comparisonKey, id: crypto.randomUUID() };
+        }
         const result = await sendJudgment({
+          request_id: pendingJudgment.current.id,
           comparison,
           shown,
           outcome,
@@ -675,7 +679,8 @@ export default function SpecimenLab() {
           conditions,
           requested,
         });
-        setSavedIds((ids) => [...ids, result.judgment.id]);
+        pendingJudgment.current = null;
+        setSavedIds((ids) => ids.includes(result.judgment.id) ? ids : [...ids, result.judgment.id]);
         setState(result.state);
         setToast(
           outcome === "same" ? "차이 없음으로 저장했어요" : "저장했어요",
@@ -688,7 +693,7 @@ export default function SpecimenLab() {
         setSaving(false);
       }
     },
-    [comparison, saving, shown, conditions, requested],
+    [comparison, comparisonKey, saving, shown, conditions, requested],
   );
 
   const undo = useCallback(async () => {

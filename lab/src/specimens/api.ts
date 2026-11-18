@@ -1,6 +1,5 @@
 import type { Comparison, Conditions, LabState, Outcome } from "./types";
 
-// vite.config.ts가 /taste-api를 취향 원장 서버(127.0.0.1:4870)의 /api로 넘긴다
 const BASE = "/taste-api/lab";
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
@@ -30,6 +29,7 @@ export function fetchState(requested: string, view: View) {
 }
 
 export interface JudgmentInput {
+  request_id: string;
   comparison: Comparison;
   shown: string[];
   outcome: Outcome;

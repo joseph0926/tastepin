@@ -25,6 +25,7 @@
 import argparse
 import collections
 import datetime
+import glob
 import json
 import os
 import shutil
@@ -37,7 +38,7 @@ import webbrowser
 
 from tastelib import lab, server, store
 
-DEFAULT_PORT = 4871
+DEFAULT_PORT = lab.DEFAULT_API_PORT
 PID_PATH = os.path.join(store.STATE_DIR, "server.pid")
 LOG_PATH = os.path.join(store.STATE_DIR, "server.log")
 # 훅 오류는 프롬프트를 막지 않으려고 출력하지 않으므로, status가 보여 줄 수 있게 시각과 함께 따로 남긴다
@@ -210,6 +211,8 @@ def _stop_pid(pid_path, name, marker):
 def cmd_stop(args):
     _stop_pid(PID_PATH, "대시보드 서버", SERVER_MARKER)
     _stop_pid(lab.LABS_PID_PATH, "labs 개발 서버", "vite")
+    for path in glob.glob(os.path.join(store.STATE_DIR, "labs-[0-9]*.pid")):
+        _stop_pid(path, "labs 개발 서버", "vite")
 
 
 def cmd_lab(args):
@@ -588,12 +591,18 @@ def cmd_effect(args):
     effect.INTRODUCED = since
     effect.INTERVENTIONS = ((since, label), *changes)
     if args.freeze:
-        baseline, created = effect.freeze_baseline()
+        try:
+            baseline, created = effect.freeze_baseline()
+        except ValueError as error:
+            sys.exit(str(error))
         summary = baseline["summary"]
         state = "고정했습니다" if created else "이미 고정돼 있어 그대로 둡니다"
         print(f"기준선 {summary['start']} ~ {summary['end']}을 {state}: {effect.BASELINE_PATH}")
     if args.save_version:
-        path, _, created = effect.save_baseline_version(args.save_version)
+        try:
+            path, _, created = effect.save_baseline_version(args.save_version)
+        except ValueError as error:
+            sys.exit(str(error))
         print(f"기준선 버전 {'저장' if created else '기존 보존'}: {path}")
     print(effect.report(datetime.datetime.now().astimezone().date()))
 
