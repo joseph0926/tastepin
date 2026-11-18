@@ -131,6 +131,25 @@ class ReplayTests(unittest.TestCase):
         self.write_catalog(["모달"], dimension_label="바뀐 설명")
         self.assertEqual(effect.classifier_version(), first, "별칭이 아닌 시편 설명은 판정 기준이 아니다")
 
+    @unittest.skipIf(effect.zstd is None, "compression.zstd가 없는 Python")
+    def test_failed_replay_can_be_repaired_before_freezing(self):
+        path = self.root / "codex" / "partial.jsonl.zst"
+        path.write_bytes(b"incomplete")
+        with self.assertRaises(ValueError):
+            effect.freeze_baseline()
+        self.assertFalse(Path(effect.BASELINE_PATH).exists())
+        lines = codex_lines("s", ["레이아웃 디자인을 다시 잡아줘"], "2026-09-20T00:00:00Z")
+        path.write_bytes(effect.zstd.compress(b"".join((json.dumps(row) + "\n").encode() for row in lines)))
+        self.assertEqual(effect.freeze_baseline()[0]["summary"]["sessions"], 1)
+
+    def test_baseline_ends_before_later_feedback_in_the_same_session(self):
+        self.write_claude("crossing", [
+            claude_line("user", "랜딩 페이지 디자인을 만들어줘", "2026-09-29T00:00:00Z"),
+            claude_line("user", "색상이 어색해요", "2026-10-02T00:00:00Z"),
+            claude_line("user", "색상이 촌스러워요", "2026-10-04T00:00:00Z"),
+        ])
+        self.assertEqual(effect.freeze_baseline()[0]["summary"]["complaints"], 1)
+
     def test_frozen_baseline_is_not_overwritten(self):
         self.write_claude("screen", [claude_line("user", "랜딩 페이지 디자인을 만들어줘", "2026-09-10T00:01:00Z")])
         first, created = effect.freeze_baseline()
@@ -162,6 +181,8 @@ class RepeatedAfterDeliveryTests(unittest.TestCase):
     def test_only_complaints_matching_a_delivered_rule_in_the_same_session_count(self):
         rules = [{"id": "motion", "title": "연속된 전환", "symptoms": ["motion-swap"]}]
         deliveries = [{"ts": "2026-10-05T00:00:00+00:00", "via": "hook", "session": "s", "rules": ["motion"]}]
+
+        deliveries = [{**deliveries[0], "rules": []}, *deliveries, *deliveries]
 
         def verdict(text, symptoms, ts="2026-10-05T01:00:00+00:00", session="s", **extra):
             return {"ts": ts, "session": session, "text": text, "symptoms": symptoms,
