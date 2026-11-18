@@ -12,6 +12,8 @@
 import datetime as dt
 import json
 import os
+import re
+from pathlib import Path
 
 from . import context, lab, store, tokens
 
@@ -169,25 +171,38 @@ def apply(repo, study_id=None):
         with open(path, "wb") as handle:
             handle.write(data)
         written.append(path)
-    _remember(repo)
+    _remember(repo, study_id)
     return repo, written, warnings
 
 
-def _remember(repo):
+def _remember(repo, study_id):
     """doctor가 사본이 낡았는지 다시 볼 수 있게 적용한 저장소를 남긴다."""
+    with store.ledger_lock():
+        applied = applied_projects()
+        applied[repo.replace(lab.HOME, "~")] = {
+            "updated": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"), "study": study_id,
+        }
+        store._write_atomic(APPLIED_PATH, json.dumps(applied, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+
+
+def applied_study(repo, record):
+    if isinstance(record, dict):
+        return record.get("study")
+    # 이전 적용 기록에는 시각만 있어 당시 생성한 지침의 참조를 읽는다.
+    agent = Path(repo) / ".taste" / "AGENT.md"
+    if not agent.is_file():
+        return None
+    match = re.search(r"^이번 화면에 지정한 채택 시안은 `\.taste/studies/([a-z0-9-]+)/AGENT\.md`", agent.read_text(encoding="utf-8"), re.M)
+    return match.group(1) if match else None
+
+
+def applied_projects():
     try:
         with open(APPLIED_PATH, encoding="utf-8") as handle:
-            applied = json.load(handle)
+            return json.load(handle)
     except (OSError, ValueError):
-        applied = {}
-    applied[repo.replace(lab.HOME, "~")] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
-    os.makedirs(store.STATE_DIR, exist_ok=True)
-    store._write_atomic(APPLIED_PATH, json.dumps(applied, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
+        return {}
 
 
 def applied_repos():
-    try:
-        with open(APPLIED_PATH, encoding="utf-8") as handle:
-            return sorted(json.load(handle))
-    except (OSError, ValueError):
-        return []
+    return sorted(applied_projects())

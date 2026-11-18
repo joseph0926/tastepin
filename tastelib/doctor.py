@@ -63,18 +63,20 @@ def _ledger_lines():
 
 def _repo_lines():
     results = []
-    for path in repo.applied_repos():
+    for path, record in sorted(repo.applied_projects().items()):
         full = os.path.expanduser(path)
         if not os.path.isdir(full):
             results.append((True, f"{path}: 이 머신에 없음(다른 머신에서 적용)"))
             continue
         try:
-            _, expected, _ = repo.plan(full)
+            study = repo.applied_study(full, record)
+            _, expected, _ = repo.plan(full, study)
             changed = repo.stale(expected)
-        except ValueError as error:
+        except (OSError, ValueError) as error:
             results.append((False, f"{path}: 확인하지 못함({error})"))
             continue
-        hint = f". `taste.py apply {path}`" if changed else ""
+        option = f" --study {study}" if study else ""
+        hint = f". `{store.CLI} apply {store.shell_path(full)}{option}`" if changed else ""
         results.append((not changed, f"{path}: 취향 사본 " + (f"{len(changed)}개 파일이 낡음{hint}" if changed else "최신")))
     return results
 
