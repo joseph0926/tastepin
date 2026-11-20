@@ -1,0 +1,236 @@
+.pg {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  min-height: 320px;
+  color: var(--sp-text);
+  font-size: 13px;
+}
+
+.pg-mosaic {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 4px;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.pg-mosaic .pg-cell:first-child {
+  grid-row: span 2;
+}
+
+.pg-cell,
+.pg-thumb {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--sp-surface-2);
+}
+
+.pg-main {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--sp-surface-2);
+}
+
+.pg-carousel {
+  height: 240px;
+}
+
+.pg-strip {
+  display: grid;
+  gap: 6px;
+}
+
+.pg-thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.pg-thumb {
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+}
+
+.pg-thumb button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.pg-thumb button[aria-pressed="true"] {
+  outline: 2px solid var(--sp-text);
+  outline-offset: -2px;
+  opacity: 1;
+}
+
+.pg-thumb button:hover {
+  opacity: 1;
+}
+
+.pg-more-overlay {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(0 0 0 / 50%);
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pg-more-overlay:hover {
+  background: rgb(0 0 0 / 60%);
+}
+
+.pg-all-button {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #1b1d22;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1b1d22;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pg-arrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  color: #1b1d22;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.pg-arrow.is-prev {
+  left: 10px;
+}
+
+.pg-arrow.is-next {
+  right: 10px;
+}
+
+.pg-arrow:disabled {
+  visibility: hidden;
+}
+
+.pg-count {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 55%);
+  color: #ffffff;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 사진 아래 이어지는 숙소 이름과 설명 자리 */
+.pg-body {
+  display: grid;
+  gap: 8px;
+}
+
+.pg-body span {
+  height: 14px;
+  border-radius: 4px;
+  background: var(--sp-surface-2);
+}
+
+.pg-body span:first-child {
+  width: 55%;
+  height: 20px;
+}
+
+.pg-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-radius: 8px;
+  background: var(--sp-surface);
+  box-shadow: var(--sp-overlay-shadow);
+}
+
+.pg-sheet header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 8px 0 16px;
+  border-bottom: 1px solid var(--sp-line);
+}
+
+.pg-sheet header button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+}
+
+.pg-sheet header button:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.pg-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  min-height: 0;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.pg-sheet-cell {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.pg-thumb button:focus-visible,
+.pg-more-overlay:focus-visible,
+.pg-all-button:focus-visible,
+.pg-arrow:focus-visible,
+.pg-sheet header button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}

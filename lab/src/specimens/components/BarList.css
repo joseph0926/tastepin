@@ -1,0 +1,266 @@
+.bl-card {
+  --bl-row: 32px;
+  --bl-gap: 2px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--sp-line);
+  border-radius: 8px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bl-card[data-bar="under"] {
+  --bl-row: 40px;
+}
+
+.bl-card[data-bar="none"] {
+  --bl-gap: 0px;
+}
+
+.bl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--sp-line);
+}
+
+.bl-unit {
+  flex-shrink: 0;
+  color: var(--sp-muted);
+  font-size: 12px;
+}
+
+.bl-tabs {
+  display: flex;
+  align-self: stretch;
+  gap: 16px;
+  min-width: 0;
+}
+
+.bl-tab {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bl-tab:hover,
+.bl-tab[aria-selected="true"] {
+  color: var(--sp-text);
+}
+
+.bl-tabs .bl-tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: var(--sp-text);
+}
+
+.bl-segments {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 6px;
+  background: var(--sp-surface-2);
+}
+
+.bl-segments .bl-tab {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.bl-segments .bl-tab[aria-selected="true"] {
+  background: var(--sp-surface);
+  box-shadow: 0 0 0 1px var(--sp-line);
+}
+
+.bl-tab:focus-visible,
+.bl-select:focus-within,
+.bl-more:focus-visible,
+.bl-footer:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.bl-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  color: var(--sp-text);
+}
+
+.bl-select select {
+  appearance: none;
+  padding: 0 20px 0 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bl-select select:focus {
+  outline: none;
+}
+
+.bl-select svg {
+  position: absolute;
+  right: 2px;
+  color: var(--sp-muted);
+  pointer-events: none;
+}
+
+.bl-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.bl-body {
+  position: relative;
+  padding: 8px;
+}
+
+.bl-card[data-more="scroll"] .bl-scroll {
+  max-height: calc(var(--bl-row) * 6 + var(--bl-gap) * 5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.bl-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bl-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bl-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: var(--bl-row);
+  padding: 0 10px;
+}
+
+.bl-row[data-faded] {
+  opacity: 0.35;
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+.bl-name {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--sp-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bl-value {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bl-bar {
+  position: absolute;
+  left: 0;
+}
+
+.bl-card[data-bar="behind"] .bl-bar {
+  inset-block: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--sp-text) 7%, transparent);
+}
+
+.bl-card[data-bar="under"] .bl-bar {
+  bottom: 6px;
+  left: 10px;
+  max-width: calc(100% - 20px);
+  height: 3px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--sp-chart) 55%, transparent);
+}
+
+.bl-card[data-bar="under"] .bl-row {
+  align-items: flex-start;
+  padding-top: 7px;
+}
+
+.bl-card[data-bar="none"] .bl-row + .bl-row {
+  border-top: 1px solid var(--sp-line);
+}
+
+.bl-more-over {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.bl-more-after {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.bl-more {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bl-more:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.bl-footer {
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-top: 1px solid var(--sp-line);
+  border-radius: 0 0 7px 7px;
+  background: none;
+  color: var(--sp-secondary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bl-footer:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}

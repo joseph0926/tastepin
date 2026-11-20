@@ -2,6 +2,8 @@ import type { ComponentType } from "react";
 import Assistant from "./components/Assistant";
 import ArticleAside from "./components/ArticleAside";
 import Badge from "./components/Badge";
+import BarList from "./components/BarList";
+import BookingBox from "./components/BookingBox";
 import Button from "./components/Button";
 import Confirm from "./components/Confirm";
 import CodeBlock from "./components/CodeBlock";
@@ -24,8 +26,10 @@ import ListDetail from "./components/ListDetail";
 import Loading from "./components/Loading";
 import LongFormDialog from "./components/LongFormDialog";
 import Menu from "./components/Menu";
+import MetricTabs from "./components/MetricTabs";
 import ManyOptions from "./components/ManyOptions";
 import ManyFilters from "./components/ManyFilters";
+import MapList from "./components/MapList";
 import MobileDialog from "./components/MobileDialog";
 import MobileForm from "./components/MobileForm";
 import MobilePage from "./components/MobilePage";
@@ -37,9 +41,13 @@ import MotionSpring from "./components/MotionSpring";
 import MotionSwap from "./components/MotionSwap";
 import Nav from "./components/Nav";
 import Notice from "./components/Notice";
+import PageHead from "./components/PageHead";
 import PageWidth from "./components/PageWidth";
+import PhotoCard from "./components/PhotoCard";
+import PhotoGrid from "./components/PhotoGrid";
 import Reading, { BlogReading } from "./components/Reading";
 import QuestionDial from "./components/QuestionDial";
+import RangePicker from "./components/RangePicker";
 import Refresh from "./components/Refresh";
 import RapidTabs from "./components/RapidTabs";
 import Reorder from "./components/Reorder";
@@ -219,4 +227,20 @@ export const specimens: Record<string, SpecimenEntry> = {
     demoInterval: 1300,
     demoSteps: 3,
   },
+  // 지표 칸을 차례로 고른다
+  metrictabs: { Component: MetricTabs, demoInterval: 1200, demoSteps: 3 },
+  // 기준마다 바꾸기, 펼치기, 접기
+  barlist: { Component: BarList, demoInterval: 1100, demoSteps: 6 },
+  // 조건 더하기, 기간 바꾸기, 처음으로
+  pagehead: { Component: PageHead, demoInterval: 1100, demoSteps: 3 },
+  // 사진 넘기기 두 번, 찜하기, 처음으로
+  photocard: { Component: PhotoCard, demoInterval: 1000, demoSteps: 4 },
+  // 사진 넘기기, 모두 보기, 닫기
+  photogrid: { Component: PhotoGrid, demoInterval: 1300, demoSteps: 3 },
+  // 반쯤 내리기, 끝까지 내리기, 맨 위로
+  bookingbox: { Component: BookingBox, demoInterval: 1400, demoSteps: 3 },
+  // 카드에 올리기, 묶인 숙소 카드에 올리기, 묶음이나 마커 누르기, 처음으로
+  maplist: { Component: MapList, demoInterval: 1300, demoSteps: 4 },
+  // 체크인 고르기, 체크아웃 후보에 올리기, 체크아웃 고르기, 처음으로
+  rangepicker: { Component: RangePicker, demoInterval: 1100, demoSteps: 4 },
 };

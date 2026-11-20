@@ -1,0 +1,196 @@
+.pgh {
+  --pgh-live: #1f7a4d;
+  display: grid;
+  min-width: 0;
+  border: 1px solid var(--sp-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--sp-page);
+  color: var(--sp-text);
+  font-size: 13px;
+}
+
+.lab[data-theme="dark"] .pgh {
+  --pgh-live: #7fd3a6;
+}
+
+.pgh-trail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--sp-line);
+  color: var(--sp-muted);
+  white-space: nowrap;
+}
+
+.pgh-trail svg {
+  flex-shrink: 0;
+}
+
+.pgh-trail [aria-current] {
+  overflow: hidden;
+  color: var(--sp-text);
+  text-overflow: ellipsis;
+}
+
+.pgh-main {
+  display: grid;
+  gap: 14px;
+  padding: 20px 16px 0;
+}
+
+.pgh-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pgh-title {
+  min-width: 0;
+}
+
+.pgh-title h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+.pgh-parent {
+  margin-right: 6px;
+  color: var(--sp-muted);
+  font-weight: 500;
+}
+
+.pgh-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  color: var(--sp-muted);
+}
+
+.pgh-live {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pgh-live);
+}
+
+.pgh-tools,
+.pgh-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 칩이 늘어 줄이 넘쳐도 기간 선택은 오른쪽 끝에 남긴다 */
+.pgh-filter-row .pgh-period {
+  margin-left: auto;
+}
+
+.pgh-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pgh-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  padding: 0 4px 0 10px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pgh-chip button {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--sp-muted);
+  cursor: pointer;
+}
+
+.pgh-chip button:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.pgh-button,
+.pgh-period select {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pgh-button:hover:not(:disabled),
+.pgh-period select:hover {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.pgh-button:disabled {
+  color: var(--sp-muted);
+  cursor: default;
+  opacity: 0.6;
+}
+
+.pgh-chip button:focus-visible,
+.pgh-button:focus-visible,
+.pgh-period select:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.pgh-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 머리 아래에 이어지는 지표 카드 자리. 머리와 본문의 간격만 보여 준다 */
+.pgh-content {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 16px 16px 20px;
+}
+
+.pgh-content span {
+  height: 56px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+}

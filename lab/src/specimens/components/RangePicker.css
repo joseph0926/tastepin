@@ -1,0 +1,208 @@
+.rp {
+  --rp-band: color-mix(in srgb, var(--sp-text) 8%, transparent);
+  --rp-preview: color-mix(in srgb, var(--sp-text) 5%, transparent);
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--sp-line);
+  border-radius: 12px;
+  background: var(--sp-raised);
+  color: var(--sp-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--sp-surface-2);
+  font-weight: 500;
+}
+
+.rp-placeholder {
+  color: var(--sp-muted);
+}
+
+.rp-body {
+  position: relative;
+}
+
+.rp-nav {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.rp-nav button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--sp-secondary);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.rp-nav button:hover:not(:disabled) {
+  background: var(--sp-hover);
+  color: var(--sp-text);
+}
+
+.rp-nav button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rp-months {
+  display: grid;
+  gap: 16px;
+}
+
+.rp[data-months="two"] .rp-months {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rp[data-months="scroll"] .rp-months {
+  max-height: 268px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rp-month {
+  min-width: 0;
+}
+
+.rp-month h5 {
+  margin: 2px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.rp[data-months="scroll"] .rp-month h5 {
+  text-align: left;
+}
+
+.rp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  row-gap: 2px;
+}
+
+.rp-weekday {
+  padding-bottom: 4px;
+  color: var(--sp-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.rp-day {
+  position: relative;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sp-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.rp-day span {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  max-width: 100%;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.rp-day:hover:not(:disabled) span {
+  box-shadow: inset 0 0 0 1px var(--sp-text);
+}
+
+.rp-day:disabled {
+  color: var(--sp-muted);
+  opacity: 0.45;
+  cursor: default;
+}
+
+.rp-day[data-today] span::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.rp-day[data-state="edge"] span {
+  background: var(--sp-text);
+  color: var(--sp-surface);
+  font-weight: 600;
+}
+
+/* 이어진 띠: 사이 날짜와 양 끝의 안쪽 절반에 옅은 면을 깔아 기간을 하나로 잇는다 */
+.rp[data-band="band"] .rp-day[data-state="range"]::before,
+.rp[data-band="band"] .rp-day[data-state="preview"]::before,
+.rp[data-band="band"] .rp-day[data-start]::before,
+.rp[data-band="band"] .rp-day[data-end]::before {
+  content: "";
+  position: absolute;
+  inset: 1px 0;
+  background: var(--rp-band);
+}
+
+.rp[data-band="band"] .rp-day[data-state="preview"]::before {
+  background: var(--rp-preview);
+}
+
+.rp[data-band="band"] .rp-day[data-start]::before {
+  left: 50%;
+}
+
+.rp[data-band="band"] .rp-day[data-end]::before {
+  right: 50%;
+}
+
+/* 기간 미리보기의 끝 칸은 체크아웃 후보로 테두리만 둔다 */
+.rp-day[data-state="preview"][data-end] span {
+  box-shadow: inset 0 0 0 1px var(--sp-text);
+}
+
+/* 양 끝만: 사이 날짜는 면 없이 굵은 글자와 아래 선으로만 기간을 보인다 */
+.rp[data-band="ends"] .rp-day[data-state="range"] span,
+.rp[data-band="ends"] .rp-day[data-state="preview"] span {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--sp-muted);
+  text-underline-offset: 3px;
+}
+
+.rp[data-band="ends"] .rp-day[data-state="preview"] span {
+  color: var(--sp-secondary);
+}
+
+.rp-day:focus-visible,
+.rp-nav button:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 1px;
+}

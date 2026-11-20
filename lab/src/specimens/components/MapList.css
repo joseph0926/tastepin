@@ -1,0 +1,186 @@
+.ml {
+  --ml-water: #c9dcea;
+  --ml-park: #d4e5cc;
+  --ml-land: #f1efe9;
+  --ml-road: #ffffff;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 168px;
+  height: 340px;
+  overflow: hidden;
+  border: 1px solid var(--sp-line);
+  border-radius: 8px;
+  background: var(--sp-surface);
+  color: var(--sp-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lab[data-theme="dark"] .ml {
+  --ml-water: #26394a;
+  --ml-park: #263628;
+  --ml-land: #1d2026;
+  --ml-road: #2c3038;
+}
+
+.ml-map {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--ml-land);
+}
+
+.ml-ground {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ml-river {
+  fill: var(--ml-water);
+}
+
+.ml-park {
+  fill: var(--ml-park);
+}
+
+.ml-road {
+  fill: none;
+  stroke: var(--ml-road);
+  stroke-width: 1.4;
+}
+
+.ml-marker {
+  position: absolute;
+  height: 26px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1b1d22;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 8%), 0 2px 6px rgb(0 0 0 / 18%);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  transition:
+    background 120ms ease-out,
+    color 120ms ease-out,
+    transform 120ms ease-out,
+    left 240ms ease-out,
+    top 240ms ease-out;
+  cursor: pointer;
+}
+
+.ml-marker[data-lit] {
+  z-index: 1;
+  background: #1b1d22;
+  color: #ffffff;
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+/* 어두운 지도에서는 검은 강조가 묻히므로 평소 마커를 어둡게, 강조를 밝게 뒤바꾼다 */
+.lab[data-theme="dark"] .ml-marker {
+  background: #2b2f37;
+  color: #eceef2;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 14%), 0 2px 6px rgb(0 0 0 / 40%);
+}
+
+.lab[data-theme="dark"] .ml-marker[data-lit],
+.lab[data-theme="dark"] .ml-marker.is-group:hover {
+  background: #ffffff;
+  color: #1b1d22;
+}
+
+.lab[data-theme="dark"] .ml[data-label="dot"] .ml-marker[data-empty] {
+  border-color: #1b1d22;
+  background: #eceef2;
+}
+
+.lab:not([data-theme="dark"]) .ml-marker.is-group:hover {
+  background: #1b1d22;
+  color: #ffffff;
+}
+
+.ml[data-label="dot"] .ml-marker[data-empty] {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 2px solid #ffffff;
+  background: #1b1d22;
+}
+
+.ml-marker:focus-visible {
+  outline: 2px solid var(--sp-accent);
+  outline-offset: 2px;
+}
+
+.ml-zoom-out {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--sp-line);
+  border-radius: 6px;
+  background: var(--sp-surface);
+  color: var(--sp-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ml-list {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  margin: 0;
+  padding: 8px;
+  overflow-y: auto;
+  border-left: 1px solid var(--sp-line);
+  list-style: none;
+}
+
+.ml-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 120ms ease-out;
+}
+
+.ml-list li[data-lit] {
+  background: var(--sp-surface-2);
+}
+
+.ml-list li[data-selected] {
+  box-shadow: inset 0 0 0 1px var(--sp-text);
+}
+
+.ml-thumb {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.ml-text {
+  display: grid;
+  min-width: 0;
+}
+
+.ml-text b {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ml-text span {
+  color: var(--sp-secondary);
+  font-size: 12px;
+}
